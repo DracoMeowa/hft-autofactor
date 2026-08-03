@@ -47,7 +47,8 @@ carried inventory, ``H_start * (m_first_today - m_last_prev_day)``, so the
 multi-day mark-to-market is complete.  Rows whose decision input (the z-score
 ``signal_lag_rows`` back) is absent -- pre-lag rows, warm-up, signal dropout
 -- never trade, so inventory is not liquidated before the signal is
-available.
+available.  Rows without a usable mark (one-sided book AND no last price)
+contribute zero row PnL instead of poisoning the telescoping sum with NaN.
 """
 from __future__ import annotations
 
@@ -255,6 +256,10 @@ def simulate_day(
     day's final row is exempt from the forced flatten so closing inventory
     chains into the next day.  Lot-size rounding applies (odd lots are only
     sellable as a full liquidation, in one order).
+
+    Rows without a usable mark (mid absent/one-sided AND last absent) are
+    unmarkable: they can never trade, contribute zero row PnL, and the
+    telescoping mark-to-market resumes at the next markable row.
     """
     n = _validate_day_arrays(day)
     if sellable_start_units < 0:
@@ -313,6 +318,12 @@ def simulate_day(
     lag = int(rule.signal_lag_rows)
 
     mark = np.where(mid > 0, mid, last)
+    # Rows with no usable mark (one-sided book AND no last price) cannot be
+    # revalued.  They are skipped in the PnL recurrence instead of being
+    # allowed to poison it: 0.0 * NaN == NaN would contaminate the whole
+    # instrument-day even when nothing trades (real data: early-session
+    # one-sided snapshots of illiquid LOFs before their first trade).
+    mark_ok = np.isfinite(mark) & (mark > 0)
 
     holdings = float(sellable_start_units)
     sellable = holdings  # units sellable right now
@@ -320,7 +331,7 @@ def simulate_day(
     slip_total = 0.0
     blocked_total = 0.0
 
-    prev_mark = float(mark[0])
+    prev_mark = None  # set at the first markable row
     prev_holdings = holdings
     # Target last attempted; suppresses re-attempting a blocked sell every row.
     last_target = holdings
@@ -344,8 +355,7 @@ def simulate_day(
         can_trade = (
             bool(tradable[i])
             and (decision_ok or force_flat)
-            and math.isfinite(m_i)
-            and m_i > 0
+            and bool(mark_ok[i])
         )
         if can_trade and tgt != last_target:
             last_target = tgt
@@ -410,11 +420,21 @@ def simulate_day(
                         fill_i = fill
 
         positions[i] = holdings
-        cash_pnl[i] = (
-            holdings * m_i - prev_holdings * prev_mark - trades[i] * fill_i
-        )
-        prev_holdings = holdings
-        prev_mark = m_i
+        if mark_ok[i]:
+            # First markable row: no prior valuation exists, so carried
+            # inventory is valued at its first mark (zero gain), matching
+            # the old prev_mark = mark[0] initialization.
+            pm = prev_mark if prev_mark is not None else m_i
+            cash_pnl[i] = (
+                holdings * m_i - prev_holdings * pm - trades[i] * fill_i
+            )
+            prev_holdings = holdings
+            prev_mark = m_i
+        else:
+            # Unmarkable row: contributes nothing; the telescoping sum
+            # resumes at the next markable row.  trades[i] == 0 here by
+            # construction (can_trade requires a mark).
+            cash_pnl[i] = 0.0
 
     return DayResult(
         positions,
@@ -556,12 +576,17 @@ def run_backtest(
             res = simulate_day(day_sim, m, costs, rule, sellable_start_units=chain)
 
             mark = np.where(mid > 0, mid, last)
+            mark_ok = np.isfinite(mark) & (mark > 0)
             gap = 0.0
-            if prev_close_mark is not None and mark.size > 0:
-                gap = chain * (float(mark[0]) - float(prev_close_mark))
+            if prev_close_mark is not None and bool(mark_ok.any()):
+                # First MARKABLE row: unmarkable rows (one-sided book, no
+                # last) contribute no gap instead of poisoning it with NaN.
+                gap = chain * (float(mark[mark_ok][0]) - float(prev_close_mark))
 
             net_pnl = float(res.cash_pnl.sum()) - res.fees_cny + gap
-            traded_notional = float((np.abs(res.trades_units) * mark).sum())
+            traded_notional = float(
+                (np.abs(res.trades_units) * np.where(mark_ok, mark, 0.0)).sum()
+            )
             per_day_rows.append(
                 {
                     "date": date,

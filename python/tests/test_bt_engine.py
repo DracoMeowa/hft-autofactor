@@ -296,6 +296,29 @@ def test_odd_lot_full_liquidation_allowed() -> None:
     assert res.sellable_end_units == 0.0
 
 
+def test_unmarkable_rows_do_not_poison_pnl() -> None:
+    # Rows 0..1 have no usable mark (one-sided book AND no last price, as in
+    # early-session illiquid-LOF snapshots): they must be skipped in the PnL
+    # recurrence instead of contaminating it with NaN.
+    z = [3.0] * 6
+    mids = [np.nan, np.nan, 4.0005, 4.010, 4.010, 4.010]
+    day = make_day(n=6, z=z, mid=mids)
+    res = simulate_day(day, T0_META, ZERO_COSTS, RULE, sellable_start_units=0.0)
+    assert np.isfinite(res.cash_pnl).all()
+    # entry executes on the first markable row (row 2, decision from z[1]=3)
+    assert res.trades_units[2] == pytest.approx(1000.0)
+    assert res.cash_pnl.sum() == pytest.approx(1000.0 * (4.010 - 4.002))
+
+
+def test_unmarkable_day_with_no_trades_has_zero_pnl() -> None:
+    # Never trades and every row lacks a usable mark: pnl must be 0, not NaN.
+    day = make_day(n=6, z=[np.nan] * 6, mid=[np.nan] * 6)
+    res = simulate_day(day, T0_META, ZERO_COSTS, RULE, sellable_start_units=0.0)
+    assert np.isfinite(res.cash_pnl).all()
+    assert res.cash_pnl.sum() == 0.0
+    assert res.sellable_end_units == 0.0
+
+
 def test_tick_meta_mismatch_rejected() -> None:
     bad = InstrumentMeta(exchange="sse", settlement="T+0", tick_cny=0.01)
     day = make_day(n=6, z=[0.0] * 6)
@@ -379,6 +402,34 @@ def test_flagged_and_one_sided_rows_untradable() -> None:
         panel, "oir", 15, {}, ZERO_COSTS, RULE, dates=["20250603"], z_window_rows=5
     )
     assert res_flag.n_trades == res_clean.n_trades == 0
+
+
+def test_run_backtest_one_sided_no_last_rows_keep_pnl_finite() -> None:
+    # Real-data pattern (512280 on 20250701): early-session one-sided
+    # snapshots with no last price carry NaN mid/last.  They are untradable,
+    # and the per-day aggregate must stay finite (0 * NaN used to poison the
+    # whole instrument-day and the portfolio summary).
+    rows = []
+    for i in range(12):
+        r = _panel_row("20250603", "sse", "510300", 34_200_000 + 3000 * i, 0.0)
+        if i < 3:
+            r["mid_px"] = None
+            r["last_px"] = None
+            r["ask1_px"] = None
+            r["ask1_qty"] = None
+            r["flags"] = 8
+        rows.append(r)
+    panel = pl.DataFrame(rows)
+    res = run_backtest(
+        panel, "oir", 15, {}, ZERO_COSTS, RULE, dates=["20250603"], z_window_rows=5
+    )
+    assert res.per_day.height == 1
+    row = res.per_day.row(0, named=True)
+    assert np.isfinite(row["pnl_cny"])
+    assert row["pnl_cny"] == pytest.approx(0.0)
+    assert np.isfinite(row["traded_notional_cny"])
+    assert res.equity_curve.height == 1
+    assert np.isfinite(res.equity_curve["pnl_cny"].to_numpy()).all()
 
 
 def test_run_backtest_end_to_end_entry_exit_and_costs() -> None:
