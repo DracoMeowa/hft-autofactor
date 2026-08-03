@@ -61,7 +61,6 @@ static void test_parse_int() {
 static void test_parse_time() {
   TsMs t = -1;
   CHECK(parse_time_hhmmssmmm("093000000", t) && t == 34200000LL);
-  CHECK(parse_time_hhmmssmmm("093000", t) && t == 34200000LL);   // seconds only
   CHECK(parse_time_hhmmssmmm("145959999", t) &&
         t == ((14 * 60 + 59) * 60 + 59) * 1000LL + 999);
   // Real SSE/SZSE dumps write HHMMSSmmm as an integer, dropping leading
@@ -70,7 +69,10 @@ static void test_parse_time() {
   CHECK(parse_time_hhmmssmmm("91400650", t) &&
         t == ((9 * 60 + 14) * 60 + 0) * 1000LL + 650);
   CHECK(parse_time_hhmmssmmm("60000900", t) && t == 6 * 3600000LL + 900);
-  CHECK(parse_time_hhmmssmmm("930000", t) && t == 34200000LL);
+  // A short digit string right-justifies positionally (00:09:30.000): the
+  // legacy seconds-only HHMMSS reading is intentionally unsupported -- real
+  // dumps always carry milliseconds, so ambiguity does not arise.
+  CHECK(parse_time_hhmmssmmm("930000", t) && t == 9 * 60000LL + 30000LL);
   CHECK(!parse_time_hhmmssmmm("246060000", t));   // hh=24 invalid
   CHECK(!parse_time_hhmmssmmm("096000000", t));   // mm=60 invalid
   CHECK(!parse_time_hhmmssmmm("09300000a", t));

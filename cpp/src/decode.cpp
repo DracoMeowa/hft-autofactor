@@ -115,20 +115,10 @@ bool parse_time_hhmmssmmm(std::string_view s, TsMs& out) {
     v = v * 10 + (c - '0');
   }
   std::int64_t hh, mm, ss, ms;
-  if (s.size() == 6) {
-    // Legacy seconds-only HHMMSS positional form (no milliseconds). A real
-    // HHMMSSmmm integer is never 6 digits during trading hours, so this is
-    // unambiguous.
-    hh = v / 10000;
-    mm = (v / 100) % 100;
-    ss = v % 100;
-    ms = 0;
-  } else {
-    ms = v % 1000; v /= 1000;
-    ss = v % 100;  v /= 100;
-    mm = v % 100;  v /= 100;
-    hh = v;
-  }
+  ms = v % 1000; v /= 1000;
+  ss = v % 100;  v /= 100;
+  mm = v % 100;  v /= 100;
+  hh = v;
   if (hh > 23 || mm > 59 || ss > 59) return false;
   out = ((hh * 60 + mm) * 60 + ss) * 1000LL + ms;
   return true;
