@@ -1,0 +1,11 @@
+# hft-autofactor pipeline configuration (server: run from repo root).
+# data_roots are READ-ONLY exchange dumps; everything is written to out_root.
+data_roots:
+  sse: /data/sse
+  szse: /data/szse
+out_root: /data/factor_lzt
+engine_bin: build/cpp/hftaf-engine
+horizons: [15, 30, 60, 300, 900]
+factors: []                 # empty => full default 12-factor registry
+max_workers: 4
+commission_scenarios: [institutional, retail_negotiated, retail_default]

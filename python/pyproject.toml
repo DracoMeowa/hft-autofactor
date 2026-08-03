@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hft-autofactor"
+version = "0.1.0"
+description = "Automated high-frequency factor mining for Chinese A-share ETFs (evaluation layer)"
+readme = { text = "See repository README.md", content-type = "text/markdown" }
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.23",
+    "polars>=0.20",
+    "pyarrow>=10.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+hftaf = "hft_autofactor.pipeline.cli:main"
+hftaf-backtest = "hft_autofactor.backtest.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hft_autofactor*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
