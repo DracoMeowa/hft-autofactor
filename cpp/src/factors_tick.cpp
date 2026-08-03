@@ -11,6 +11,7 @@
 // Cancel gating: order_arrival_60s and cancel_ratio_60s emit NaN on exchanges
 // whose cancel decode is unreliable (see decode.cpp / docs/data_dictionary.md).
 #include "hftaf/factors.hpp"
+#include "hftaf/decode.hpp"  // order_is_cancel / cancel_decode_reliable
 #include <cmath>
 #include <cstdint>
 #include <deque>
@@ -287,6 +288,9 @@ class FutureMid15s final : public TickFactorBase {
  public:
   const std::string& name() const override { static const std::string n = "future_mid_15s"; return n; }
   bool is_canary() const override { return true; }
+
+  // Snapshot-only factor: ticks carry no information for it (no-op override).
+  void on_tick(const TickEvent&, const BookState&) override {}
 
   void on_instrument_day_start(const Symbol& inst) override {
     TickFactorBase::on_instrument_day_start(inst);

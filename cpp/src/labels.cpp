@@ -84,7 +84,7 @@ void LabelBuilder::push(Row&& observation, const Snapshot& s) {
   }
 
   // 3) Append the new observation.
-  Pending p;
+  Impl::Pending p;
   p.row = std::move(observation);
   p.t = U;
   p.mid_t = p.row.mid_px;
