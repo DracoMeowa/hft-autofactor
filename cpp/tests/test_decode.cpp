@@ -64,10 +64,18 @@ static void test_parse_time() {
   CHECK(parse_time_hhmmssmmm("093000", t) && t == 34200000LL);   // seconds only
   CHECK(parse_time_hhmmssmmm("145959999", t) &&
         t == ((14 * 60 + 59) * 60 + 59) * 1000LL + 999);
+  // Real SSE/SZSE dumps write HHMMSSmmm as an integer, dropping leading
+  // zeros: accept and right-justify positionally.
+  CHECK(parse_time_hhmmssmmm("93000000", t) && t == 34200000LL);
+  CHECK(parse_time_hhmmssmmm("91400650", t) &&
+        t == ((9 * 60 + 14) * 60 + 0) * 1000LL + 650);
+  CHECK(parse_time_hhmmssmmm("60000900", t) && t == 6 * 3600000LL + 900);
+  CHECK(parse_time_hhmmssmmm("930000", t) && t == 34200000LL);
   CHECK(!parse_time_hhmmssmmm("246060000", t));   // hh=24 invalid
   CHECK(!parse_time_hhmmssmmm("096000000", t));   // mm=60 invalid
-  CHECK(!parse_time_hhmmssmmm("0930000", t));     // 7 digits: neither format
   CHECK(!parse_time_hhmmssmmm("09300000a", t));
+  CHECK(!parse_time_hhmmssmmm("1234567890", t));  // >9 digits
+  CHECK(!parse_time_hhmmssmmm("", t));
 }
 
 static void test_tick_schema() {
@@ -128,6 +136,16 @@ static void test_snapshot_schema() {
   CHECK_EQ(sc.bid_px[1], 9);
   CHECK_EQ(sc.ask_px[1], 11);
   CHECK_EQ(sc.bid_px[2], -1);   // contiguous levels stop at missing column
+
+  // Real SSE/SZSE dumps use bracketed level names (BidPrice[0], ...).
+  auto hb = hdr({"InstrumentID", "UpdateTime", "LastPrice", "IOPV",
+                 "BidPrice[0]", "BidVolume[0]", "AskPrice[0]", "AskVolume[0]",
+                 "BidPrice[1]", "BidVolume[1]", "AskPrice[1]", "AskVolume[1]"});
+  CHECK(make_snapshot_schema(hb, sc, err));
+  CHECK_EQ(sc.bid_px[0], 4);
+  CHECK_EQ(sc.ask_vol[0], 7);
+  CHECK_EQ(sc.bid_px[1], 8);
+  CHECK_EQ(sc.ask_vol[1], 11);
 
   // Missing best ask level => failure.
   auto h2 = hdr({"InstrumentID", "UpdateTime", "LastPrice",

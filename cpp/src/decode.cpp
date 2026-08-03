@@ -104,30 +104,23 @@ bool parse_int(std::string_view s, std::int64_t& out) {
 
 bool parse_time_hhmmssmmm(std::string_view s, TsMs& out) {
   s = trim(s);
-  auto digits_ok = [&](std::size_t n) {
-    if (s.size() < n) return false;
-    for (std::size_t i = 0; i < n; ++i)
-      if (s[i] < '0' || s[i] > '9') return false;
-    return true;
-  };
-  if (s.size() == 9 && digits_ok(9)) {
-    int hh = (s[0] - '0') * 10 + (s[1] - '0');
-    int mm = (s[2] - '0') * 10 + (s[3] - '0');
-    int ss = (s[4] - '0') * 10 + (s[5] - '0');
-    int ms = (s[6] - '0') * 100 + (s[7] - '0') * 10 + (s[8] - '0');
-    if (hh > 23 || mm > 59 || ss > 59) return false;
-    out = ((hh * 60 + mm) * 60 + ss) * 1000LL + ms;
-    return true;
+  if (s.empty() || s.size() > 9) return false;
+  // Accept HHMMSSmmm as a positional decimal value with up to 9 digits. Real
+  // SSE/SZSE dumps write it as an integer, so leading zeros are dropped
+  // ("91400650" = 09:14:00.650); the fixed-width 9-char form parses to the
+  // same value. Right-justify: ms = v%1000, ss = v/1000%100, mm, hh.
+  std::int64_t v = 0;
+  for (char c : s) {
+    if (c < '0' || c > '9') return false;
+    v = v * 10 + (c - '0');
   }
-  if (s.size() == 6 && digits_ok(6)) {
-    int hh = (s[0] - '0') * 10 + (s[1] - '0');
-    int mm = (s[2] - '0') * 10 + (s[3] - '0');
-    int ss = (s[4] - '0') * 10 + (s[5] - '0');
-    if (hh > 23 || mm > 59 || ss > 59) return false;
-    out = ((hh * 60 + mm) * 60 + ss) * 1000LL;
-    return true;
-  }
-  return false;
+  const std::int64_t ms = v % 1000; v /= 1000;
+  const std::int64_t ss = v % 100;  v /= 100;
+  const std::int64_t mm = v % 100;  v /= 100;
+  const std::int64_t hh = v;
+  if (hh > 23 || mm > 59 || ss > 59) return false;
+  out = ((hh * 60 + mm) * 60 + ss) * 1000LL + ms;
+  return true;
 }
 
 bool make_tick_schema(const std::vector<std::string_view>& header, TickSchema& out, std::string& err) {
@@ -190,18 +183,26 @@ bool make_snapshot_schema(const std::vector<std::string_view>& header, SnapshotS
 
   for (int k = 0; k < 10; ++k) {
     char bp[16], bv[16], ap[16], av[16], bo[24], ao[24];
+    char bp_b[16], bv_b[16], ap_b[16], av_b[16], bo_b[24], ao_b[24];
     std::snprintf(bp, sizeof(bp), "BidPrice%d", k);
     std::snprintf(bv, sizeof(bv), "BidVolume%d", k);
     std::snprintf(ap, sizeof(ap), "AskPrice%d", k);
     std::snprintf(av, sizeof(av), "AskVolume%d", k);
     std::snprintf(bo, sizeof(bo), "BidNumOrders%d", k);
     std::snprintf(ao, sizeof(ao), "AskNumOrders%d", k);
-    out.bid_px[k] = find_col(header, {bp});
-    out.bid_vol[k] = find_col(header, {bv});
-    out.ask_px[k] = find_col(header, {ap});
-    out.ask_vol[k] = find_col(header, {av});
-    out.bid_orders[k] = find_col(header, {bo});
-    out.ask_orders[k] = find_col(header, {ao});
+    // Real SSE/SZSE dumps use bracketed level names (BidPrice[0], ...).
+    std::snprintf(bp_b, sizeof(bp_b), "BidPrice[%d]", k);
+    std::snprintf(bv_b, sizeof(bv_b), "BidVolume[%d]", k);
+    std::snprintf(ap_b, sizeof(ap_b), "AskPrice[%d]", k);
+    std::snprintf(av_b, sizeof(av_b), "AskVolume[%d]", k);
+    std::snprintf(bo_b, sizeof(bo_b), "BidNumOrders[%d]", k);
+    std::snprintf(ao_b, sizeof(ao_b), "AskNumOrders[%d]", k);
+    out.bid_px[k] = find_col(header, {bp, bp_b});
+    out.bid_vol[k] = find_col(header, {bv, bv_b});
+    out.ask_px[k] = find_col(header, {ap, ap_b});
+    out.ask_vol[k] = find_col(header, {av, av_b});
+    out.bid_orders[k] = find_col(header, {bo, bo_b});
+    out.ask_orders[k] = find_col(header, {ao, ao_b});
     // Levels are contiguous: stop resolving once a level's price column is gone.
     if (out.bid_px[k] < 0) break;
   }
