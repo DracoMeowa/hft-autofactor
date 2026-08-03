@@ -6,7 +6,9 @@
 //     5 levels/side; between snapshots: 2 deep adds, 2 trades (one per side),
 //     1 best-bid add. Prices wobble deterministically so factors move.
 //   * 510500 (ETF): two snapshots (k=8 two-sided, k=9 one-sided + no IOPV) to
-//     exercise FLAG_ONE_SIDED_BOOK | FLAG_IOPV_INVALID.
+//     exercise FLAG_ONE_SIDED_BOOK | FLAG_IOPV_INVALID, plus one order tick at
+//     k=11 so it counts as a member of this channel's tick stream (rows for
+//     instruments absent from the tick stream are filtered out).
 //   * 600000 (stock): one snapshot + one order tick; must be filtered out.
 //   * One tick exactly at snapshot time t_5 (merge boundary: tick.time <= U).
 // variant 0: clean SeqNo stream. variant 1: one SeqNo gap (skips 47..49).
@@ -111,6 +113,7 @@ inline FixturePaths write_fixture(const std::string& dir, int variant) {
     order_row("510300", t + 2500, bid1, 50, 1, 'A');        // add at best bid
     if (k == 5) order_row("510300", t + 3000, ask1 + 12, 10, 2, 'A');  // == snapshot time
     if (k == 10) order_row("600000", t + 700, 1100, 100, 1, 'A');      // filtered stock
+    if (k == 11) order_row("510500", t + 700, 2490, 100, 1, 'A');      // channel membership
   }
 
   FixturePaths paths;

@@ -33,6 +33,12 @@ double milli_to_cny(PriceI p) { return static_cast<double>(p) / 1000.0; }
 
 struct InstState {
   BookState book;
+  // Channel membership: set when the instrument shows up in THIS channel's
+  // tick stream. The snapshot stream is shared by every channel of the
+  // exchange, but each instrument's ticks live in exactly one channel per
+  // day; only members may appear in this channel's output (otherwise every
+  // ETF would be re-emitted into every channel CSV and the parquet build --
+  // which asserts one channel per instrument -- would reject the day).
   bool seen = false;
   // Buffered rows awaiting canary finalization: (row, snapshot). Only used
   // when canaries are present so they can illegitimately read the future.
@@ -229,6 +235,9 @@ int run_job(const JobPaths& paths, const EngineOptions& opts, std::ostream& log)
     if (t.seq > last_seq) last_seq = t.seq;
 
     if (!is_etf_code(t.instrument, opts.exchange)) return;
+    // Channel membership: this instrument's ticks live in this channel, so it
+    // belongs in this channel's output (independent of session filtering).
+    get_state(t.instrument).seen = true;
     if (!in_continuous_session(session, t.time)) return;
     InstState& st = get_state(t.instrument);
     if (t.is_trade) st.book.apply_trade(t);
@@ -299,6 +308,19 @@ int run_job(const JobPaths& paths, const EngineOptions& opts, std::ostream& log)
   // --- flush labels (absent labels stay NaN) ---
   for (auto& sym : inst_order) builder.end_instrument_day(sym);
   builder.reset();
+
+  // --- channel membership filter ---
+  // The snapshot stream is shared by every channel of the exchange, but an
+  // instrument's ticks live in exactly ONE channel per day. Rows for
+  // instruments absent from this channel's tick stream must not leak into
+  // this channel's CSV (the parquet build asserts one channel per instrument
+  // and would reject the day otherwise).
+  collected.erase(std::remove_if(collected.begin(), collected.end(),
+                                 [&](const Row& r) {
+                                   auto it = insts.find(r.instrument);
+                                   return it == insts.end() || !it->second.seen;
+                                 }),
+                  collected.end());
 
   // --- deterministic ordering: instrument asc, then time asc ---
   std::sort(collected.begin(), collected.end(), [](const Row& a, const Row& b) {
