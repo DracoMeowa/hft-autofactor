@@ -11,7 +11,9 @@ GzLineReader::GzLineReader(const std::string& path, std::size_t chunk_bytes)
     error_ = "cannot open " + path;
     return;
   }
-  buf_.resize(chunk_bytes_);
+  // buf_ starts EMPTY. refill() allocates and fills it on the first
+  // next_line(). (Pre-sizing here would inject chunk_bytes_ of '\0' into the
+  // first line, corrupting the CSV header.)
 }
 
 GzLineReader::~GzLineReader() {
@@ -24,7 +26,9 @@ const std::string& GzLineReader::error() const { return error_; }
 
 bool GzLineReader::refill() {
   if (eof_ || !gz_) return false;
-  int n = gzread(static_cast<gzFile>(gz_), &buf_[0], static_cast<unsigned>(buf_.size()));
+  buf_.assign(chunk_bytes_, '\0');  // allocate space for gzread
+  int n = gzread(static_cast<gzFile>(gz_), buf_.data(),
+                 static_cast<unsigned>(chunk_bytes_));
   if (n < 0) {
     int errnum = 0;
     const char* msg = gzerror(static_cast<gzFile>(gz_), &errnum);
@@ -36,8 +40,8 @@ bool GzLineReader::refill() {
     return false;
   }
   bytes_read_ += static_cast<std::uint64_t>(n);
-  pos_ = 0;
   buf_.resize(static_cast<std::size_t>(n));
+  pos_ = 0;
   return true;
 }
 
@@ -45,7 +49,13 @@ bool GzLineReader::next_line(std::string& line) {
   line.clear();
   if (!ok()) return false;
   for (;;) {
-    // Consume from the current buffer until we hit '\n' or run dry.
+    // Refill whenever the buffer is exhausted (also covers the empty start).
+    if (pos_ >= buf_.size()) {
+      if (!refill()) {
+        if (!error_.empty()) return false;
+        return !line.empty();  // final unterminated line at EOF
+      }
+    }
     std::size_t start = pos_;
     while (pos_ < buf_.size() && buf_[pos_] != '\n') ++pos_;
     if (pos_ < buf_.size()) {
@@ -56,13 +66,8 @@ bool GzLineReader::next_line(std::string& line) {
       line.append(buf_.data() + start, end - start);
       return true;
     }
-    // Exhausted buffer without newline: keep what we have, refill.
+    // Exhausted buffer without newline: keep partial line, loop to refill.
     line.append(buf_.data() + start, buf_.size() - start);
-    if (!refill()) {
-      // EOF or error: emit final unterminated line if non-empty.
-      if (!error_.empty()) return false;
-      return !line.empty();
-    }
   }
 }
 

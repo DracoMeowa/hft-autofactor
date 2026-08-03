@@ -62,6 +62,8 @@ void LabelBuilder::push(Row&& observation, const Snapshot& s) {
   //    first snapshot satisfying U >= t+H is exactly this one).
   for (auto& p : dq) {
     for (std::size_t i = 0; i < im.cfg.horizons_s.size(); ++i) {
+      if (p.done_mid[i]) continue;   // resolved at the first snapshot >= t+H;
+                                     // later snapshots must NOT overwrite it.
       const TsMs H = static_cast<TsMs>(im.cfg.horizons_s[i]) * 1000;
       if (!p.fits[i]) {
         // Window crosses lunch/auction/session-end => ABSENT.

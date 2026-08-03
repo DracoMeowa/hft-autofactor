@@ -71,12 +71,22 @@ static void test_basic_resolution() {
   for (std::size_t i = 1; i < out.size(); ++i)
     CHECK(out[i - 1].time < out[i].time);                 // ascending emission
 
-  // Day-end flush emits the rest with ABSENT (NaN) unresolved labels.
+  // Day-end flush emits the rest with ABSENT (NaN) labels for every horizon
+  // whose window ran out of data. ABSENT is per-horizon: the 60s window
+  // (20 snapshots ahead) exceeds the last snapshot for ALL flushed rows, but
+  // the 15s window (5 ahead) still fits for rows 6..20, whose resolved values
+  // must be preserved (mirrors test_determinism row 0: short horizons present,
+  // long horizons absent).
   lb.end_instrument_day(inst);
   CHECK_EQ((int)out.size(), N);
   for (int i = 6; i < N; ++i) {
-    CHECK(std::isnan(out[i].fwd_mid[0]));
     CHECK(std::isnan(out[i].fwd_mid[1]));
+    CHECK(std::isnan(out[i].fwd_last[1]));
+    if (i + 5 < N) {
+      CHECK(!std::isnan(out[i].fwd_mid[0]));   // 15s fits: present
+    } else {
+      CHECK(std::isnan(out[i].fwd_mid[0]));    // 15s beyond last snapshot
+    }
   }
   // A second flush is a no-op.
   lb.end_instrument_day(inst);
