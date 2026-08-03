@@ -11,7 +11,12 @@ Protocol (docs/validation_plan.md, MASK TEST A):
   5. assert the truncated output equals the full output restricted to
      t <= T for factor/state/flag columns, and to t <= T - H_max for label
      columns (labels legitimately differ closer to the cut because they look
-     H_max into the future).
+     H_max into the future).  One asymmetry is allowed even inside the label
+     horizon: a label ABSENT in the truncated run but present in the full run
+     is legitimate, because a label resolves at the FIRST snapshot U >= t+H,
+     and U may fall after the cut when the instrument has snapshot gaps
+     (sparse LOF/ETF books).  The converse is enforced: a label present in
+     the truncated run must equal the full run's value.
 
 Canary check: rerunning with ``--canaries`` (deliberate look-ahead factors)
 MUST fail the prefix identity test -- proving the validator detects leakage.
@@ -222,8 +227,11 @@ def truncate_tick_file(src_gz: Path, dst_gz: Path, max_seq: int) -> int:
     """
     kept = 0
     dst_gz.parent.mkdir(parents=True, exist_ok=True)
+    # compresslevel=1: truncated inputs are transient; rewrite speed matters
+    # far more than compression ratio (this loop dominates mask wall time).
     with gzip.open(src_gz, "rt", encoding="utf-8", newline="") as src, \
-            gzip.open(dst_gz, "wt", encoding="utf-8", newline="\n") as dst:
+            gzip.open(dst_gz, "wt", encoding="utf-8", newline="\n",
+                      compresslevel=1) as dst:
         header = src.readline().rstrip("\r\n")
         cols = header.split(",")
         seq_idx = _column_index(cols, _SEQ_COLS, "SeqNo/ApplSeqNum")
@@ -241,7 +249,8 @@ def truncate_snapshot_file(src_gz: Path, dst_gz: Path, max_ts_ms: int) -> int:
     kept = 0
     dst_gz.parent.mkdir(parents=True, exist_ok=True)
     with gzip.open(src_gz, "rt", encoding="utf-8", newline="") as src, \
-            gzip.open(dst_gz, "wt", encoding="utf-8", newline="\n") as dst:
+            gzip.open(dst_gz, "wt", encoding="utf-8", newline="\n",
+                      compresslevel=1) as dst:
         header = src.readline().rstrip("\r\n")
         cols = header.split(",")
         time_idx = _column_index(cols, _SNAP_TIME_COLS, "UpdateTime")
@@ -270,9 +279,14 @@ def compare_prefix(
 
     Factor/state/flag columns are compared for ``ts_ms <= cut_ts_ms``;
     label columns (``fwd_*_ret_*``) only for ``ts_ms <= cut - horizons_max_s``
-    because labels legitimately look into the future.  Comparison is exact
-    string equality of CSV cells (legal under the bit-exact determinism
-    contract for same-binary reruns).
+    because labels legitimately look into the future.  Within that label
+    scope the check is directional: a label present in the truncated run
+    must equal the full run's cell, but a label ABSENT in the truncated
+    run is allowed -- resolution happens at the first snapshot U >= t+H,
+    which may fall after the cut for instruments with snapshot gaps, so
+    the full run can legitimately resolve labels the truncated run cannot.
+    Comparison is exact string equality of CSV cells (legal under the
+    bit-exact determinism contract for same-binary reruns).
     """
     def load(path: Path) -> tuple[list[str], dict[tuple[str, int], list[str]]]:
         rows: dict[tuple[str, int], list[str]] = {}
@@ -335,8 +349,17 @@ def compare_prefix(
             for i, (a, b) in enumerate(zip(f_row, t_row)):
                 if i in (inst_idx, ts_idx):
                     continue
-                if i in label_cols and not compare_labels:
-                    continue
+                if i in label_cols:
+                    if not compare_labels:
+                        continue
+                    if b == "":
+                        # ABSENT in the truncated run: legitimate even inside
+                        # the label horizon -- the resolving snapshot (first
+                        # U >= t+H) may fall after the cut for instruments
+                        # with snapshot gaps.  full-present/trunc-absent is
+                        # therefore not a mismatch; trunc-present cells must
+                        # still equal the full run's (checked below).
+                        continue
                 if a != b:
                     first_diff = (
                         f"value mismatch at instrument={key[0]} ts_ms={key[1]} "
@@ -502,12 +525,13 @@ def mask_test_day(
             ),
             what="canary full run",
         )
-        # use the latest cut point: canary rows in (T-H, T] must differ
+        # use the latest cut point: canary rows in (T-H, T] must differ.
+        # The truncated inputs for that point were already written by the
+        # loop above (same tick_seq / ts_ms) -- reuse them instead of
+        # rewriting hundreds of MB of gzip a second time.
         p = resolved[-1]
-        t_gz = work / "ticks_canary.csv.gz"
-        s_gz = work / "snaps_canary.csv.gz"
-        truncate_tick_file(job.tick_gz, t_gz, p.tick_seq)
-        truncate_snapshot_file(job.snapshot_gz, s_gz, p.ts_ms)
+        t_gz = work / f"ticks_cut{len(resolved) - 1}.csv.gz"
+        s_gz = work / f"snaps_cut{len(resolved) - 1}.csv.gz"
         canary_trunc = work / "out_canary_trunc.csv"
         _run_or_raise(
             cfg.engine_bin,

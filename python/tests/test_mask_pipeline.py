@@ -127,6 +127,51 @@ def test_label_change_before_label_cutoff_detected(full_csv, trunc_csv):
     assert "fwd_mid_ret_15s" in diff.first_diff
 
 
+def test_label_absent_in_truncated_run_inside_horizon_is_allowed(full_csv, trunc_csv):
+    """full-present/trunc-absent inside the label horizon is legitimate.
+
+    A label resolves at the FIRST snapshot U >= t+H; when the instrument has
+    snapshot gaps, U can fall after the cut, so the truncated run cannot
+    resolve a label the full run resolves.  (Real-data case: sparse 501xxx
+    LOFs during the 20250701 smoke run.)
+    """
+    text = trunc_csv.read_text().splitlines()
+    header = text[0].split(",")
+    lab_idx = header.index("fwd_mid_ret_15s")
+    row_idx = 10  # ts = START+30s <= CUT_MS - 15s -> inside compare scope
+    fields = text[1 + row_idx].split(",")
+    assert fields[lab_idx] != ""  # sanity: full run resolved this label
+    fields[lab_idx] = ""
+    text[1 + row_idx] = ",".join(fields)
+    trunc_csv.write_text("\n".join(text) + "\n")
+
+    diff = compare_prefix(full_csv, trunc_csv, CUT_MS, horizons_max_s=15)
+    assert diff.identical is True
+
+
+def test_label_present_in_truncated_but_absent_in_full_detected(full_csv, trunc_csv):
+    """The converse direction stays enforced: a truncated-present label must
+    equal the full run's cell, so trunc-present/full-absent is a mismatch."""
+    text = trunc_csv.read_text().splitlines()
+    header = text[0].split(",")
+    lab_idx = header.index("fwd_mid_ret_15s")
+    row_idx = 10
+    fields = text[1 + row_idx].split(",")
+    fields[lab_idx] = "0.500000"
+    text[1 + row_idx] = ",".join(fields)
+    trunc_csv.write_text("\n".join(text) + "\n")
+
+    ftext = full_csv.read_text().splitlines()
+    ffields = ftext[1 + row_idx].split(",")
+    ffields[lab_idx] = ""
+    ftext[1 + row_idx] = ",".join(ffields)
+    full_csv.write_text("\n".join(ftext) + "\n")
+
+    diff = compare_prefix(full_csv, trunc_csv, CUT_MS, horizons_max_s=15)
+    assert diff.identical is False
+    assert "fwd_mid_ret_15s" in diff.first_diff
+
+
 def test_compare_prefix_missing_row_detected(full_csv, trunc_csv):
     text = trunc_csv.read_text().splitlines()
     del text[6]  # drop row idx 4
