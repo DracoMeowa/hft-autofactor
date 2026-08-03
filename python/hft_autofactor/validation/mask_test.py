@@ -84,7 +84,12 @@ class MaskReport:
 # time helpers (fast path for HHMMSSmmm, tolerant of HH:MM:SS[.mmm])    #
 # --------------------------------------------------------------------- #
 def parse_time_ms(value: str) -> int | None:
-    """Parse HHMMSSmmm / HHMMSS / HH:MM:SS[.mmm] into ms since midnight."""
+    """Parse HHMMSSmmm / HH:MM:SS[.mmm] into ms since midnight.
+
+    Digit strings of up to 9 chars are right-justified HHMMSSmmm: real
+    SSE/SZSE dumps write the value as an integer with leading zeros dropped
+    ("91400650" = 09:14:00.650). Consistent with the C++ engine parser.
+    """
     s = value.strip()
     if not s:
         return None
@@ -92,16 +97,16 @@ def parse_time_ms(value: str) -> int | None:
         if ":" in s:
             hh, mm, rest = s.split(":")
             return int(hh) * 3_600_000 + int(mm) * 60_000 + int(round(float(rest) * 1000))
-        if len(s) == 9 and s.isdigit():
-            return (
-                int(s[0:2]) * 3_600_000
-                + int(s[2:4]) * 60_000
-                + int(s[4:6]) * 1_000
-                + int(s[6:9])
-            )
-        if len(s) == 6 and s.isdigit():
-            return int(s[0:2]) * 3_600_000 + int(s[2:4]) * 60_000 + int(s[4:6]) * 1_000
-        return int(float(s))
+        if not s.isdigit() or len(s) > 9:
+            return None
+        v = int(s)
+        ms = v % 1000; v //= 1000
+        ss = v % 100;  v //= 100
+        mm = v % 100;  v //= 100
+        hh = v
+        if hh > 23 or mm > 59 or ss > 59:
+            return None
+        return ((hh * 60 + mm) * 60 + ss) * 1000 + ms
     except (ValueError, IndexError):
         return None
 

@@ -218,6 +218,10 @@ def test_parse_time_ms_formats():
     assert parse_time_ms("09:30:00") == START_MS
     assert parse_time_ms("09:30:00.250") == START_MS + 250
     assert parse_time_ms("") is None
+    # Real dumps drop leading zeros (integer HHMMSSmmm).
+    assert parse_time_ms("93000000") == START_MS
+    assert parse_time_ms("91400650") == 9 * 3_600_000 + 14 * 60_000 + 650
+    assert parse_time_ms("1234567890") is None
 
 
 # --------------------------------------------------------------------- #
