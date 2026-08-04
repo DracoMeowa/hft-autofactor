@@ -202,7 +202,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     try:
         panel = load_panel(cfg, dates, instruments=instruments, factors=[args.factor])
-    except FileNotFoundError as exc:
+    except (FileNotFoundError, ValueError) as exc:
         print(f"error: {exc}")
         return 2
     if panel.height == 0 or args.factor not in panel.columns:

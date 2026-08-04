@@ -8,12 +8,20 @@ The C++ engine emits one sorted CSV per (date, exchange, channel) under
   everything downstream joins by InstrumentID, never channel);
 * converts a day's channel CSVs into one parquet partition
   ``parquet/dt={date}/factors.parquet`` (asserting exactly one channel per
-  instrument per day -- duplicates are errors, never silent merges);
-* loads date blocks back as a single polars panel for evaluation.
+  instrument per day -- duplicates are errors, never silent merges).  The
+  convert can be restricted to a set of instruments (single-instrument
+  pilot); a ``factors.parquet.meta.json`` sidecar records the filter (and
+  raw-CSV provenance) so the skip-if-done check never mistakes a filtered
+  partition for a full one;
+* loads date blocks back as a single polars panel for evaluation.  When an
+  instrument filter is requested the load is lazy (``pl.scan_parquet`` with
+  predicate pushdown) so unrequested instruments never reach RAM.
 """
 from __future__ import annotations
 
+import json
 import re
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Sequence
@@ -88,6 +96,9 @@ _BASE_DTYPES: dict[str, object] = {
 LABEL_PREFIXES: tuple[str, ...] = ("fwd_mid_ret_", "fwd_last_ret_")
 
 _CHANNEL_FILE_RE = re.compile(r"^1_channel_(\d+)\.csv\.gz$")
+
+#: File-name pattern of interchange raw CSVs under ``raw/{date}/``.
+_RAW_CSV_RE = re.compile(r"^(?P<ex>[a-z]+)_ch(?P<ch>\d+)\.csv$")
 
 
 @dataclass(frozen=True)
@@ -185,42 +196,146 @@ def _interchange_schema_overrides(csv_path: Path) -> dict:
     return overrides
 
 
-def build_day_parquet(date: str, cfg: PipelineConfig, *, overwrite: bool = False) -> Path:
+def convert_meta_path(out_path: Path) -> Path:
+    """Sidecar path for one day partition: ``factors.parquet.meta.json``."""
+    return out_path.parent / (out_path.name + ".meta.json")
+
+
+def _raw_channel_csvs(raw_day_dir: Path) -> list[Path]:
+    """Sorted interchange raw CSVs (``{exchange}_ch{N}.csv``) of one day."""
+    if not raw_day_dir.is_dir():
+        return []
+    return sorted(
+        p for p in raw_day_dir.glob("*.csv") if _RAW_CSV_RE.match(p.name)
+    )
+
+
+def _convert_uptodate(
+    date: str, cfg: PipelineConfig, instruments: list[str] | None
+) -> bool:
+    """Skip-if-done for the convert stage.
+
+    An existing partition is reusable iff it COVERS the requested filter:
+
+    * a partition recorded as full (sidecar ``instruments: null``) covers
+      every request;
+    * a legacy partition WITHOUT a sidecar predates the filter and was
+      always a full panel, so it also covers every request;
+    * a filtered partition covers only requests whose instrument set is a
+      subset of the recorded filter (a full-panel request therefore
+      invalidates it and forces a rebuild).
+
+    When a sidecar is present the recorded raw-CSV provenance (file set +
+    sizes) must also match the current ``raw/{date}`` directory, so changed
+    or newly added engine outputs invalidate the partition.
+    """
+    out_path = cfg.parquet_path(date)
+    if not out_path.is_file():
+        return False
+    meta_path = convert_meta_path(out_path)
+    if not meta_path.is_file():
+        return True  # legacy partition: always a full panel
+
+    try:
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+
+    recorded = meta.get("instruments")
+    if recorded is not None:
+        if instruments is None:
+            return False  # filtered partition cannot satisfy a full request
+        if not set(map(str, recorded)) >= set(instruments):
+            return False
+
+    sizes = meta.get("source_csvs")
+    if isinstance(sizes, dict):
+        try:
+            recorded_sizes = {str(k): int(v) for k, v in sizes.items()}
+        except (TypeError, ValueError):
+            return False
+        current = {
+            p.name: p.stat().st_size for p in _raw_channel_csvs(cfg.raw_dir / date)
+        }
+        if recorded_sizes != current:
+            return False
+    return True
+
+
+def build_day_parquet(
+    date: str,
+    cfg: PipelineConfig,
+    *,
+    overwrite: bool = False,
+    instruments: Sequence[str] | None = None,
+) -> Path:
     """Merge all channel CSVs of one day into a single parquet partition.
 
     Asserts that each instrument appears in exactly ONE channel that day
     (the channel mapping changes across days, so joins are always by
     InstrumentID) and that (instrument, ts_ms) rows are unique.  Idempotent:
-    an existing partition is returned unchanged unless ``overwrite``.
+    an existing partition covering the requested ``instruments`` filter is
+    returned unchanged unless ``overwrite``.
+
+    ``instruments`` restricts the partition to those instrument codes
+    (single-instrument pilot).  The effective filter is recorded in the
+    ``factors.parquet.meta.json`` sidecar next to the partition so a
+    filtered parquet is never mistaken for a full one by the skip-if-done
+    check (see :func:`_convert_uptodate`).  With a filter active the CSVs
+    are read lazily so rows of other instruments never reach RAM.
     """
+    wanted: list[str] | None = (
+        list(dict.fromkeys(str(i) for i in instruments))
+        if instruments is not None
+        else None
+    )
     out_path = cfg.parquet_path(date)
-    if out_path.exists() and not overwrite:
+    if not overwrite and _convert_uptodate(date, cfg, wanted):
         return out_path
 
     raw_day_dir = cfg.raw_dir / date
-    csvs = sorted(raw_day_dir.glob("*.csv")) if raw_day_dir.is_dir() else []
+    csvs = _raw_channel_csvs(raw_day_dir)
     if not csvs:
         raise FileNotFoundError(f"no raw channel CSVs under {raw_day_dir}")
 
     frames: list[pl.DataFrame] = []
     for csv_path in csvs:
-        m = re.match(r"^(?P<ex>[a-z]+)_ch(?P<ch>\d+)\.csv$", csv_path.name)
+        m = _RAW_CSV_RE.match(csv_path.name)
         if not m:
             continue
-        df = pl.read_csv(
-            csv_path,
-            null_values=["", "NaN", "nan"],
-            # instrument codes ("510300") are pure digits but MUST stay
-            # strings; every factor/label column is forced to Float64 so a
-            # warm-up-only inference window cannot mis-type it as String
-            schema_overrides=_interchange_schema_overrides(csv_path),
-        )
+        # instrument codes ("510300") are pure digits but MUST stay
+        # strings; every factor/label column is forced to Float64 so a
+        # warm-up-only inference window cannot mis-type it as String
+        overrides = _interchange_schema_overrides(csv_path)
+        if wanted is None:
+            df = pl.read_csv(
+                csv_path,
+                null_values=["", "NaN", "nan"],
+                schema_overrides=overrides,
+            )
+        else:
+            # lazy scan: the instrument filter is pushed down into the CSV
+            # reader, so rows of unrequested instruments are never built
+            df = (
+                pl.scan_csv(
+                    csv_path,
+                    null_values=["", "NaN", "nan"],
+                    schema_overrides=overrides,
+                )
+                .filter(pl.col("instrument").is_in(wanted))
+                .collect()
+            )
         if df.is_empty():
             continue
         df = df.with_columns(pl.lit(int(m.group("ch")), dtype=pl.Int32).alias("channel"))
         frames.append(df)
 
     if not frames:
+        if wanted is not None:
+            raise ValueError(
+                f"day {date}: no rows for instruments {wanted} in raw CSVs "
+                f"under {raw_day_dir}"
+            )
         raise FileNotFoundError(f"raw CSVs under {raw_day_dir} contain no rows")
 
     panel = pl.concat(frames, how="vertical_relaxed")
@@ -250,6 +365,19 @@ def build_day_parquet(date: str, cfg: PipelineConfig, *, overwrite: bool = False
     panel = panel.sort(["instrument", "ts_ms"])
     out_path.parent.mkdir(parents=True, exist_ok=True)
     panel.write_parquet(out_path)
+
+    meta = {
+        "date": date,
+        # null => full panel; list => converted with that instrument filter
+        "instruments": wanted,
+        "full_panel": wanted is None,
+        "n_rows": int(panel.height),
+        "source_csvs": {p.name: p.stat().st_size for p in csvs},
+        "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+    }
+    convert_meta_path(out_path).write_text(
+        json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     return out_path
 
 
@@ -264,6 +392,13 @@ def load_panel(
 
     Columns kept: base columns + ``channel`` + selected factor columns +
     all label columns.  ``factors=None`` keeps every factor column found.
+
+    With ``instruments`` given, each partition is read LAZILY via
+    ``pl.scan_parquet`` and the instrument filter is applied as a predicate
+    (pushed down into the parquet scan), so rows of unrequested instruments
+    never materialize in RAM -- important when the partitions hold the full
+    market but only a single-instrument pilot panel is needed.  Without a
+    filter the partitions are read eagerly as before.
     """
     paths = [cfg.parquet_path(d) for d in dates]
     missing = [str(p) for p in paths if not p.exists()]
@@ -273,9 +408,23 @@ def load_panel(
             + ", ".join(missing)
         )
 
-    df = pl.concat([pl.read_parquet(p) for p in paths], how="vertical_relaxed")
     if instruments is not None:
-        df = df.filter(pl.col("instrument").is_in(list(instruments)))
+        wanted = list(dict.fromkeys(str(i) for i in instruments))
+        frames = [
+            pl.scan_parquet(p)
+            .filter(pl.col("instrument").is_in(wanted))
+            .collect()
+            for p in paths
+        ]
+        df = pl.concat(frames, how="vertical_relaxed")
+    else:
+        df = pl.concat([pl.read_parquet(p) for p in paths], how="vertical_relaxed")
+
+    if instruments is not None and df.is_empty():
+        raise ValueError(
+            f"no rows for instruments {list(instruments)} in partitions: "
+            + ", ".join(str(p) for p in paths)
+        )
 
     keep = [c for c in BASE_COLUMNS if c in df.columns]
     if "channel" in df.columns:
