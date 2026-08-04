@@ -84,6 +84,19 @@ canary 按预期失败。**重要语义修正（1f9eff4）**：对快照稀疏�
 "解析不到"（首个 >= t+H 的快照落在截断点之后）→ compare 采用 directional 语义：
 **截断端 PRESENT 的标签必须与全量相等；截断端 ABSENT 允许**，而非双侧严格相等。
 
+**重要语义修正（71480f9，2026-08-04）**：`ts == T_cut` 的**单个边界行**的非标签列豁免
+bit 级比较（标签列仍按上述 directional 语义比较）。根因：SSE tick 流 **SeqNo 严格单调**
+（实测 0 违例）但 TransactTime 存在约 10³/日 的乱序戳；归并在「首个 TransactTime > U 的
+tick」处停止，SeqNo 截断使停止点移动，边界快照吸收的 tick 集因此不同 → 边界行的
+order-flow 类因子（如 ofi_60s）在全量/截断两次运行间合法地不同。**这不是穿越**：
+`ts < T_cut` 的所有行仍 bit 级一致（因果性保证不变），canary 仍必须失败（检出力不变）。
+实测：20250701 sse ch5 四个截断点除边界行外逐字节一致（修复前四天全部因边界行因子差异
+FAIL）。**2026-08-04 复验通过**：20250701 / 20250815 / 20250930（sse ch5，k=4）三天
+4/4 截断点 `identical=True`、`canary_failed_as_required=True`，golden hash 已入库
+（`validation/golden/*__sse__ch5.sha256`）。
+回归测试：`test_mask_pipeline.py` 的 `test_compare_prefix_boundary_row_*` 两用例
+（豁免生效 + 边界行标签仍比较）。
+
 ### 4.2 Bit 级相同的浮点契约（使 MASK TEST 合法）
 
 编译 `-fno-fast-math -ffp-contract=off`（禁 FMA 收缩）、不用 `-Ofast`、固定 FTZ/DAZ、
@@ -100,6 +113,9 @@ per-instrument 单线程累加、跨 instrument 操作有序归约、避免不�
   且与引擎语义有分歧（RV 链在快照 gap>6s 时断链、要求 20/100 连续收益 vs 引擎无 gap 检查、
   只要求 ≥80% 名义收益；还查 `BidPrice0` 而真实 SSE 列名是 `BidPrice[0]`，真实数据上会
   全 null）。接线前该测试视为**未启用**，靠 spot-check 补位。
+  **2026-08-04 更正**：上述分歧已在任务 #66 修复（列名兼容 `BidPrice[0]`、RV 改引擎语义、
+  exchange 行域参数，见文末更新日志）；「未接入 pipeline」仍为真——差分测试仍属
+  opt-in，生产验证继续以 mask + spot-check 为主。
 - **D（ordering）**：`(TransactTime, SeqNo)` 排序 vs 纯 SeqNo 必须输出相同。
 - **E（labels）**：同一截断协议用于 label builder —— t <= T−H 的标签不变，更晚的标签 ABSENT。
 
@@ -186,3 +202,7 @@ ULP 容差回退。
     且窗口内收益数 ≥ 80% 名义值；缺失量能字段按引擎 opt-int 语义解析为 0；新增
     `exchange="sse"|"szse"` 参数复现引擎行域（ETF 代码 + 连续竞价段）。旧 gap>6s 断链、
     要求满窗连续收益的语义作废。单测同步重写（223/223 通过）。
+- 2026-08-04（mask 边界行豁免，71480f9）: §4.1 新增第二个语义修正——`ts == T_cut` 的
+  单个边界行非标签列豁免 bit 级比较。根因与边界（SeqNo 截断 × 乱序 TransactTime 戳的
+  归并顺序效应，非穿越；ts < cut 仍 bit 级一致、canary 检出力不变）见 §4.1 正文。
+  回归测试 `test_compare_prefix_boundary_row_*` 两用例入库（全套 245/245 通过）。

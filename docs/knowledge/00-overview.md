@@ -89,7 +89,17 @@ Stage 5  成本感知回测             (py-backtest: hftaf-backtest，仅对 ad
 | `validation/` | mask 报告、golden hashes |
 | `reports/` | eval 报告、`trial_ledger.jsonl`（append-only） |
 | `backtest/` | `{factor}_h{horizon}/report.json + summary.csv + per_day/equity` |
+| `cache/YYYYMMDD/` | Stage 1 回放缓存 `{ex}_ch{N}[/codes]/events.csv.gz + meta.json`（见下） |
 | `logs/` | 每 job 日志 |
+
+**回放缓存（2026-08-04 起）**：`hftaf factors --cache build` 把原始 gz 双流按
+(date, channel) 流式扫一遍，写成事件级缓存（`T,<逐笔行原文>` / `S,<gap_bit>,<快照行原文>`）；
+`--cache use` 直接从缓存重放算因子，**全通道缓存与 raw 跑数输出逐字节一致**（已用
+sha256 核验）。`--cache-instruments 588000` 建标的级小缓存（仅含该标的事件），重放写入
+`raw/{date}/{ex}_ch{ch}_replay_{codes}.csv`（绝不覆盖全市场生产 CSV）。build 成本≈一次
+raw 跑数、按 meta 与输入尺寸 skip-if-built；use 永不 skip（重算本身即目的）。
+实测（20250702 sse ch5，32 核共享服务器单核）：raw 全通道 ~240s；全通道 replay 77.6s；
+**588000 标的级 replay 0.4s**——引擎重建后的单资产因子迭代由此进入秒级。
 
 **Parquet 面板 schema (37 列)**:
 `date, exchange, instrument, ts_ms, snap_seq, flags, mid_px, last_px, bid1_px, ask1_px,
@@ -157,6 +167,13 @@ SSE 上 cancel 解码不可靠 → `order_arrival_60s` / `cancel_ratio_60s` **�
   mask 验证 4/4 截断点 PASS 且 canary 按预期失败；backtest 三情景费用分化正常
   （单日结果为负属噪声，不是因子结论）。
 - 独立对抗性复核：13/13 手工 spot-check 与原始数据一致；生产路径未发现 look-ahead。
+- 2026-08-04（效率）：引擎优化①非 ETF 行 early-skip（全通道 raw 跑数 ~382s → ~240s，
+  −37%，输出 bit 级不变）；优化②回放缓存（build≈raw 成本 / replay 秒级，输出 bit 级一致，
+  sha256 核验）；优化③缓存接入 `hftaf factors --cache build/use`（skip-if-built、
+  标的级缓存写 side-file 不覆盖生产 CSV，pytest 254/254）。mask 前缀比较豁免**单个边界行**
+  （ts == cut 的行非标签列）：tick 流 SeqNo 单调但 TransactTime 存在 ~10³/日 乱序戳，
+  SeqNo 截断使边界快照吸收的 tick 集不同，属归并顺序边界效应而非穿越（ts < cut 的行仍
+  bit 级一致，canary 仍保证检出力）。详见 04 号文档更新日志。
 
 ## 更新日志
 
@@ -165,3 +182,6 @@ SSE 上 cancel 解码不可靠 → `order_arrival_60s` / `cancel_ratio_60s` **�
 - 2026-08-04: 补齐 05（因子选择与统计门控）与 06（开源生态调研，GitHub API 逐一核验）；
   `etf_backtest_params.yaml` 权威副本落位 `docs/knowledge/`；README 同步重写。
   前任 librarian 遗留的缺口全部闭合。
+- 2026-08-04: §4.2 增补回放缓存目录与语义；§9 增补效率里程碑（优化①②③实测数字 +
+  mask 边界行豁免说明）。依据：服务器端到端核验（全通道 replay 与生产 raw CSV
+  sha256 一致；588000 标的级 replay 0.4s，行级与生产一致）。

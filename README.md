@@ -265,7 +265,7 @@ hftaf factors --config config/pipeline-prod.yaml --dates 202507..202605  # 生�
   SSE 上有效因子为 10/12。
 - 501xxx LOF / 508xxx REIT / 货币 ETF（511xxx）流动性差，生产跑数应考虑流动性过滤。
 - 稀疏标的的 `fwd_*` 标签在「首个 U ≥ t+H 的快照」处解析，实际 horizon 可能 > H（已文档化）。
-- `reference_factors.py` 差分校验尚未接入流水线，且列名/语义与引擎有出入（见 04 §测试C）。
+- `reference_factors.py` 差分验证尚未接入流水线（语义已于 2026-08-04 与引擎对齐，见 04 §测试C 更正）。
 
 ## 更新日志
 
