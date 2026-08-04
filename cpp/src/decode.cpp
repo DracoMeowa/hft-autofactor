@@ -8,14 +8,14 @@
 
 namespace hftaf {
 
-namespace {
-
 std::string_view trim(std::string_view s) {
   std::size_t b = 0, e = s.size();
   while (b < e && (s[b] == ' ' || s[b] == '\t' || s[b] == '\r')) ++b;
   while (e > b && (s[e - 1] == ' ' || s[e - 1] == '\t' || s[e - 1] == '\r')) --e;
   return s.substr(b, e - b);
 }
+
+namespace {
 
 // Case-insensitive header-name match (some dumps vary case).
 bool name_eq(std::string_view a, const char* b) {
@@ -48,6 +48,20 @@ std::size_t split_csv(std::string_view line, std::vector<std::string_view>& fiel
   for (std::size_t i = 0; i <= line.size(); ++i) {
     if (i == line.size() || line[i] == ',') {
       fields.push_back(line.substr(start, i - start));
+      start = i + 1;
+    }
+  }
+  return fields.size();
+}
+
+std::size_t split_csv_prefix(std::string_view line, std::vector<std::string_view>& fields, std::size_t upto) {
+  fields.clear();
+  const std::size_t max_fields = upto + 1;
+  std::size_t start = 0;
+  for (std::size_t i = 0; i <= line.size(); ++i) {
+    if (i == line.size() || line[i] == ',') {
+      fields.push_back(line.substr(start, i - start));
+      if (fields.size() >= max_fields) return fields.size();
       start = i + 1;
     }
   }
@@ -253,9 +267,7 @@ void opt_price(const std::vector<std::string_view>& f, int idx, PriceI& out) {
 
 }  // namespace
 
-bool parse_tick(const TickSchema& sc, std::string_view line, TickEvent& out, std::string& err) {
-  std::vector<std::string_view> f;
-  split_csv(line, f);
+bool parse_tick_fields(const TickSchema& sc, const std::vector<std::string_view>& f, TickEvent& out, std::string& err) {
   out = TickEvent{};
 
   std::string_view v;
@@ -300,6 +312,12 @@ bool parse_tick(const TickSchema& sc, std::string_view line, TickEvent& out, std
   opt_int(f, sc.ord_no, out.ord_no);
   opt_int(f, sc.biz_index, out.biz_index);
   return true;
+}
+
+bool parse_tick(const TickSchema& sc, std::string_view line, TickEvent& out, std::string& err) {
+  std::vector<std::string_view> f;
+  split_csv(line, f);
+  return parse_tick_fields(sc, f, out, err);
 }
 
 bool parse_snapshot(const SnapshotSchema& sc, std::string_view line, Snapshot& out, std::string& err) {
@@ -377,6 +395,19 @@ bool order_is_cancel(const TickEvent& t, const std::string& exchange) {
 bool is_etf_code(const Symbol& s, const std::string& exchange) {
   if (s.size < 2) return false;
   auto p2 = [&](const char* p) { return s.data[0] == p[0] && s.data[1] == p[1]; };
+  if (exchange == "sse") {
+    return p2("50") || p2("51") || p2("52") || p2("56") || p2("58");
+  }
+  if (exchange == "szse") {
+    return p2("15") || p2("16");
+  }
+  return false;
+}
+
+bool is_etf_code_sv(std::string_view code, const std::string& exchange) {
+  std::string_view s = trim(code);
+  if (s.size() < 2 || s.size() > 12) return false;
+  auto p2 = [&](const char* p) { return s[0] == p[0] && s[1] == p[1]; };
   if (exchange == "sse") {
     return p2("50") || p2("51") || p2("52") || p2("56") || p2("58");
   }

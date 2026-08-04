@@ -15,10 +15,19 @@
 
 namespace hftaf {
 
+// Trim leading/trailing space/tab/CR (never any other byte) from a field view.
+std::string_view trim(std::string_view s);
+
 // Split `line` on ',' into `fields` (views into `line`; valid while `line`
 // lives). L2 dumps carry no quoted/embedded commas; if that ever changes the
 // data dictionary must be updated first. Returns the field count.
 std::size_t split_csv(std::string_view line, std::vector<std::string_view>& fields);
+
+// Like split_csv but stops scanning after `upto + 1` fields have been
+// collected; the remainder of the line is never touched. Returns the number
+// of fields collected (<= upto + 1). Used by the engine fast path to decide
+// parse outcome / instrument identity on rows that are then skipped.
+std::size_t split_csv_prefix(std::string_view line, std::vector<std::string_view>& fields, std::size_t upto);
 
 // Exact fixed-point decimal -> milli-CNY. No float roundtrip: "3.456" -> 3456,
 // "3.45" -> 3450, "3" -> 3000, "0.001" -> 1. Fractional digits beyond 3 are
@@ -82,6 +91,12 @@ struct SnapshotSchema {
 bool make_tick_schema(const std::vector<std::string_view>& header, TickSchema& out, std::string& err);
 bool make_snapshot_schema(const std::vector<std::string_view>& header, SnapshotSchema& out, std::string& err);
 bool parse_tick(const TickSchema&, std::string_view line, TickEvent& out, std::string& err);
+// parse_tick over pre-split fields. Accept/reject semantics are IDENTICAL to
+// parse_tick: all required columns are validated the same way, and optional
+// trailing columns absent from `fields` keep their defaults exactly as when
+// the column is missing from the row. A prefix split covering every required
+// column therefore decides parse outcome without scanning the rest of the row.
+bool parse_tick_fields(const TickSchema&, const std::vector<std::string_view>& fields, TickEvent& out, std::string& err);
 bool parse_snapshot(const SnapshotSchema&, std::string_view line, Snapshot& out, std::string& err);
 
 // Cancel classification per exchange; mapping documented in docs/data_dictionary.md.
@@ -100,5 +115,7 @@ bool order_is_cancel(const TickEvent& t, const std::string& exchange);
 
 // v1 universe: ETFs only. SSE codes start 50/51/52/56/58, SZSE codes 15/16.
 bool is_etf_code(const Symbol& s, const std::string& exchange);
+// Same predicate on a raw (untrimmed) field view, for pre-parse filtering.
+bool is_etf_code_sv(std::string_view code, const std::string& exchange);
 
 }  // namespace hftaf

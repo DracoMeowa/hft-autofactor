@@ -7,6 +7,7 @@ set(HFTAF_TESTS
     test_labels
     test_factors
     test_determinism
+    test_cache
 )
 
 foreach(t ${HFTAF_TESTS})

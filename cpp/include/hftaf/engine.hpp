@@ -20,6 +20,24 @@ struct EngineOptions {
   std::vector<std::string> factors;      // empty => full default registry
   bool include_canaries = false;
   std::string build_id;                  // embedded in .meta.json sidecar
+
+  // --- replay cache -------------------------------------------------------
+  // Cache-build mode (build_cache_dir non-empty): stream the inputs once with
+  // the exact raw-mode merge/SeqNo semantics and write a replay cache:
+  //   <dir>/events.csv.gz — verbatim target tick rows ("T,<line>") and target
+  //     snapshot rows ("S,<gap_bit>,<line>") in original interleaved order,
+  //   <dir>/meta.json     — exchange/date/channel, original header lines,
+  //     raw input sizes, event counts, instrument list.
+  // No factor rows are computed and --out is ignored. cache_instruments picks
+  // the targets; empty => every ETF in the channel.
+  std::string build_cache_dir;
+  std::vector<std::string> cache_instruments;
+  // Replay mode (use_cache_dir non-empty): compute factor rows from a cache
+  // written by cache-build. --ticks/--snapshots are ignored; --exchange/
+  // --date/--channel must match the cache meta. Output is byte-identical to
+  // running the raw inputs with the same options, restricted to the cached
+  // instruments (gap flags replayed from the recorded per-snapshot bits).
+  std::string use_cache_dir;
 };
 
 // Streams both inputs; merge rule: ticks ordered by SeqNo, snapshots by UpdateTime, all ticks

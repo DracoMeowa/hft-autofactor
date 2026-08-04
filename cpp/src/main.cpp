@@ -8,6 +8,15 @@
 //     [--factors ofi_60s,oir,...] [--horizons 15,30,60,300,900] \
 //     [--canaries] [--build-id SHA]
 //
+// Replay cache:
+//   --build-cache DIR [--cache-instruments 588000,...]
+//       Stream the raw inputs once and write DIR/{events.csv.gz,meta.json}.
+//       --out is ignored. Same cost as a raw run; do it once per (date,channel).
+//   --use-cache DIR
+//       Recompute factor rows from the cache. --ticks/--snapshots are ignored;
+//       --exchange/--date/--channel must match the cache meta. Seconds instead
+//       of minutes: use for factor iteration over already-cached days.
+//
 // Exit codes: 0 success; 2 usage/argument error; otherwise engine failure code.
 #include <cstdlib>
 #include <iostream>
@@ -24,7 +33,9 @@ void usage(std::ostream& os) {
      << "                    --ticks <1_channel_N.csv.gz> --snapshots <1_snapshot.csv.gz>\n"
      << "                    --out <raw/.../{ex}_ch{N}.csv>\n"
      << "                    [--factors a,b,c] [--horizons 15,30,60,300,900]\n"
-     << "                    [--canaries] [--build-id SHA]\n";
+     << "                    [--canaries] [--build-id SHA]\n"
+     << "       cache modes: [--build-cache <dir>] [--cache-instruments a,b]\n"
+     << "                    [--use-cache <dir>]   (--ticks/--snapshots omitted)\n";
 }
 
 bool needs_value(int i, int argc) { return i + 1 < argc; }
@@ -73,6 +84,9 @@ int main(int argc, char** argv) {
     else if (a == "--horizons" && needs_value(i, argc)) { opts.horizons_s = parse_int_list(argv[++i]); horizons_set = true; }
     else if (a == "--canaries") { opts.include_canaries = true; }
     else if (a == "--build-id" && needs_value(i, argc)) { opts.build_id = argv[++i]; }
+    else if (a == "--build-cache" && needs_value(i, argc)) { opts.build_cache_dir = argv[++i]; }
+    else if (a == "--cache-instruments" && needs_value(i, argc)) { opts.cache_instruments = parse_str_list(argv[++i]); }
+    else if (a == "--use-cache" && needs_value(i, argc)) { opts.use_cache_dir = argv[++i]; }
     else {
       std::cerr << "error: unknown or incomplete argument: " << a << "\n";
       usage(std::cerr);
@@ -80,7 +94,15 @@ int main(int argc, char** argv) {
     }
   }
 
-  if (!have_exchange || !have_date || !have_channel || !have_ticks || !have_snap || !have_out) {
+  const bool replay = !opts.use_cache_dir.empty();
+  const bool build = !opts.build_cache_dir.empty();
+  if (replay && build) {
+    std::cerr << "error: --build-cache and --use-cache are mutually exclusive\n";
+    return 2;
+  }
+  if (!have_exchange || !have_date || !have_channel ||
+      (!replay && (!have_ticks || !have_snap)) ||
+      (!build && !have_out)) {
     std::cerr << "error: missing required argument(s)\n";
     usage(std::cerr);
     return 2;
