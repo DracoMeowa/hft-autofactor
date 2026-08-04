@@ -1,0 +1,2575 @@
+{
+  "iteration": "iter-001",
+  "instrument": "588000",
+  "generated_at": "2026-08-04T23:42:24",
+  "gate_summary": {
+    "ledger_trials_before": 1760,
+    "ledger_trials_after": 1782,
+    "harvey_liu_hurdle": 3.8692354821154926,
+    "bhy_fdr_q": 0.1,
+    "permutation_floor": {
+      "implementation": "official",
+      "n_perms": 100,
+      "seed": 20260804,
+      "pct": 99.9,
+      "blocks": "within-day (single instrument => date blocks)"
+    },
+    "split": {
+      "is": "20250701-20250828 (43d)",
+      "purge": "20250829 (1d embargo)",
+      "oos": "20250901-20250930 (22d)",
+      "label": "fwd_mid_ret",
+      "method": "day-level time-series RankIC + Newey-West t (max_lag=h/3)"
+    },
+    "dedup_pairs_over_bar": [
+      {
+        "a": "ti_ewm_state_300s",
+        "b": "ti_accum_300s",
+        "rho": 0.956823065085881
+      },
+      {
+        "a": "ti_ewm_state_300s",
+        "b": "dd_flow_300s",
+        "rho": 0.8594854278488034
+      },
+      {
+        "a": "ti_accum_300s",
+        "b": "dd_flow_300s",
+        "rho": 0.8944971611469975
+      }
+    ]
+  },
+  "admitted": [
+    {
+      "name": "depth5_delta_60s",
+      "horizons": [
+        15
+      ]
+    },
+    {
+      "name": "flow_divergence_300s",
+      "horizons": [
+        15
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "name": "depth5_delta_60s",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "flow-queue",
+      "mechanism": "Depth delta: the trailing-60s CHANGE in 5-level depth imbalance (bid-ask)/(bid+ask), not its level. A book whose bid-side depth stock is actively growing relative to the ask side is experiencing net limit-order inflow on the bid - latent demand building up before it shows up in trades. The level of imbalance (wdi) is crowded and slow; the delta captures the flow INTO the deeper book and should decorrelate from the level by construction (differencing removes the persistent state), targeting the digest's explicitly unexplored 'depth delta' dimension.",
+      "info_set": "depth_bid5, depth_ask5",
+      "inspiration": "Digest iter-000 opportunity map: 'Depth-side unexplored: resiliency, depth delta, queue position, large-order depth share'; cross-family mutation away from the depth mega-family has higher marginal value (rho 0.69 within family); Cao-Hansch-Wang (2009) information content of the book's depth dynamics.",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.3833927144959361,
+        "vs": "wdi",
+        "screen_threshold": 0.7
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": 0.2212076871980851,
+          "t_nw": 20.830902311040745
+        },
+        "30": {
+          "rank_ic": 0.21933739104856154,
+          "t_nw": 10.11626625596441
+        },
+        "60": {
+          "rank_ic": 0.1994061613566189,
+          "t_nw": 6.5505801387636335
+        },
+        "300": {
+          "rank_ic": 0.12046208797083081,
+          "t_nw": 6.212572388855134
+        },
+        "900": {
+          "rank_ic": 0.08021147989858972,
+          "t_nw": 6.1643702536169105
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": 0.13441556489929782,
+          "t_nw": 9.683945309758034,
+          "retention": 0.6076441854343542,
+          "screen_pass": true
+        },
+        "30": {
+          "rank_ic": 0.10893919236105752,
+          "t_nw": 9.133108180161207,
+          "retention": 0.49667405926670416,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": 0.0879580862699767,
+          "t_nw": 10.410538955393852,
+          "retention": 0.44110014290216465,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": 0.0418038627446616,
+          "t_nw": 6.886772533930537,
+          "retention": 0.347029206025253,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": 0.030260482253380325,
+          "t_nw": 5.081549148397001,
+          "retention": 0.37725874515266694,
+          "screen_pass": false
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": true,
+      "gate_stage1": [
+        {
+          "candidate": "depth5_delta_60s",
+          "horizon_s": 15,
+          "oos_mean_ic": 0.13441556489929782,
+          "oos_icir": 3.619322772201644,
+          "oos_t_nw": 9.683945309758034,
+          "n_obs_days": 22,
+          "p_value_two_sided": 0.0,
+          "noise_floor": 0.01574264928614611,
+          "above_noise_floor": true,
+          "t_ge_hurdle": true,
+          "fdr_pass": true,
+          "admitted": true,
+          "canonical_stage1_pass": true,
+          "canonical_min_ic_ok": true,
+          "canonical_icir_ok": true
+        }
+      ],
+      "verdict": "admitted",
+      "admitted_horizons": [
+        15
+      ],
+      "promotion": "promote_cpp_now",
+      "verdict_detail": "Gate ADMIT at 15s: OOS t=9.68 >= Harvey-Liu 3.869, BHY-FDR pass, OOS IC 0.134 = 8.5x permutation floor, 22/22 days positive. 30s/60s variants miss the pre-registered screen retention budget (0.497/0.44 < 0.5) despite OOS t 9.1/10.4 -- NOT forwarded, no post-hoc relaxation; re-screen with longer OOS in iter-002."
+    },
+    {
+      "name": "flow_divergence_300s",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "flow-queue",
+      "mechanism": "Absorption / stealth limit flow: the trailing-300s z-score of OFI (order-book-delta flow: limit placement/pull at the touch) minus the z-score of executed trade imbalance. Positive divergence means the book is being built on the bid side relative to what aggressive trades justify - passive buyers absorbing sell aggression (iceberg/stealth accumulation); negative divergence is the mirror. The limit-flow component dominates for next-move prediction (CKS: OFI R2 > signed volume), and disagreement between executed and book-building flow flags informed traders hiding in the book, so the divergence direction should carry into 15s-300s returns.",
+      "info_set": "ofi_60s, trade_imbalance_60s (library)",
+      "inspiration": "Digest iter-000: ofi vs trade_imbalance rho=0.49 and 'the ORDER-BOOK-DELTA component of OFI not in trade imbalance is worth isolating'; Cont-Kukanov-Stoikov (2014) OFI dominates signed volume; absorption via iceberg orders (Buti & Rindi 2013, undisplayed liquidity).",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.42644925723864596,
+        "vs": "trade_imbalance_60s",
+        "screen_threshold": 0.7
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": 0.027316657436188507,
+          "t_nw": 2.849380026319242
+        },
+        "30": {
+          "rank_ic": 0.025456811246938563,
+          "t_nw": 2.605308071151031
+        },
+        "60": {
+          "rank_ic": 0.01861560408250684,
+          "t_nw": 1.671428198181331
+        },
+        "300": {
+          "rank_ic": -0.001160563932419377,
+          "t_nw": -0.10179602073716813
+        },
+        "900": {
+          "rank_ic": -0.000518445933588262,
+          "t_nw": -0.07988674200899797
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": 0.03282687963204813,
+          "t_nw": 3.9959758551225284,
+          "retention": 1.2017165609932863,
+          "screen_pass": true
+        },
+        "30": {
+          "rank_ic": 0.02778097688167844,
+          "t_nw": 2.5140892861917554,
+          "retention": 1.0912983803114533,
+          "screen_pass": true
+        },
+        "60": {
+          "rank_ic": 0.026081211046312704,
+          "t_nw": 2.3029747842454213,
+          "retention": 1.4010402741010874,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": 0.01697336056612209,
+          "t_nw": 1.512894438224183,
+          "retention": 14.625097413408726,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": 0.014781318489140905,
+          "t_nw": 1.4541561184400698,
+          "retention": 28.51081960820218,
+          "screen_pass": false
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": true,
+      "gate_stage1": [
+        {
+          "candidate": "flow_divergence_300s",
+          "horizon_s": 15,
+          "oos_mean_ic": 0.03282687963204813,
+          "oos_icir": 0.9675780535793366,
+          "oos_t_nw": 3.9959758551225284,
+          "n_obs_days": 22,
+          "p_value_two_sided": 6.442830070807481e-05,
+          "noise_floor": 0.01762224687018821,
+          "above_noise_floor": true,
+          "t_ge_hurdle": true,
+          "fdr_pass": true,
+          "admitted": true,
+          "canonical_stage1_pass": true,
+          "canonical_min_ic_ok": true,
+          "canonical_icir_ok": true
+        },
+        {
+          "candidate": "flow_divergence_300s",
+          "horizon_s": 30,
+          "oos_mean_ic": 0.02778097688167844,
+          "oos_icir": 0.6811565550541787,
+          "oos_t_nw": 2.5140892861917554,
+          "n_obs_days": 22,
+          "p_value_two_sided": 0.011934021611687884,
+          "noise_floor": 0.018167443606593,
+          "above_noise_floor": true,
+          "t_ge_hurdle": false,
+          "fdr_pass": true,
+          "admitted": false,
+          "canonical_stage1_pass": false,
+          "canonical_min_ic_ok": true,
+          "canonical_icir_ok": true
+        }
+      ],
+      "verdict": "admitted",
+      "admitted_horizons": [
+        15
+      ],
+      "promotion": "promote_cpp_now",
+      "verdict_detail": "Gate ADMIT at 15s: OOS t=4.00 >= 3.869 (3% margin), BHY-FDR pass, OOS IC 0.033 = 1.9x floor, win rate 20/22. 30s fails the Stage-1 hurdle (t=2.51 < 3.869) though it clears floor and FDR -- honest Stage-1 negative. Mega-family-orthogonal (rho < 0.05 vs wdi/oir/microprice)."
+    },
+    {
+      "name": "queue_refill_asym_300s",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "flow-queue",
+      "mechanism": "Coarse resiliency / queue-refill asymmetry: after a top-of-book depth depletion step on one side, how much depth is back 15s later, averaged over depletion events in the trailing 300s, bid vs ask, normalized by average top-of-book size. A bid queue that refills faster than the ask queue means patient buy-side liquidity keeps re-arming: downward probes get absorbed and the next move is biased up (fast refill = temporary impact = mean reversion of the depleting move; slow/partial refill = informed consumption = continuation). This is a genuine DYNAMICS quantity - refill speed - orthogonal to depth-imbalance LEVELS (the oir/wdi family).",
+      "info_set": "bid1_qty, ask1_qty",
+      "inspiration": "Digest iter-000: 'arrival/cancel dynamics only testable via snapshot-delta reconstruction' on SSE and the opportunity map lists resiliency as unexplored depth-side; Obizhaeva & Wang (2013) resiliency after large trades; Foucault-Kadan-Kandel (2005) limit order book replenishment.",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.3121418157893622,
+        "vs": "wdi",
+        "screen_threshold": 0.7
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": 0.13100333496007838,
+          "t_nw": 8.771118068596635
+        },
+        "30": {
+          "rank_ic": 0.13906393129445074,
+          "t_nw": 6.321466975024918
+        },
+        "60": {
+          "rank_ic": 0.13726158626710955,
+          "t_nw": 5.086038329852763
+        },
+        "300": {
+          "rank_ic": 0.11426291196848681,
+          "t_nw": 3.7936228983312854
+        },
+        "900": {
+          "rank_ic": 0.06527598212818675,
+          "t_nw": 2.6638160538966673
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": 0.041763935847999256,
+          "t_nw": 4.097848274419278,
+          "retention": 0.3188005546631793,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": 0.030991840235193857,
+          "t_nw": 2.334568347494608,
+          "retention": 0.22286037757391206,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": 0.01772704479255796,
+          "t_nw": 1.0133800607076158,
+          "retention": 0.12914789399316226,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": 0.008210560053717746,
+          "t_nw": 0.2689292894637875,
+          "retention": 0.07185673734607938,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": 0.03084985062064587,
+          "t_nw": 0.7394623166638217,
+          "retention": 0.47260645669128326,
+          "screen_pass": false
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": false,
+      "gate_stage1": [],
+      "verdict": "rejected",
+      "admitted_horizons": [],
+      "promotion": "none",
+      "verdict_detail": "Screen FAIL on retention alone (0.32 < 0.5 at 15s; OOS t=4.10 still significant, no sign flip): resiliency information exists on 588000 but is regime-dependent (strong Jul-Aug, weak Sep). iter-002: condition on rv/iopv regime or retest with more months."
+    },
+    {
+      "name": "ti_ewm_state_300s",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "flow-queue",
+      "mechanism": "Flow-accumulation state variable: an exponentially-weighted running integral of signed aggressive trade imbalance with ~150s half-life. Meta-orders (institutional execution, arbitrage baskets vs IOPV) arrive over minutes, so the integrated imbalance of executed aggressor flow is a persistent pressure/information state, not a 60s impulse. High positive state = sustained net buying aggression accumulated over the last several minutes -> continuation expected at 60-300s horizons, where the library's fixed 60s windows have already decayed to their tails.",
+      "info_set": "trade_imbalance_60s (library)",
+      "inspiration": "Digest iter-000: '300s HORIZON = WEAKEST AND MOST OPEN ... every library flow factor uses a 60s lookback, so 300s only sees decay tails. Proposals with 2-5 min state variables (flow accumulation) directly target this gap'; meta-order propagation and square-root impact (Bouchaud-Gefen-Potters-Wyart 2004, G(t) ~ t^-1/2).",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.5419544960969553,
+        "vs": "trade_imbalance_60s",
+        "screen_threshold": 0.7
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": 0.01747025302934702,
+          "t_nw": 3.34113316037551
+        },
+        "30": {
+          "rank_ic": 0.021136909010219352,
+          "t_nw": 2.819197276473045
+        },
+        "60": {
+          "rank_ic": 0.023306952494218085,
+          "t_nw": 2.0686589803990616
+        },
+        "300": {
+          "rank_ic": -0.0008733484612170543,
+          "t_nw": -0.03483505829689114
+        },
+        "900": {
+          "rank_ic": -0.04493467738166177,
+          "t_nw": -1.5710699172428046
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": 0.004206453942738863,
+          "t_nw": 0.6539302531551984,
+          "retention": 0.24077807778014115,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": -0.0016885343593995197,
+          "t_nw": -0.21000250063466658,
+          "retention": 0.07988558585283878,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": -0.013785473135539792,
+          "t_nw": -1.2193912560898923,
+          "retention": 0.591474717209796,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": -0.04900091570965572,
+          "t_nw": -1.928444105479881,
+          "retention": 56.10694686674151,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": -0.08858543622759346,
+          "t_nw": -2.47916533654334,
+          "retention": 1.971427000024394,
+          "screen_pass": false
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": false,
+      "gate_stage1": [],
+      "verdict": "rejected",
+      "admitted_horizons": [],
+      "promotion": "none",
+      "verdict_detail": "No horizon passed screen; rank-corr 0.957 with ti_accum_300s -> merged into the smoothed-trade-imbalance duplicate cluster (kept representative: ti_accum_300s). Slow EWMA accumulation does NOT extend flow to 300s on 588000; OOS-only negative 900s effect (t=-2.48) routed to the long/short decomposition (task #86).",
+      "dedup_merged_into": "ti_accum_300s",
+      "dedup_rho": 0.957
+    },
+    {
+      "name": "ti_ewm_accel_120s",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "flow-queue",
+      "mechanism": "Aggressive-flow acceleration: fast EWMA (15s half-life) minus slow EWMA (60s half-life) of signed trade imbalance - a MACD of aggressor flow. The LEVEL of imbalance says where flow has been; the acceleration says where it is turning. A burst of one-sided aggression (sweeping several book levels within seconds) precedes short-horizon continuation (queue depletion cascades), while a deceleration of previously strong flow precedes stalls/reversion. Because it is a difference of two backward filters of the same series it is nearly orthogonal to the flow LEVEL factors by construction.",
+      "info_set": "trade_imbalance_60s (library)",
+      "inspiration": "Digest iter-000: flow signals die by 900s and peak at 15s - the fresh information in flow is its CHANGE, not its level; momentum-trigger logic in order-flow bursts (Cartea-Jaimungal-Penalva 2015, ch.8 aggressive-order dynamics).",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.7394007411829387,
+        "vs": "trade_imbalance_60s",
+        "screen_threshold": 0.7
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": 0.035589697827491995,
+          "t_nw": 5.127327555251369
+        },
+        "30": {
+          "rank_ic": 0.04073883690572172,
+          "t_nw": 5.680673012781376
+        },
+        "60": {
+          "rank_ic": 0.049518834797997374,
+          "t_nw": 5.321511917979048
+        },
+        "300": {
+          "rank_ic": 0.04480136411368938,
+          "t_nw": 4.541914052613569
+        },
+        "900": {
+          "rank_ic": 0.022852884935896413,
+          "t_nw": 3.539782897528992
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": 0.027958951131179,
+          "t_nw": 1.4822041624281868,
+          "retention": 0.7855911355780474,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": 0.021140239321886706,
+          "t_nw": 0.7639253767900014,
+          "retention": 0.5189210327926074,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": 0.00969758528094141,
+          "t_nw": 0.3643000111971133,
+          "retention": 0.19583629785516676,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": 0.006371825321354785,
+          "t_nw": 0.6468332157774376,
+          "retention": 0.1422239132091031,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": 0.0017643084394280606,
+          "t_nw": 0.22265644553803363,
+          "retention": 0.07720287588971991,
+          "screen_pass": false
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": false,
+      "gate_stage1": [],
+      "verdict": "rejected",
+      "admitted_horizons": [],
+      "promotion": "none",
+      "verdict_detail": "Double failure: rank-corr 0.739 vs its own source column trade_imbalance_60s (fails the 0.7 novelty bar) -- fast-minus-slow EWMA of an already-windowed series tracks its level; plus OOS t <= 1.5 at every horizon. Do not retry flow-MACD on windowed inputs; differentiate raw 3s flow deltas instead."
+    },
+    {
+      "name": "iopv_premium_mom",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "etf-structure",
+      "mechanism": "IOPV premium momentum: the exchange IOPV refreshes on <=15s steps while the ETF trades continuously, so the premium's 30s rate of change is distinct from its level. A widening premium (ETF running ahead of fair value) flags continuation pressure; a narrowing premium flags active arbitrage pull-back. This is the lead-lag between basket fair value and ETF price captured as premium velocity, not premium level.",
+      "info_set": "iopv_premium (library)",
+      "inspiration": "digest: 'IOPV dimension is thin (1 factor, level only); premium momentum/delta ... unexplored and orthogonal to the depth mega-family' (max |rho| of iopv_premium vs all others = 0.23); docs/knowledge/02 ETF lead-lag section (basket/fair-value pulls the ETF with seconds-to-minutes lag).",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.369920116837552,
+        "vs": "iopv_premium",
+        "screen_threshold": 0.85
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": -0.04764320675601919,
+          "t_nw": -7.062670003038656
+        },
+        "30": {
+          "rank_ic": -0.050193343555577724,
+          "t_nw": -5.886460672492896
+        },
+        "60": {
+          "rank_ic": -0.04724963432709808,
+          "t_nw": -6.345914472293323
+        },
+        "300": {
+          "rank_ic": -0.023802263458277358,
+          "t_nw": -4.933099874102913
+        },
+        "900": {
+          "rank_ic": -0.017102738731664947,
+          "t_nw": -6.82923279629355
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": -0.018873280566529805,
+          "t_nw": -2.249087178415707,
+          "retention": 0.3961379145442466,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": -0.015869945356137574,
+          "t_nw": -1.2841246214839228,
+          "retention": 0.3161762941447647,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": -0.013849427119808789,
+          "t_nw": -1.6024589736460049,
+          "retention": 0.2931118370976687,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": -0.011483499550658537,
+          "t_nw": -1.4683767470963307,
+          "retention": 0.48245409814859824,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": -0.00952778535537961,
+          "t_nw": -3.003927152342965,
+          "retention": 0.5570912065527462,
+          "screen_pass": true
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": true,
+      "gate_stage1": [
+        {
+          "candidate": "iopv_premium_mom",
+          "horizon_s": 900,
+          "oos_mean_ic": -0.00952778535537961,
+          "oos_icir": -0.640439420759589,
+          "oos_t_nw": -3.003927152342965,
+          "n_obs_days": 22,
+          "p_value_two_sided": 0.00266519131218379,
+          "noise_floor": 0.017878159281082554,
+          "above_noise_floor": false,
+          "t_ge_hurdle": false,
+          "fdr_pass": true,
+          "admitted": false,
+          "canonical_stage1_pass": false,
+          "canonical_min_ic_ok": false,
+          "canonical_icir_ok": true
+        }
+      ],
+      "verdict": "rejected_sign_gated",
+      "admitted_horizons": [],
+      "promotion": "conditional_task86",
+      "verdict_detail": "Screen PASS at 900s (retention 0.56) but Stage-1 gate rejects: one-sided hurdle blocks the negative sign (t=-3.00) and |OOS IC| 0.0095 sits BELOW the 0.0179 permutation floor (IS 0.0171 is above). Genuinely new vs parent (rho 0.37). Route: task #86 long/short decomposition, batched with parent iopv_premium."
+    },
+    {
+      "name": "prem_x_ofi",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "etf-structure",
+      "mechanism": "Premium x order-flow interaction: premium mean-reversion is driven by AP creation/redemption arbitrage, but its speed depends on the prevailing order flow. When the ETF is at a premium AND net order flow is selling, the forces reinforce reversion (stronger predicted down-move); when flow opposes the premium, reversion is delayed. The product of the causally z-scored premium and OFI isolates this conditional-reversion channel rather than either signal alone.",
+      "info_set": "iopv_premium (library), ofi_60s (library)",
+      "inspiration": "digest: 'premium x order-flow interaction ... orthogonal to the depth mega-family'; iopv_premium is the strongest mean-reversion signal (|t|=7.9) and ofi_60s the strongest flow signal, yet their INTERACTION is unexplored and sits in a different info dimension.",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.09289699664460256,
+        "vs": "rv_60s",
+        "screen_threshold": 0.85
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": -0.0023848653184956156,
+          "t_nw": -0.6116937893646446
+        },
+        "30": {
+          "rank_ic": -0.003982681984296431,
+          "t_nw": -1.0168582358648024
+        },
+        "60": {
+          "rank_ic": -0.0052060475276295365,
+          "t_nw": -1.2424581902604865
+        },
+        "300": {
+          "rank_ic": -0.005444054395568853,
+          "t_nw": -0.904943480738453
+        },
+        "900": {
+          "rank_ic": -0.00673734470590795,
+          "t_nw": -1.2829202207355839
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": 0.009097587082661255,
+          "t_nw": 1.6092483168212328,
+          "retention": 3.8147173394261342,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": 0.011186825054515447,
+          "t_nw": 2.2049376907625846,
+          "retention": 2.8088672654820765,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": 0.015654178669671434,
+          "t_nw": 2.430941723026736,
+          "retention": 3.0069219665382563,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": -0.005413422438291702,
+          "t_nw": -0.5966434428560009,
+          "retention": 0.9943733190281706,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": -0.01056648068190166,
+          "t_nw": -1.0753420385600025,
+          "retention": 1.5683449701832763,
+          "screen_pass": false
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": false,
+      "gate_stage1": [],
+      "verdict": "rejected",
+      "admitted_horizons": [],
+      "promotion": "none",
+      "verdict_detail": "Interaction dimension is real (max rho 0.093 vs library) but information-free on 588000: no IS signal at any horizon (|t| <= 1.28, magnitudes below the permutation floor) and IS->OOS sign flips at 15/30/60s. AP arbitrage acts on the premium itself; reversion timing is not gated by local ETF order flow."
+    },
+    {
+      "name": "prem_x_wdi",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "etf-structure",
+      "mechanism": "Premium x depth-imbalance interaction: a positive premium means the ETF is rich vs fair value (arbitrage pressure downward), but the book's depth imbalance decides how fast reversion lands. A premium paired with a bid-heavy book (high wdi) is being propped up and reverts slowly; paired with an ask-heavy book it snaps back fast. The product of causally z-scored premium and wdi captures this conditional-reversion timing, a cross-family interaction.",
+      "info_set": "iopv_premium (library), wdi (library)",
+      "inspiration": "digest: wdi is the cost-friendly champion (slowest decay, half-life 900s) and iopv_premium the most independent signal (max |rho|=0.23); cross-family mutation (IOPV x depth) has 'far higher marginal value than more imbalance variants'.",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.037497223900866905,
+        "vs": "book_slope",
+        "screen_threshold": 0.85
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": -0.004106979594957351,
+          "t_nw": -0.5037094905098902
+        },
+        "30": {
+          "rank_ic": -0.00478888795273886,
+          "t_nw": -0.48964123637588974
+        },
+        "60": {
+          "rank_ic": -0.0018260031559842367,
+          "t_nw": -0.24635290495130746
+        },
+        "300": {
+          "rank_ic": 0.0005143042154290561,
+          "t_nw": 0.0847028099430369
+        },
+        "900": {
+          "rank_ic": 0.0014855731922039676,
+          "t_nw": 0.2245312698900437
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": -0.003793110971202787,
+          "t_nw": -0.9320307232898877,
+          "retention": 0.9235767754629365,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": -0.0014936243107008904,
+          "t_nw": -0.36580089610224825,
+          "retention": 0.31189376854111966,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": 0.0002756676440386456,
+          "t_nw": 0.07172794192288261,
+          "retention": 0.15096778071561304,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": 0.002516300405378669,
+          "t_nw": 0.333900254507331,
+          "retention": 4.892630334129103,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": 0.0009284214478413006,
+          "t_nw": 0.1293644199944397,
+          "retention": 0.6249584017223093,
+          "screen_pass": false
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": false,
+      "gate_stage1": [],
+      "verdict": "rejected",
+      "admitted_horizons": [],
+      "promotion": "none",
+      "verdict_detail": "Cleanest null of the iteration: max |t| = 0.93 across all 10 IS/OOS horizon blocks. Fully orthogonal (max rho 0.037) but zero support for the conditional-reversion-timing hypothesis."
+    },
+    {
+      "name": "vol_adj_slope",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "etf-structure",
+      "mechanism": "Volatility-adjusted book slope: a steep order book partly just encodes that recent volatility has been low (book_slope corr ~0.60 with rv_300s). A causal trailing-window regression removes the vol-explained component, leaving the slope deviation NOT explained by recent realized vol -- the pure book-shape / support-resistance concentration signal that carries minutes-scale (300s+) predictive content, targeting the open 300s gap.",
+      "info_set": "book_slope (library), rv_300s (library)",
+      "inspiration": "digest: 'book_slope correlated with rv_300s (rho=0.60): on 588000 slope partly just encodes recent volatility; a vol-adjusted slope is an obvious mutation' + '300s horizon = weakest and most open'.",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.3254754622060833,
+        "vs": "book_slope",
+        "screen_threshold": 0.85
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": -0.013391539176321954,
+          "t_nw": -2.334591547955694
+        },
+        "30": {
+          "rank_ic": -0.017866689094951503,
+          "t_nw": -2.469614205442654
+        },
+        "60": {
+          "rank_ic": -0.017299054160180412,
+          "t_nw": -1.7442284460842188
+        },
+        "300": {
+          "rank_ic": -0.0031800664374383577,
+          "t_nw": -0.21276968863272117
+        },
+        "900": {
+          "rank_ic": -0.02362645099852368,
+          "t_nw": -1.2920004582144267
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": -0.0037286223415410238,
+          "t_nw": -0.39972682559891287,
+          "retention": 0.2784312014061633,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": -0.0063785366977249505,
+          "t_nw": -0.5317956060479152,
+          "retention": 0.3570072028357677,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": -0.005192954510367128,
+          "t_nw": -0.3471869252451322,
+          "retention": 0.3001871930270303,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": -0.015734359145771107,
+          "t_nw": -0.8498353132369736,
+          "retention": 4.947808310082233,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": -0.02516375880077308,
+          "t_nw": -1.0898649095312865,
+          "retention": 1.065067233430254,
+          "screen_pass": false
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": false,
+      "gate_stage1": [],
+      "verdict": "rejected",
+      "admitted_horizons": [],
+      "promotion": "none",
+      "verdict_detail": "Residualization structurally succeeded (rho 0.325 vs book_slope, 0.127 vs rv_300s) but residual predictive content is at the noise floor; 15/30s OOS collapse (retention 0.28/0.36). Most of the minutes-scale information in book_slope WAS the stripped vol component. The 300s exploitable gap remains open."
+    },
+    {
+      "name": "depth_resiliency",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "etf-structure",
+      "mechanism": "Depth resiliency: market makers with quoting obligations replenish the book after trades consume it. The 60s change in TOTAL depth (bid+ask), normalized by its trailing 300s level, is a snapshot resiliency proxy. Rising total depth = active replenishment, so recent shocks are transient (mean reversion); falling total depth = liquidity withdrawal, so shocks are informative (continuation). Built from total depth, NOT bid-vs-ask imbalance, so it sits in a different dimension from the wdi/oir/microprice mega-family.",
+      "info_set": "depth_bid5, depth_ask5",
+      "inspiration": "digest: 'Depth-side unexplored: resiliency, depth delta, queue position, large-order depth share'; Foucault-Kadan-Kandel (2005) and Obizhaeva-Wang (2013) resiliency -> reversal-vs-continuation over 1-5 minutes (targets the open 300s horizon).",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.07237881233583346,
+        "vs": "ofi_60s",
+        "screen_threshold": 0.85
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": 0.015891726824179404,
+          "t_nw": 2.1167673807828438
+        },
+        "30": {
+          "rank_ic": 0.010706360676036804,
+          "t_nw": 1.411000985062488
+        },
+        "60": {
+          "rank_ic": 0.003887758415300756,
+          "t_nw": 0.5375835065123368
+        },
+        "300": {
+          "rank_ic": -0.0018406458803747936,
+          "t_nw": -0.23308207969611602
+        },
+        "900": {
+          "rank_ic": 0.0005316865049255572,
+          "t_nw": 0.07300478698539839
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": 0.005598211703144566,
+          "t_nw": 0.4773335474967072,
+          "retention": 0.35227208251697584,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": 0.0020842485103854573,
+          "t_nw": 0.21008473509319722,
+          "retention": 0.19467385542600532,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": -0.0033301896780635496,
+          "t_nw": -0.37743184665339646,
+          "retention": 0.8565834916483428,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": -0.023979321685189327,
+          "t_nw": -3.035490911164943,
+          "retention": 13.027667049300456,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": -0.00893126323664526,
+          "t_nw": -1.2926887791837114,
+          "retention": 16.797987449193865,
+          "screen_pass": false
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": false,
+      "gate_stage1": [],
+      "verdict": "rejected",
+      "admitted_horizons": [],
+      "promotion": "none",
+      "verdict_detail": "Orthogonal (max rho 0.072) but UNCONDITIONAL total-depth change on the 3s grid is dominated by MM quote updates with no directional content: 15/30s evaporate OOS (retention 0.35/0.19); 300s OOS t=-3.04 sign-flips from IS t=-0.23 (regime artifact). Event-conditioned resiliency remains testable as a different prototype later."
+    },
+    {
+      "name": "session_clock",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "etf-structure",
+      "mechanism": "Intraday session-clock seasonality: maps each snapshot to its elapsed continuous-trading time in [0,1] (09:30->0, 11:30->0.5, 13:00->0.5, 15:00->1), skipping the lunch break. This is the clean test of whether 588000 short-horizon returns carry any deterministic time-of-day drift (open/close effects, lunch-resumption, U-shape positioning). Pure calendar/time features have no microstructure state of their own, so a null result is informative: seasonality must enter as CONDITIONING of other signals, not as a standalone directional factor.",
+      "info_set": "ts_ms",
+      "inspiration": "digest: 'GAP dimension = time_of_day (ts_ms unused by all 12 factors - open/close auctions, lunch-break boundary, U-shape vol normalization, time-conditioning)'; docs/knowledge/02 section 6 intraday seasonality (U-shape volume/vol, 13:00 second open).",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.3607643580285826,
+        "vs": "rv_300s",
+        "screen_threshold": 0.85
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": -0.012800638890923354,
+          "t_nw": -2.033082267654831
+        },
+        "30": {
+          "rank_ic": -0.018110864281257633,
+          "t_nw": -1.9697240717496303
+        },
+        "60": {
+          "rank_ic": -0.02535511760018666,
+          "t_nw": -1.825291445224339
+        },
+        "300": {
+          "rank_ic": -0.03944543943318173,
+          "t_nw": -1.8746126756943886
+        },
+        "900": {
+          "rank_ic": -0.07177856320823413,
+          "t_nw": -1.9289463920145318
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": -0.010604506176154084,
+          "t_nw": -1.189063931563245,
+          "retention": 0.8284356950084344,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": -0.015057069238540914,
+          "t_nw": -1.2426679628247177,
+          "retention": 0.8313832517713141,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": -0.016651411021421845,
+          "t_nw": -1.0368610513683352,
+          "retention": 0.6567278166084807,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": -0.014863014003479268,
+          "t_nw": -0.424303244118128,
+          "retention": 0.37679930093455655,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": -0.023764573464479778,
+          "t_nw": -0.4233094085592489,
+          "retention": 0.3310817659520051,
+          "screen_pass": false
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": false,
+      "gate_stage1": [],
+      "verdict": "rejected",
+      "admitted_horizons": [],
+      "promotion": "none",
+      "verdict_detail": "Pre-registered negative: pure monotonic time-of-day carries no exploitable drift on 588000 (max |t| 2.03 IS, below the permutation floor at short horizons; no OOS significance despite consistent sign and retention 0.66-0.83). Seasonality should enter as CONDITIONING of other signals, not as an alpha column. Caveat: a monotonic clock is blind to non-monotonic U-shape patterns."
+    },
+    {
+      "name": "ti_accum_300s",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "accumulation-regime",
+      "mechanism": "Persistence of signed-volume asymmetry over minutes: the library trade_imbalance_60s is a 60s snapshot of directional flow that decays to zero IC by 300-900s, but informed flow is worked into price over MANY minutes as one-sided meta-orders (Kyle 1985), and the price impact of executed flow decays only as a power law (~t^-1/2, Bouchaud et al. 2004). A trailing 300s average of signed trade imbalance is an ACCUMULATION state variable: it keeps the direction of persistent one-sided flow while averaging out idiosyncratic bursts, matching the minutes-scale memory a 60s window cannot see. Targets the 300s/900s horizon gap.",
+      "info_set": "trade_imbalance_60s (library factor)",
+      "inspiration": "Digest iter-000: 'FLOW SIGNALS DIE BY 900s ... long-horizon flow constructs need accumulation/state variables instead of 60s windows'; 300s horizon = 0/12 stage1 passes, the biggest open gap. Accumulation logic analogous to VPIN's bucketed signed-volume sums (Easley, Lopez de Prado & O'Hara 2012) applied to the exchange-aggressor-flagged imbalance; impact power-law tail per Bouchaud, Gefen, Potters & Wyart (2004).",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.4609446039248162,
+        "vs": "trade_imbalance_60s",
+        "screen_threshold": 0.85
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": 0.01470118395961329,
+          "t_nw": 2.847722187106552
+        },
+        "30": {
+          "rank_ic": 0.01878611371657607,
+          "t_nw": 2.5202490584029973
+        },
+        "60": {
+          "rank_ic": 0.02281130294429868,
+          "t_nw": 2.063473408596718
+        },
+        "300": {
+          "rank_ic": 0.002174467214531767,
+          "t_nw": 0.08415652055172367
+        },
+        "900": {
+          "rank_ic": -0.0376172143315087,
+          "t_nw": -1.4212031999965493
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": 0.0022622494110208324,
+          "t_nw": 0.3306902475920039,
+          "retention": 0.15388212386401157,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": -0.002461543267605134,
+          "t_nw": -0.23280741148407832,
+          "retention": 0.13102993544818015,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": -0.01369168409771947,
+          "t_nw": -1.1779566591407182,
+          "retention": 0.60021490798453,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": -0.04414913134782154,
+          "t_nw": -1.7694666362204694,
+          "retention": 20.303424697680835,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": -0.07732473014669856,
+          "t_nw": -2.476014598834861,
+          "retention": 2.055567684126209,
+          "screen_pass": false
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": false,
+      "gate_stage1": [],
+      "verdict": "rejected",
+      "admitted_horizons": [],
+      "promotion": "none",
+      "verdict_detail": "0/5 horizons passed screen (<=60s edge collapses OOS, retention 0.13-0.60; 900s negative IC lacks IS support, IS t=-1.42). Kept as representative of the merged duplicate cluster {ti_accum_300s, ti_ewm_state_300s rho 0.957, dd_flow_300s rho 0.894}. Simple signed-flow accumulation adds no stable information beyond the 60s base on 588000.",
+      "dedup_cluster_representative_of": [
+        "ti_ewm_state_300s",
+        "dd_flow_300s"
+      ]
+    },
+    {
+      "name": "ofi_accum_300s",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "accumulation-regime",
+      "mechanism": "Accumulated order-book-delta pressure over minutes: the engine's ofi_60s is the Cont-Kukanov-Stoikov best-quote OFI (limit-order placements, pulls AND trades) normalized by mean best depth, and its IC decays from 0.093@15s to ~0 by 900s. But OFI's price impact relaxes only as a power law, so successive minutes of net-positive queue building leave residual pressure that a 60s window forgets. Averaging OFI over 300s yields a minutes-scale accumulation state distinct from both trade-flow accumulation (digest rho(ofi, trade_imbalance) = 0.49, only partial overlap) and static book levels (wdi/oir). Targets 300s/900s.",
+      "info_set": "ofi_60s (library factor)",
+      "inspiration": "Digest iter-000: 'the ORDER-BOOK-DELTA component of OFI not in trade imbalance is worth isolating'; Cont, Kukanov & Stoikov (2014) OFI linear impact; Bouchaud et al. (2004) propagator t^-1/2 tail justifies multi-minute integration of flow; 300s horizon is the weakest-and-most-open gap (mean |IC| 0.064, 0/12 stage1 passes).",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.3671766772960324,
+        "vs": "trade_imbalance_60s",
+        "screen_threshold": 0.85
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": 0.022412554456522387,
+          "t_nw": 5.842818271264591
+        },
+        "30": {
+          "rank_ic": 0.02737583193580546,
+          "t_nw": 5.0382999687681975
+        },
+        "60": {
+          "rank_ic": 0.031048556318028147,
+          "t_nw": 3.847180025781288
+        },
+        "300": {
+          "rank_ic": 0.013983297180957635,
+          "t_nw": 0.7231360133058689
+        },
+        "900": {
+          "rank_ic": -0.06965615959706456,
+          "t_nw": -2.8691576784147106
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": 0.006086786735602972,
+          "t_nw": 0.8921606859736045,
+          "retention": 0.271579339490757,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": -0.002428100978207504,
+          "t_nw": -0.27523248635335457,
+          "retention": 0.08869505715483797,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": -0.0184086362533574,
+          "t_nw": -1.539699655641985,
+          "retention": 0.5928982998371665,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": -0.050876062219648396,
+          "t_nw": -2.088025469042568,
+          "retention": 3.6383452029419137,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": -0.06794135363854785,
+          "t_nw": -2.154065705376196,
+          "retention": 0.9753818475144734,
+          "screen_pass": true
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": true,
+      "gate_stage1": [
+        {
+          "candidate": "ofi_accum_300s",
+          "horizon_s": 900,
+          "oos_mean_ic": -0.06794135363854785,
+          "oos_icir": -0.45924835146325826,
+          "oos_t_nw": -2.154065705376196,
+          "n_obs_days": 22,
+          "p_value_two_sided": 0.031235019527674268,
+          "noise_floor": 0.018500844143092162,
+          "above_noise_floor": true,
+          "t_ge_hurdle": false,
+          "fdr_pass": true,
+          "admitted": false,
+          "canonical_stage1_pass": false,
+          "canonical_min_ic_ok": true,
+          "canonical_icir_ok": false
+        }
+      ],
+      "verdict": "rejected_sign_gated",
+      "admitted_horizons": [],
+      "promotion": "conditional_task86",
+      "verdict_detail": "Screen PASS at 900s (IS -0.070 t=-2.87; OOS -0.068 t=-2.15; retention 0.98) but Stage-1 rejects: negative sign + |t| below the Harvey-Liu hurdle. 15-minute REVERSAL signal (sustained net buying predicts downward drift), OOS IC 3.7x floor, genuinely distinct from instantaneous ofi_60s (rho 0.265). Route: task #86, sign-flipped re-test. Note rho 0.75 with rv_asym_300s."
+    },
+    {
+      "name": "rv_asym_300s",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "accumulation-regime",
+      "mechanism": "Directional accumulation of volatility over minutes: the library rv_60s/rv_300s keep only the MAGNITUDE of realized variance, but volatility clusters with a sign signature -- runs of downside jumps (stop cascades, distressed/inventory selling) vs upside jumps (short covering, news absorption). The trailing-300s realized semivariance asymmetry (up-RV minus down-RV over total) is a signed vol-state: asymmetric vol regimes persist (vol-of-vol clustering) and carry directional drift into the next minutes, whereas pure vol level is direction-free. Targets 300s/900s, exactly where the unsigned rv_60s is the only library factor whose |IC| RISES with horizon.",
+      "info_set": "mid_px",
+      "inspiration": "Realized semivariance and good/bad volatility: Barndorff-Nielsen, Kinnebrock & Shephard (2010), Patton & Sheppard (2015, REStat). Digest iter-000: rv_60s |IC| rises monotonically 0.014@15s -> 0.047@900s (vol information lives in the minutes window) but the library keeps it unsigned; vol-of-vol/second-moment accumulation is the lens item, made directional via semivariance asymmetry (an unsigned vol-of-vol level was rejected ex ante as direction-symmetric and not worth a trial-ledger entry).",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.44304514138658696,
+        "vs": "trade_imbalance_60s",
+        "screen_threshold": 0.85
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": -0.036556755535664356,
+          "t_nw": -2.6668005436791566
+        },
+        "30": {
+          "rank_ic": -0.039410600385263006,
+          "t_nw": -2.083487435642455
+        },
+        "60": {
+          "rank_ic": -0.03509689507185454,
+          "t_nw": -1.6166202942797967
+        },
+        "300": {
+          "rank_ic": -0.02395750818066995,
+          "t_nw": -1.1639128649775157
+        },
+        "900": {
+          "rank_ic": -0.08414600477189298,
+          "t_nw": -3.691866432439344
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": 0.010485373247393064,
+          "t_nw": 1.338710027792573,
+          "retention": 0.28682450326215775,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": 0.0020609621604954606,
+          "t_nw": 0.2098722526705548,
+          "retention": 0.05229461465565813,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": -0.011530187494370974,
+          "t_nw": -1.042290272989677,
+          "retention": 0.3285244313140807,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": -0.03548164801302912,
+          "t_nw": -1.4695734121352775,
+          "retention": 1.4810241426383979,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": -0.05787367314108025,
+          "t_nw": -2.0739629955738366,
+          "retention": 0.6877768385791694,
+          "screen_pass": true
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": true,
+      "gate_stage1": [
+        {
+          "candidate": "rv_asym_300s",
+          "horizon_s": 900,
+          "oos_mean_ic": -0.05787367314108025,
+          "oos_icir": -0.4421703963513697,
+          "oos_t_nw": -2.0739629955738366,
+          "n_obs_days": 22,
+          "p_value_two_sided": 0.03808274767967346,
+          "noise_floor": 0.017998262362481827,
+          "above_noise_floor": true,
+          "t_ge_hurdle": false,
+          "fdr_pass": true,
+          "admitted": false,
+          "canonical_stage1_pass": false,
+          "canonical_min_ic_ok": true,
+          "canonical_icir_ok": false
+        }
+      ],
+      "verdict": "rejected_sign_gated",
+      "admitted_horizons": [],
+      "promotion": "conditional_task86",
+      "verdict_detail": "Screen PASS at 900s with the strongest IS evidence of the batch (IS -0.084 t=-3.69; OOS -0.058 t=-2.07; retention 0.69) but Stage-1 rejects on negative sign + |t| < hurdle. Signed-vol dimension is genuinely new (rho 0.036 vs rv_60s/rv_300s): upside-dominated vol predicts LOWER 15-min returns (mean reversion after directional jump runs). Route: task #86. Note rho 0.75 with ofi_accum_300s -- pick one or portfolio-dedup if both revive."
+    },
+    {
+      "name": "dd_flow_300s",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "accumulation-regime",
+      "mechanism": "Drawdown-state conditioning of accumulated flow: the distance of mid from its running intraday high measures trapped-long / stop-loss potential energy. Directional flow delivered WHILE the instrument sits deep below its day-high is more informative: distressed selling, stop cascades and opportunistic absorption all concentrate in that state, so the same accumulated imbalance carries different implications at the high vs in the drawdown. value = (trailing-300s mean trade imbalance) x (-drawdown), amplifying accumulated flow by drawdown depth. Neither component alone (imbalance accumulation, price position) captures the interaction. Whether the sign of IC comes out continuation (selling begets selling) or absorption (dip-buying reverses) is the empirical question; the screen is two-sided.",
+      "info_set": "mid_px, trade_imbalance_60s (library factor)",
+      "inspiration": "Lens item 'drawdown-from-day-open interactions'; digest iter-000 coverage GAP: price-position/time-of-day information unused by all 12 library factors; intraday-extreme anchoring (George & Hwang 2004) adapted to the running day-high; stop-cascade / distress continuation vs absorption is a standard minutes-scale regime mechanism.",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.4020883742949715,
+        "vs": "trade_imbalance_60s",
+        "screen_threshold": 0.85
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": 0.0209094341503823,
+          "t_nw": 4.611326631894441
+        },
+        "30": {
+          "rank_ic": 0.025550920161463982,
+          "t_nw": 3.9040046372143067
+        },
+        "60": {
+          "rank_ic": 0.028434315129413596,
+          "t_nw": 2.9519237417571063
+        },
+        "300": {
+          "rank_ic": 0.0046894571995755915,
+          "t_nw": 0.19615977717412333
+        },
+        "900": {
+          "rank_ic": -0.027422703834025165,
+          "t_nw": -1.0813826204634487
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": 0.004688304536412432,
+          "t_nw": 0.6748048358378197,
+          "retention": 0.22421957967364278,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": 0.0007593771636946593,
+          "t_nw": 0.06819888404181228,
+          "retention": 0.029720149368239013,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": -0.011535956049324218,
+          "t_nw": -0.9570022636840515,
+          "retention": 0.4057054301051536,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": -0.061479051290199906,
+          "t_nw": -2.7083769722219126,
+          "retention": 13.11005702232743,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": -0.11471134119720942,
+          "t_nw": -3.8528233805204253,
+          "retention": 4.18307917014658,
+          "screen_pass": false
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": false,
+      "gate_stage1": [],
+      "verdict": "rejected",
+      "admitted_horizons": [],
+      "promotion": "none",
+      "verdict_detail": "0/5 horizons: short-horizon IS t up to 4.6 evaporates OOS (retention 0.03-0.41, IS-only regime); 300/900s signs flip with no IS support (OOS-only apparition). Drawdown x flow interaction is regime-specific to Jul-Aug 2025; rank-corr 0.894 with ti_accum_300s shows the drawdown modulation adds almost no rank information. Merged into the ti_accum cluster.",
+      "dedup_merged_into": "ti_accum_300s",
+      "dedup_rho": 0.894
+    },
+    {
+      "name": "wdi_mom_90s",
+      "iteration": "iter-001",
+      "instrument": "588000",
+      "lens": "accumulation-regime",
+      "mechanism": "Momentum of book state: the LIBRARY tests only the LEVEL of weighted depth imbalance (wdi), the slowest-decaying signal on 588000 (half-life 900s). A book that is actively BUILDING one-sided depth over the last ~90 seconds is a different state from one that is statically lopsided: the delta separates active accumulation of book pressure (queue being rebuilt on one side) from stale imbalance that market makers have already priced. Rising wdi momentum should precede continued mid drift at 60-300s horizons, adding the time-derivative dimension of the depth family that the level-only library lacks.",
+      "info_set": "wdi (library factor)",
+      "inspiration": "Digest iter-000: wdi is the cost-friendly champion with the slowest decay (still IC 0.134/t=4.4 at 900s); opportunity map lists depth DELTA as unexplored; queue-imbalance changes as the coarse direction of net queue replenishment (cf. Cont, Kukanov & Stoikov 2014 OFI book-event decomposition); lens item 'momentum-in-book-state'.",
+      "causal_prefix_ok": true,
+      "max_corr_library": {
+        "value": 0.3286834290431351,
+        "vs": "wdi",
+        "screen_threshold": 0.85
+      },
+      "is_stats": {
+        "15": {
+          "rank_ic": 0.14293044980185804,
+          "t_nw": 9.771254394147126
+        },
+        "30": {
+          "rank_ic": 0.15149241907244512,
+          "t_nw": 6.816914728082319
+        },
+        "60": {
+          "rank_ic": 0.14565014405728538,
+          "t_nw": 5.4617099632240755
+        },
+        "300": {
+          "rank_ic": 0.09753574876357372,
+          "t_nw": 5.953126346786675
+        },
+        "900": {
+          "rank_ic": 0.060346041957995096,
+          "t_nw": 5.3977009106394425
+        }
+      },
+      "oos_stats": {
+        "15": {
+          "rank_ic": 0.06473139986088995,
+          "t_nw": 10.934262247417522,
+          "retention": 0.45288740048482284,
+          "screen_pass": false
+        },
+        "30": {
+          "rank_ic": 0.058014183649991044,
+          "t_nw": 10.35112178153773,
+          "retention": 0.382951067817117,
+          "screen_pass": false
+        },
+        "60": {
+          "rank_ic": 0.05628261694205719,
+          "t_nw": 11.536777732273194,
+          "retention": 0.3864233523855684,
+          "screen_pass": false
+        },
+        "300": {
+          "rank_ic": 0.021126109988117578,
+          "t_nw": 2.957167428921153,
+          "retention": 0.2165986344076487,
+          "screen_pass": false
+        },
+        "900": {
+          "rank_ic": 0.016994608310685354,
+          "t_nw": 2.690514326383777,
+          "retention": 0.28161927044883484,
+          "screen_pass": false
+        }
+      },
+      "split": {
+        "train_dates": [
+          "20250701",
+          "20250702",
+          "20250703",
+          "20250704",
+          "20250707",
+          "20250708",
+          "20250709",
+          "20250710",
+          "20250711",
+          "20250714",
+          "20250715",
+          "20250716",
+          "20250717",
+          "20250718",
+          "20250721",
+          "20250722",
+          "20250723",
+          "20250724",
+          "20250725",
+          "20250728",
+          "20250729",
+          "20250730",
+          "20250731",
+          "20250801",
+          "20250804",
+          "20250805",
+          "20250806",
+          "20250807",
+          "20250808",
+          "20250811",
+          "20250812",
+          "20250813",
+          "20250814",
+          "20250815",
+          "20250818",
+          "20250819",
+          "20250820",
+          "20250821",
+          "20250822",
+          "20250825",
+          "20250826",
+          "20250827",
+          "20250828"
+        ],
+        "test_dates": [
+          "20250901",
+          "20250902",
+          "20250903",
+          "20250904",
+          "20250905",
+          "20250908",
+          "20250909",
+          "20250910",
+          "20250911",
+          "20250912",
+          "20250915",
+          "20250916",
+          "20250917",
+          "20250918",
+          "20250919",
+          "20250922",
+          "20250923",
+          "20250924",
+          "20250925",
+          "20250926",
+          "20250929",
+          "20250930"
+        ],
+        "embargo_days": 1,
+        "mode": "anchored"
+      },
+      "screen_passed": false,
+      "gate_stage1": [],
+      "verdict": "rejected",
+      "admitted_horizons": [],
+      "promotion": "none",
+      "verdict_detail": "Retention-ONLY screen failure (0.22-0.45 < 0.5 at all horizons) despite IS|t| 5.4-9.8 and OOS|t| 2.7-11.5 at ALL 5 horizons, same positive sign everywhere, OOS t EXCEEDING IS t at 15-60s (no overfit signature); OOS IC 0.056-0.065 is library-passing magnitude. Pre-registered gate upheld, NO post-hoc tuning -- but this is the strongest OOS evidence of the batch: MUST be re-examined with a longer OOS in iter-002 and cross-sectionally at multi-asset scale-up. Independent of depth5_delta_60s (rho 0.369)."
+    },
+    {
+      "name": "large_trade_share_60s",
+      "lens": "flow-queue",
+      "verdict": "needs_materialization",
+      "admitted_horizons": [],
+      "promotion": "needs_materialization",
+      "mechanism": "Trade-size conditioning: share of trailing-60s aggressive volume carried by large prints. Large trades carry more information (urgent informed flow splits less); the size DISTRIBUTION of flow - not just its signed sum - should condition continuation/reversal. Complements ofi/ti which are size-blind sums.",
+      "info_set": "NOT COMPUTABLE FROM PANEL: needs per-trade Volume + aggressor side (TrdBSFlag) from the tick stream.",
+      "inspiration": "Lens mandate 'trade-size conditioning'; digest opportunity map 'large-order depth share' unexplored; Kyle (1985); Bouchaud et al. (2004) square-root meta-order impact.",
+      "causal_prefix_ok": null,
+      "detail": "Mechanism and spec drafted but the materialized panel lacks per-trade sizes. Cheapest path: add avg_trade_size_60s / large_trade_share_60s to the C++ engine factor set and replay via the instrument-level cache (~0.4s/day for 588000). Register in iter-002 once the column exists.",
+      "is_stats": null,
+      "oos_stats": null,
+      "max_corr_library": null
+    },
+    {
+      "name": "trade_arrival_burst",
+      "lens": "accumulation-regime",
+      "verdict": "needs_materialization",
+      "admitted_horizons": [],
+      "promotion": "needs_materialization",
+      "mechanism": "Trade-arrival bursts (Hawkes self-excitation / ACD): information events cluster, so a burst in trade-arrival rate relative to its trailing baseline flags the start of an information episode that unfolds over minutes (300/900s signal). Requires actual trade counts or inter-trade durations.",
+      "info_set": "REQUIRED: cum_trade_vol or trade_gap_ms/trade counts (absent from panel); order_arrival_60s present but NaN-by-design on SSE.",
+      "inspiration": "Engle & Russell (1998) ACD; Hawkes self-excitation; digest: arrival/cancel dynamics only testable on SZSE or via snapshot-delta reconstruction.",
+      "causal_prefix_ok": null,
+      "detail": "Untestable on the current 588000 panel; the only panel-feasible proxy (1-bit last_px-changed indicator) cannot separate arrival RATE from trade SIZE and conflates the mechanism with time-of-day seasonality, so it was deliberately NOT registered (would spend honest-N ledger trials without testing the mechanism). Panel wishlist: cum_trade_vol (zero engine-logic cost) and/or trade_gap_ms. On SZSE instruments order-arrival decode IS reliable -- test there first in the multi-asset phase.",
+      "is_stats": null,
+      "oos_stats": null,
+      "max_corr_library": null
+    }
+  ]
+}
