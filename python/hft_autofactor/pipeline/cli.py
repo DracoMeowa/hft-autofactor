@@ -6,6 +6,11 @@ Examples::
     hftaf convert  --dates 20250603..20250607 --overwrite
     hftaf eval     --dates 20250603..20250630
     hftaf mask     --dates 20250603 --k 4
+
+Single-instrument pilot (e.g. 588000)::
+
+    hftaf convert  --dates 20250701..20250930 --instruments 588000
+    hftaf eval     --dates 20250701..20250930 --instruments 588000
 """
 from __future__ import annotations
 
@@ -58,6 +63,12 @@ def _parse_int_list(spec: str | None) -> list[int] | None:
     return [int(x) for x in spec.split(",") if x.strip()]
 
 
+def _parse_str_list(spec: str | None) -> list[str] | None:
+    if not spec:
+        return None
+    return [x.strip() for x in spec.split(",") if x.strip()] or None
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="hftaf",
@@ -78,11 +89,23 @@ def build_parser() -> argparse.ArgumentParser:
     p_conv = sub.add_parser("convert", help="raw CSV -> day parquet partitions")
     p_conv.add_argument("--dates", required=True)
     p_conv.add_argument("--overwrite", action="store_true")
+    p_conv.add_argument(
+        "--instruments", default=None,
+        help="comma list of instrument codes to keep (default: all). "
+             "Recorded in the partition sidecar so a filtered parquet is "
+             "never mistaken for a full one.",
+    )
 
     p_eval = sub.add_parser("eval", help="IC/RankIC evaluation + gating report")
     p_eval.add_argument("--dates", required=True)
     p_eval.add_argument("--factors", default=None, help="comma list (default: all)")
     p_eval.add_argument("--horizons", default=None, help="comma list in seconds")
+    p_eval.add_argument(
+        "--instruments", default=None,
+        help="comma list of instrument codes to evaluate (default: all). "
+             "With a single instrument, cross-sectional IC is skipped and "
+             "all gating uses the time-series RankIC.",
+    )
 
     p_mask = sub.add_parser("mask", help="lookahead mask validation (Stage 2)")
     p_mask.add_argument("--dates", required=True)
@@ -135,7 +158,12 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     if args.command == "convert":
         try:
-            paths = orchestrator.run_convert_stage(cfg, dates, overwrite=args.overwrite)
+            paths = orchestrator.run_convert_stage(
+                cfg,
+                dates,
+                overwrite=args.overwrite,
+                instruments=_parse_str_list(args.instruments),
+            )
         except (FileNotFoundError, ValueError) as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 1
@@ -152,7 +180,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         horizons = _parse_int_list(args.horizons)
         try:
             report = orchestrator.run_eval_stage(
-                cfg, dates, factors=factor_list, horizons=horizons
+                cfg,
+                dates,
+                factors=factor_list,
+                horizons=horizons,
+                instruments=_parse_str_list(args.instruments),
             )
         except (FileNotFoundError, ValueError, KeyError) as exc:
             print(f"error: {exc}", file=sys.stderr)

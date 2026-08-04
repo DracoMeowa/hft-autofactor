@@ -5,8 +5,13 @@ All runners are resumable and idempotent:
 * factors: per-(date, exchange, channel) jobs, skip-if-done (output exists
   and its .meta.json sidecar matches current inputs/config), sorted by input
   size descending for even disk pressure, bounded parallelism (CPU-only).
-* convert: one parquet partition per day, skips existing.
-* eval: full Stage-4 screen + walk-forward report under reports/.
+* convert: one parquet partition per day, skip-if-done against the
+  partition's sidecar (an optional ``instruments`` filter is recorded there,
+  so a filtered partition is never mistaken for a full one).
+* eval: full Stage-4 screen + walk-forward report under reports/.  Panels
+  with fewer than 5 instruments (e.g. the single-instrument pilot) skip
+  cross-sectional IC -- it is undefined there -- and base every gate on the
+  per-(date) time-series RankIC.
 * mask: truncate-and-recompute validation per job, reports under validation/.
 
 Every artifact goes to ``cfg.out_root`` (/data/factor_lzt) -- never into the
@@ -34,6 +39,11 @@ from ..validation.mask_test import engine_cli_args, mask_test_day, run_engine
 
 #: permutations used for the noise floor inside the eval stage report
 _EVAL_NOISE_PERMS = 20
+
+#: cross-sectional IC needs a real cross-section: below this many distinct
+#: instruments it is undefined (rank correlation across 2-3 ETFs is noise),
+#: so the eval stage skips it and bases every gate on the time-series RankIC
+MIN_CROSS_SECTION_INSTRUMENTS = 5
 
 _META_TICK_KEYS = ("tick_bytes", "ticks_bytes", "input_tick_bytes", "tick_size")
 _META_SNAP_KEYS = (
@@ -190,13 +200,26 @@ def run_factor_stage(
 
 
 def run_convert_stage(
-    cfg: PipelineConfig, dates: Sequence[str], *, overwrite: bool = False
+    cfg: PipelineConfig,
+    dates: Sequence[str],
+    *,
+    overwrite: bool = False,
+    instruments: Sequence[str] | None = None,
 ) -> list[Path]:
-    """Build (or reuse) one parquet partition per date."""
+    """Build (or reuse) one parquet partition per date.
+
+    ``instruments`` restricts every partition to those instrument codes; the
+    filter is recorded in each partition's sidecar so a filtered partition is
+    never reused where a full one is required (and vice versa).
+    """
     cfg.ensure_dirs()
     paths: list[Path] = []
     for date in sorted(set(dates)):
-        paths.append(build_day_parquet(date, cfg, overwrite=overwrite))
+        paths.append(
+            build_day_parquet(
+                date, cfg, overwrite=overwrite, instruments=instruments
+            )
+        )
     return paths
 
 
@@ -210,16 +233,24 @@ def run_eval_stage(
     *,
     factors: Sequence[str] | None = None,
     horizons: Sequence[int] | None = None,
+    instruments: Sequence[str] | None = None,
 ) -> Path:
     """Full Stage-4 evaluation: IC stats, Stage-1 screen, walk-forward gates.
 
     Writes ``reports/eval_{first}_{last}.json`` (+ ``.csv`` stats table) and
     returns the JSON path.  Every evaluated (factor, horizon) is appended to
     the trial ledger BEFORE thresholds are read.
+
+    ``instruments`` restricts the panel (e.g. the 588000 single-instrument
+    pilot).  Panels with fewer than :data:`MIN_CROSS_SECTION_INSTRUMENTS`
+    distinct instruments skip cross-sectional IC entirely -- with one
+    instrument there is no cross-section -- and ALL gating (Stage-1 screen,
+    permutation floor, walk-forward OOS gate) runs on the per-(date)
+    time-series RankIC aggregated with Newey-West t.
     """
     cfg.ensure_dirs()
     dates_sorted = sorted(set(dates))
-    panel = load_panel(cfg, dates_sorted, factors=factors)
+    panel = load_panel(cfg, dates_sorted, factors=factors, instruments=instruments)
 
     factor_cols = (
         [f for f in factors if f in panel.columns]
@@ -229,6 +260,9 @@ def run_eval_stage(
     if not factor_cols:
         raise ValueError("no factor columns available for evaluation")
     horizons_eff = [int(h) for h in (horizons or cfg.horizons_s)]
+
+    n_instruments = panel["instrument"].n_unique() if panel.height else 0
+    cross_enabled = n_instruments >= MIN_CROSS_SECTION_INSTRUMENTS
 
     ledger = TrialLedger(cfg.reports_dir / "trial_ledger.jsonl")
     gate_cfg = GateConfig()
@@ -240,8 +274,9 @@ def run_eval_stage(
         for h in horizons_eff:
             ic_ts = rank_ic_time_series(panel, f, h)
             stats_list.append(ic_stats(ic_ts, f, h, max_lag=h // 3))
-            ic_xs = rank_ic_cross_section(panel, f, h)
-            cross_list.append(ic_stats(ic_xs, f, h, ic_col="ic"))
+            if cross_enabled:
+                ic_xs = rank_ic_cross_section(panel, f, h)
+                cross_list.append(ic_stats(ic_xs, f, h, ic_col="ic"))
             noise_floors[(f, h)] = permutation_noise_floor(
                 panel, f, h, n_perms=_EVAL_NOISE_PERMS
             )
@@ -292,6 +327,9 @@ def run_eval_stage(
         "dates": dates_sorted,
         "factors": factor_cols,
         "horizons_s": horizons_eff,
+        "instruments": sorted(panel["instrument"].unique().to_list()),
+        "n_instruments": n_instruments,
+        "cross_section_skipped": not cross_enabled,
         "stats": [dataclasses.asdict(s) for s in stats_list],
         "cross_section_stats": [dataclasses.asdict(s) for s in cross_list],
         "noise_floors": [
