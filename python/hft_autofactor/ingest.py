@@ -53,6 +53,18 @@ DEFAULT_FACTORS: tuple[str, ...] = (
 #: Canary look-ahead factors (only emitted by the engine with --canaries).
 CANARY_FACTORS: tuple[str, ...] = ("future_mid_15s", "future_trade_sign")
 
+#: Opt-in wishlist factor columns (NOT in DEFAULT_FACTORS so already-produced
+#: runs keep their skip-if-done sidecars valid; materialized on demand via an
+#: explicit ``factors:`` config list -- see docs/roadmap/panel-columns-wishlist.md).
+#: Reserved as prototype names and available to explore-screen library dedup.
+WISHLIST_FACTORS: tuple[str, ...] = (
+    "avg_trade_size_60s",
+    "n_trades_60s",
+    "large_trade_share_60s",
+    "trade_gap_ms",
+    "cum_trade_vol",
+)
+
 #: Interchange columns that are always present and are not factor columns.
 BASE_COLUMNS: tuple[str, ...] = (
     "date",
@@ -168,13 +180,18 @@ def _label_columns(columns: Sequence[str]) -> list[str]:
     return [c for c in columns if any(c.startswith(p) for p in LABEL_PREFIXES)]
 
 
-def _factor_columns(columns: Sequence[str]) -> list[str]:
+def factor_columns(columns: Sequence[str]) -> list[str]:
+    """The factor columns among ``columns`` (not base, not labels, not channel)."""
     labels = set(_label_columns(columns))
     return [
         c
         for c in columns
         if c not in BASE_COLUMNS and c not in labels and c != "channel"
     ]
+
+
+#: Backwards-compatible alias (was the private name).
+_factor_columns = factor_columns
 
 
 def _interchange_schema_overrides(csv_path: Path) -> dict:

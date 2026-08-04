@@ -15,6 +15,7 @@ from hft_autofactor.explore.registry import (
     explore_prototype,
     load_prototype_spec,
 )
+from hft_autofactor.ingest import WISHLIST_FACTORS
 
 
 def _compute(part: pl.DataFrame) -> pl.Series:
@@ -82,6 +83,14 @@ def test_name_must_be_lower_snake_case(bad_name):
 def test_name_must_not_shadow_panel_columns(reserved):
     with pytest.raises(PrototypeError, match="reserved"):
         explore_prototype(**_kwargs(name=reserved))
+
+
+def test_wishlist_factor_names_are_reserved():
+    """Opt-in engine columns (once materialized they ARE panel columns)."""
+    assert WISHLIST_FACTORS  # imported by the registry's reserved set
+    for name in WISHLIST_FACTORS:
+        with pytest.raises(PrototypeError, match="reserved"):
+            explore_prototype(**_kwargs(name=name))
 
 
 # --------------------------------------------------------------------- #

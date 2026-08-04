@@ -4,8 +4,12 @@ A cheap gate between "prototype computes" and the full Stage-4 evaluation:
 
 * per-horizon RankIC with Newey-West corrected t (reuses ``eval/ic.py``,
   ``max_lag = horizon // 3`` for the overlapping 3s-grid labels);
-* duplication gate: Spearman correlation against the 12 library factor
-  columns, ``max |corr| > max_abs_corr (0.85) => duplicate => reject``;
+* duplication gate: Spearman correlation against the library factor
+  columns, ``max |corr| > max_abs_corr (0.85) => duplicate => reject``.
+  The dedup universe defaults to the 12 canonical library factors and is
+  EXTENSIBLE per call (``library_factors=``): once wishlist columns are
+  materialized into the panel, pass ``PANEL_FACTORS`` (or an explicit name
+  list) so new candidates are also deduped against them;
 * IS/OOS date split with a >= 1-day purge (reuses ``eval/splits.py``):
   purged anchored walk-forward folds, last fold as the canonical split,
   retention via ``is_oos_retention``.
@@ -29,17 +33,33 @@ from ..config import PipelineConfig
 from ..eval.gating import TrialLedger
 from ..eval.ic import ic_stats, label_column, rank_ic_time_series, spearman
 from ..eval.splits import is_oos_retention, purged_day_splits
-from ..ingest import DEFAULT_FACTORS
+from ..ingest import DEFAULT_FACTORS, factor_columns
 from .layout import screen_report_path, sanitize_for_json
 from .registry import Prototype
 from .runner import load_explore_panel
 
 __all__ = [
+    "PANEL_FACTORS",
     "ScreenConfig",
     "ScreenReport",
     "library_correlations",
     "screen_prototype",
 ]
+
+
+class _PanelFactorsSentinel:
+    """Sentinel for ``library_factors``: dedup against EVERY factor column
+    present in the loaded panel (base/label/channel columns excluded, the
+    prototype's own column excluded inside :func:`library_correlations`).
+    Use once materialized wishlist columns extend the panel beyond the 12
+    canonical library factors."""
+
+    def __repr__(self) -> str:  # pragma: no cover - cosmetic
+        return "PANEL_FACTORS"
+
+
+#: Pass as ``library_factors`` to dedup against all panel factor columns.
+PANEL_FACTORS = _PanelFactorsSentinel()
 
 
 @dataclass
@@ -120,12 +140,20 @@ def screen_prototype(
     horizons: Sequence[int] | None = None,
     screen_cfg: ScreenConfig | None = None,
     ledger: TrialLedger | None = None,
+    library_factors: Sequence[str] | _PanelFactorsSentinel | None = None,
 ) -> ScreenReport:
     """Run the full pre-screen for one prototype over ``dates``.
 
     Requires the prototype's augmented partitions (``run_prototype`` first).
     Writes ``reports/screen_{name}_{stamp}.json`` (+ ``.csv`` horizon table)
     under the explore root and returns the :class:`ScreenReport`.
+
+    ``library_factors`` sets the dedup universe: ``None`` (default) = the 12
+    canonical library factors (unchanged historical behavior);
+    :data:`PANEL_FACTORS` = every factor column present in the loaded panel
+    (use once materialized wishlist columns extend the panel); or an explicit
+    list of column names (names absent from the panel are skipped). The
+    resolved list is recorded in the report's ``duplicate_check`` for audit.
     """
     sc = screen_cfg or ScreenConfig()
     dates_sorted = sorted(set(dates))
@@ -144,9 +172,15 @@ def screen_prototype(
         if label_column(int(h)) in panel.columns
     ]
 
-    # ---------------- dedup vs the 12 library factors ------------------ #
+    # ---------------- dedup vs the library factors -------------------- #
+    if library_factors is PANEL_FACTORS:
+        lib = factor_columns(panel.columns)
+    elif library_factors is None:
+        lib = list(DEFAULT_FACTORS)
+    else:
+        lib = list(library_factors)
     corrs = library_correlations(
-        panel, proto.name, max_obs=sc.max_corr_obs
+        panel, proto.name, library_factors=lib, max_obs=sc.max_corr_obs
     )
     abs_corrs = {
         f: (abs(v) if np.isfinite(v) else -1.0) for f, v in corrs.items()
@@ -187,6 +221,7 @@ def screen_prototype(
                 "library_factor": worst,
                 "threshold": sc.max_abs_corr,
                 "duplicated": duplicated,
+                "library_factors": lib,
                 "corrs": corrs,
             },
         )
@@ -285,6 +320,7 @@ def screen_prototype(
             "library_factor": worst,
             "threshold": sc.max_abs_corr,
             "duplicated": duplicated,
+            "library_factors": lib,
             "corrs": corrs,
         },
         horizons=horizon_rows,

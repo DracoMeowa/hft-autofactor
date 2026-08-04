@@ -23,10 +23,12 @@ from hft_autofactor.explore.layout import panel_path, spec_meta_path, spec_path
 from hft_autofactor.explore.registry import explore_prototype
 from hft_autofactor.explore.runner import run_prototype
 from hft_autofactor.explore.screen import (
+    PANEL_FACTORS,
     ScreenConfig,
     library_correlations,
     screen_prototype,
 )
+from hft_autofactor.ingest import DEFAULT_FACTORS
 
 DATES = [f"202506{d:02d}" for d in range(2, 14)]  # 12 synthetic days
 INSTRUMENTS = ("510300", "510050", "159915", "588000")
@@ -68,6 +70,15 @@ def write_synthetic_partitions(
                     "oir": rng.standard_normal(),
                     "wdi": rng.standard_normal(),
                     "quoted_spread_ticks": 2.0,
+                    # opt-in wishlist engine columns (noise doubles here; on
+                    # the real panel these are the materialized trade-size /
+                    # arrival factors -- kept so PANEL_FACTORS dedup sees a
+                    # realistic extended universe)
+                    "avg_trade_size_60s": 1.0 + abs(rng.standard_normal()),
+                    "n_trades_60s": float(rng.integers(0, 200)),
+                    "large_trade_share_60s": rng.uniform(0.0, 1.0),
+                    "trade_gap_ms": float(rng.integers(0, 3000)),
+                    "cum_trade_vol": float(rng.integers(100, 10_000_000)),
                     "channel": 1,
                 }
                 for h in HORIZONS:
@@ -106,6 +117,19 @@ def weak_proto():
         info_set="mid_px",
         inspiration="synthetic fixture",
         compute=lambda part: part["mid_px"].log().diff(1),
+    )
+
+
+def wishlist_duplicate_proto():
+    return explore_prototype(
+        name="lts_copy_f",
+        mechanism=(
+            "exact copy of the materialized wishlist column "
+            "large_trade_share_60s; only caught when dedup covers the panel"
+        ),
+        info_set="large_trade_share_60s",
+        inspiration="synthetic fixture",
+        compute=lambda part: part["large_trade_share_60s"],
     )
 
 
@@ -183,6 +207,56 @@ def test_screen_rejects_library_duplicate(explore_cfg):
     assert report.duplicate_check["library_factor"] == "oir"
     assert report.duplicate_check["max_abs_corr"] > 0.85
     assert any("duplicate" in r for r in report.reasons)
+
+
+def test_screen_panel_factors_flags_wishlist_duplicate(explore_cfg):
+    """PANEL_FACTORS dedup catches a copy of a materialized wishlist column."""
+    proto = wishlist_duplicate_proto()
+    _run(explore_cfg, proto)
+    report = screen_prototype(
+        explore_cfg, proto, DATES, library_factors=PANEL_FACTORS
+    )
+
+    assert report.status == "rejected_duplicate"
+    assert report.passed is False
+    assert report.duplicate_check["duplicated"] is True
+    assert report.duplicate_check["library_factor"] == "large_trade_share_60s"
+    assert report.duplicate_check["max_abs_corr"] > 0.85
+    # audit trail: the resolved universe spans every panel factor column
+    lib = report.duplicate_check["library_factors"]
+    assert "large_trade_share_60s" in lib
+    assert "oir" in lib and "wdi" in lib
+    assert proto.name in lib  # self-exclusion happens inside correlations
+    # sibling wishlist columns were scored too
+    assert "avg_trade_size_60s" in report.duplicate_check["corrs"]
+
+
+def test_screen_default_universe_unchanged_misses_wishlist_duplicate(explore_cfg):
+    """library_factors=None still dedups against the 12 canonicals ONLY."""
+    proto = wishlist_duplicate_proto()
+    _run(explore_cfg, proto)
+    report = screen_prototype(explore_cfg, proto, DATES)
+
+    assert report.duplicate_check["library_factors"] == list(DEFAULT_FACTORS)
+    # the wishlist column is outside the default universe -> not flagged
+    assert report.duplicate_check["duplicated"] is False
+    assert "large_trade_share_60s" not in report.duplicate_check["corrs"]
+    # noise prototype: no duplicate, but no horizon survives IS/OOS either
+    assert report.status == "ok"
+    assert report.passed is False
+
+
+def test_screen_explicit_library_list_skips_absent_names(explore_cfg):
+    proto = wishlist_duplicate_proto()
+    _run(explore_cfg, proto)
+    report = screen_prototype(
+        explore_cfg, proto, DATES,
+        library_factors=["large_trade_share_60s", "not_in_panel"],
+    )
+
+    assert report.duplicate_check["duplicated"] is True
+    assert report.duplicate_check["library_factor"] == "large_trade_share_60s"
+    assert set(report.duplicate_check["corrs"]) == {"large_trade_share_60s"}
 
 
 def test_screen_fails_weak_signal_without_duplicate_flag(explore_cfg):
@@ -350,6 +424,60 @@ def test_cli_run_and_screen_end_to_end(cli_env, capsys):
     assert rc2 == 0
     out2 = capsys.readouterr().out
     assert "PASS" in out2 and "cli_signal_f" in out2
+
+
+def test_cli_screen_library_factors_flag(cli_env, capsys):
+    """``--library-factors panel`` flags a wishlist-column copy the default
+    (12 canonicals) universe misses; a comma list works too."""
+    cfg, cfg_yaml = cli_env
+    spec = cfg.out_root.parent / "lts_copy_cli_f.py"
+    spec.write_text(
+        "from hft_autofactor.explore.registry import explore_prototype\n"
+        "PROTOTYPE = explore_prototype(\n"
+        "    name='lts_copy_cli_f',\n"
+        "    mechanism='copy of a materialized wishlist column',\n"
+        "    info_set='large_trade_share_60s',\n"
+        "    inspiration='cli test',\n"
+        "    compute=lambda part: part['large_trade_share_60s'],\n"
+        ")\n",
+        encoding="utf-8",
+    )
+    assert explore_main(["--config", str(cfg_yaml), "add", "--spec", str(spec)]) == 0
+    dates_spec = f"{DATES[0]}..{DATES[-1]}"
+    assert explore_main(
+        ["--config", str(cfg_yaml), "run", "--dates", dates_spec,
+         "--protos", "lts_copy_cli_f", "--chunk-days", "5"]
+    ) == 0
+
+    # default universe: noise signal fails IS/OOS but NOT as a duplicate
+    capsys.readouterr()
+    rc_default = explore_main(
+        ["--config", str(cfg_yaml), "screen", "--dates", dates_spec,
+         "--protos", "lts_copy_cli_f"]
+    )
+    assert rc_default == 0
+    out_default = capsys.readouterr().out
+    assert "FAIL" in out_default and "duplicate" not in out_default
+
+    # 'panel' universe: the wishlist column is in scope -> duplicate
+    capsys.readouterr()
+    rc_panel = explore_main(
+        ["--config", str(cfg_yaml), "screen", "--dates", dates_spec,
+         "--protos", "lts_copy_cli_f", "--library-factors", "panel"]
+    )
+    assert rc_panel == 0
+    out_panel = capsys.readouterr().out
+    assert "FAIL" in out_panel and "duplicate" in out_panel
+
+    # explicit comma list (absent names skipped silently)
+    capsys.readouterr()
+    rc_list = explore_main(
+        ["--config", str(cfg_yaml), "screen", "--dates", dates_spec,
+         "--protos", "lts_copy_cli_f",
+         "--library-factors", "large_trade_share_60s,missing_col"]
+    )
+    assert rc_list == 0
+    assert "duplicate" in capsys.readouterr().out
 
 
 def test_cli_run_rejects_leaky_prototype(cli_env, capsys):

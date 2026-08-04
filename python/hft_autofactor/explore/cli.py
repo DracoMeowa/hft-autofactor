@@ -35,7 +35,7 @@ from .registry import (
     load_prototype_spec,
 )
 from .runner import run_prototype
-from .screen import ScreenConfig, screen_prototype
+from .screen import PANEL_FACTORS, ScreenConfig, screen_prototype
 
 __all__ = ["main", "build_parser", "load_registry"]
 
@@ -113,6 +113,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="comma list of prototype names (default: all registered)",
     )
     p_scr.add_argument("--horizons", default=None, help="comma list in seconds")
+    p_scr.add_argument(
+        "--library-factors", default=None,
+        help="dedup universe for the duplication gate: comma list of panel "
+        "column names, or the literal 'panel' = every factor column present "
+        "in the panel (default: the 12 canonical library factors)",
+    )
     p_scr.add_argument("--max-abs-corr", type=float, default=0.85)
     p_scr.add_argument("--min-is-t", type=float, default=2.0)
     p_scr.add_argument("--min-oos-t", type=float, default=2.0)
@@ -238,6 +244,16 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     if args.command == "screen":
         horizons = _parse_int_list(args.horizons)
+        if args.library_factors is None:
+            library_factors: object = None
+        elif args.library_factors.strip().lower() == "panel":
+            library_factors = PANEL_FACTORS
+        else:
+            library_factors = [
+                n.strip()
+                for n in args.library_factors.split(",")
+                if n.strip()
+            ]
         sc = ScreenConfig(
             max_abs_corr=args.max_abs_corr,
             min_is_t=args.min_is_t,
@@ -250,7 +266,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         for proto in protos:
             try:
                 report = screen_prototype(
-                    cfg, proto, dates, horizons=horizons, screen_cfg=sc
+                    cfg, proto, dates, horizons=horizons, screen_cfg=sc,
+                    library_factors=library_factors,
                 )
             except (FileNotFoundError, ValueError, KeyError) as exc:
                 n_bad += 1

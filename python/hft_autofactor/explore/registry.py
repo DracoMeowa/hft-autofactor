@@ -28,7 +28,7 @@ from typing import Callable, Iterable
 
 import polars as pl
 
-from ..ingest import BASE_COLUMNS, DEFAULT_FACTORS
+from ..ingest import BASE_COLUMNS, DEFAULT_FACTORS, WISHLIST_FACTORS
 
 __all__ = [
     "Prototype",
@@ -45,10 +45,15 @@ REQUIRED_METADATA: tuple[str, ...] = ("name", "mechanism", "info_set", "inspirat
 #: valid prototype names double as panel column names
 _NAME_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 
-#: column names a prototype may never take (would shadow panel columns)
-_RESERVED_COLUMNS: frozenset[str] = frozenset(BASE_COLUMNS) | frozenset(
-    DEFAULT_FACTORS
-) | {"channel"}
+#: column names a prototype may never take (would shadow panel columns).
+#: Includes the opt-in wishlist columns: once materialized they ARE panel
+#: columns, and a prototype of the same name would shadow them silently.
+_RESERVED_COLUMNS: frozenset[str] = (
+    frozenset(BASE_COLUMNS)
+    | frozenset(DEFAULT_FACTORS)
+    | frozenset(WISHLIST_FACTORS)
+    | {"channel"}
+)
 
 
 class PrototypeError(ValueError):
