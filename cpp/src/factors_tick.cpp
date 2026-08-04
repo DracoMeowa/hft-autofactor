@@ -379,12 +379,13 @@ class LargeTradeShare60s final : public TradeWindow60sBase {
 
 // trade_gap_ms = ms elapsed since the most recent trade, sampled at snapshot
 // time (inter-trade duration; small <=> high arrival rate). Instantaneous
-// statistic: defined from the first trade onward, no 60s warm-up. The lunch
-// break appears as a large gap -- a recurring daily seasonality that
-// downstream trailing z-scoring absorbs. Clamped at >= 0: snapshot-phase
-// skew (see on_snapshot) can make the newest known trade's stamp slightly
-// later than the snapshot's own UpdateTime; the trade is already known, so
-// the honest elapsed time is "just traded" = 0.
+// statistic: defined from the first trade onward, no 60s warm-up. No rows are
+// emitted across the lunch break, and liquid instruments resume trading
+// within the skew window of the first afternoon snapshot, so the break itself
+// rarely surfaces as a large gap here (quiet resumes still show it). Clamped
+// at >= 0: snapshot-phase skew (see on_snapshot) can make the newest known
+// trade's stamp slightly later than the snapshot's own UpdateTime; the trade
+// is already known, so the honest elapsed time is "just traded" = 0.
 class TradeGapMs final : public TickFactorBase {
  public:
   const std::string& name() const override { static const std::string n = "trade_gap_ms"; return n; }
