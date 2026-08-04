@@ -62,9 +62,13 @@ static void test_szse_window_factors() {
   const Session sess = session_for("szse");
   FactorContext ctx{"20250603", "szse", sess};
 
+  // include_canaries=true: this test exercises future_mid_15s's look-ahead
+  // value_at() semantics, and the canary guard refuses canary names in the
+  // plain factors list. The implicit append then also adds future_trade_sign,
+  // which the find()-based checks below simply ignore.
   auto reg = make_registry({"quoted_spread_ticks", "microprice_dev", "oir", "ofi_60s",
                             "order_arrival_60s", "cancel_ratio_60s", "future_mid_15s"},
-                           false);
+                           true);
   for (auto& f : reg) {
     f->on_day_start(ctx);
     f->on_instrument_day_start(inst);
