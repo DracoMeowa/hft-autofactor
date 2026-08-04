@@ -381,7 +381,10 @@ class LargeTradeShare60s final : public TradeWindow60sBase {
 // time (inter-trade duration; small <=> high arrival rate). Instantaneous
 // statistic: defined from the first trade onward, no 60s warm-up. The lunch
 // break appears as a large gap -- a recurring daily seasonality that
-// downstream trailing z-scoring absorbs.
+// downstream trailing z-scoring absorbs. Clamped at >= 0: snapshot-phase
+// skew (see on_snapshot) can make the newest known trade's stamp slightly
+// later than the snapshot's own UpdateTime; the trade is already known, so
+// the honest elapsed time is "just traded" = 0.
 class TradeGapMs final : public TickFactorBase {
  public:
   const std::string& name() const override { static const std::string n = "trade_gap_ms"; return n; }
@@ -399,7 +402,19 @@ class TradeGapMs final : public TickFactorBase {
   void on_snapshot(const Snapshot& s, const BookState&) override {
     auto it = last_trade_.find(s.instrument);
     if (it == last_trade_.end()) return store(s.instrument, kNan);
-    store(s.instrument, static_cast<double>(s.time - it->second));
+    // Clamp at zero. The merged snapshot stream carries per-instrument
+    // UpdateTime phase skew within each publication batch (one SSE batch's
+    // stamps span ~1s; the drainers are typically NON-ETF barrier snapshots
+    // that never emit rows). The engine's shared merge cursor drains every
+    // tick with time <= U (U = UpdateTime of the snapshot being processed),
+    // so such a barrier can pull trades stamped slightly AFTER this
+    // instrument's own snapshot time into factor state before its
+    // on_snapshot runs (observed on 20250702: 16,022 negative rows, worst
+    // -970 ms, concentrated in the open burst). At the row's availability
+    // time the trade is already known, so the honest elapsed time is "just
+    // traded" => 0, never < 0.
+    const TsMs dt = s.time - it->second;
+    store(s.instrument, static_cast<double>(dt > 0 ? dt : 0));
   }
 
  private:

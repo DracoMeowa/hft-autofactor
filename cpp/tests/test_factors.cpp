@@ -340,6 +340,49 @@ static void test_trade_window_factors() {
   CHECK_NEAR(v, 1600.0, 1e-12);
 }
 
+// Real-stream ordering guard for trade_gap_ms: SSE publishes different
+// instruments' snapshots with different per-cycle UpdateTime phases, and the
+// engine's shared merge cursor drains every tick with time <= U (U = the
+// current snapshot's UpdateTime) before that snapshot's on_snapshot runs. A
+// later-phased instrument's snapshot can therefore deliver a trade stamped
+// slightly AFTER this instrument's own snapshot time before on_snapshot sees
+// it. The gap must clamp at 0 ("the trade is already known"), never negative.
+static void test_trade_gap_skew_clamp() {
+  const Symbol inst = make_symbol("510300", 6);
+  const Session sess = session_for("sse");
+  FactorContext ctx{"20250603", "sse", sess};
+
+  auto reg = make_registry({"trade_gap_ms"}, false);
+  CHECK_EQ((int)reg.size(), 1);
+  IFactor* gap = reg[0].get();
+  CHECK(gap != nullptr);
+  gap->on_day_start(ctx);
+  gap->on_instrument_day_start(inst);
+
+  BookState book;
+  const TsMs t0 = t(9, 30, 0);
+  double v;
+
+  // Skewed delivery: a trade stamped t0+500 enters factor state before this
+  // instrument's snapshot at t0+200 (another instrument's later UpdateTime
+  // raised the merge cutoff past 500 first).
+  TickEvent e = trade(t0 + 500, inst, 100, 'B');
+  book.apply_trade(e);
+  gap->on_tick(e, book);
+  Snapshot s1 = make_snap(inst, t0 + 200);
+  book.apply_snapshot(s1);
+  gap->on_snapshot(s1, book);
+  CHECK(gap->value(inst, v));
+  CHECK_NEAR(v, 0.0, 1e-12);                    // clamped, not -300
+
+  // The next snapshot restores the ordinary positive gap.
+  Snapshot s2 = make_snap(inst, t0 + 3200);
+  book.apply_snapshot(s2);
+  gap->on_snapshot(s2, book);
+  CHECK(gap->value(inst, v));
+  CHECK_NEAR(v, 2700.0, 1e-9);                  // 3200 - 500
+}
+
 static void test_registry() {
   auto def = make_default_registry();
   CHECK_EQ((int)def.size(), (int)kDefaultFactorNames.size());
@@ -410,6 +453,7 @@ int main() {
   test_warmup();
   test_sse_cancel_gating();
   test_trade_window_factors();
+  test_trade_gap_skew_clamp();
   test_registry();
   return hftaft::finish("test_factors");
 }

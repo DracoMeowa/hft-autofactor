@@ -61,3 +61,10 @@ total_bid/ask_vol、OHLC）与 B 组其余（big_trade_flow、order_lifetime、b
 时段编码）**留待多资产阶段一次性批量物化**（届时默认注册表扩容 + 全量重跑）。
 固定金额阈值的大单列（`big_trade_flow_buy/sell`，TrdMoney 阈值）与
 signed 大单占比变体作为后续候选，不在本批。
+
+补记（同日）：replay 发现 `trade_gap_ms` 负值（20250702：16,022 行，min -970ms）。
+根因为 SSE 发布批次内 UpdateTime 相位差 + 引擎共享归并游标（非 ETF barrier 快照
+把 tick 游标拉过本标的快照时刻；详见 01-microstructure-factors.md 更新日志
+2026-08-05（二））。修复：负值截断为 0（决策时刻该成交已知 ⇒ "刚发生"），
+回归测试 `test_trade_gap_skew_clamp`。该截断属于本列语义约定；未来若需保留
+负值的变体应另立新列。

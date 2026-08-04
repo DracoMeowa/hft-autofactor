@@ -68,7 +68,8 @@ class IFactor {
 //   tick family:     avg_trade_size_60s      mean per-trade volume over trailing 60s
 //                    n_trades_60s            trade count over trailing 60s (arrival rate)
 //                    large_trade_share_60s   volume share of the largest ceil(n/10) trades
-//                    trade_gap_ms            ms since the most recent trade (no 60s warm-up)
+//                    trade_gap_ms            ms since the most recent trade (no 60s warm-up;
+//                                              clamped at 0 under snapshot-phase skew)
 std::vector<std::unique_ptr<IFactor>> make_default_registry();
 std::vector<std::unique_ptr<IFactor>> make_registry(const std::vector<std::string>& names, bool include_canaries = false);
 

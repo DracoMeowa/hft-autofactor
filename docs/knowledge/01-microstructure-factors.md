@@ -480,3 +480,14 @@ eval 阶段 IC 表：`oir` 0.21–0.25（t 8–16）、`microprice_dev` 0.21–0
     恢复至前高以上后恢复输出。
   - 用途：iter-002 物化 `large_trade_share_60s` 与 `trade_arrival_burst` 两个
     needs_materialization 候选（library/candidates.json）。
+- 2026-08-05（二）：`trade_gap_ms` 负值截断（clamp）到 0。真实数据核验（20250702
+  17 因子 replay）发现 16,022 行为负（min -970ms，集中在开盘 burst）。根因：SSE
+  快照发布批次内各标的 UpdateTime 存在相位差（一个批次内时间戳横跨 ~1s：
+  93001000 网格时刻 ×972 行与 93001022~93001912 散布 ×~883 行并存）；引擎共享
+  归并游标按"当前快照 U = UpdateTime，消耗所有 `tick.time <= U`"推进，**非 ETF
+  股票**的晚时间戳快照（barrier 快照，自身不产生面板行）把 tick 游标拉过
+  93001350，使 588000 网格快照（93001000）的因子状态里已含时间戳更晚的成交 ⇒
+  瞬时 gap 为负。决策时刻该笔成交已知 ⇒ 诚实取值为 0（"刚发生"），已加回归测试
+  `test_trade_gap_skew_clamp`。仅影响该瞬时列；60s 窗口族因子（ofi/imbalance/
+  trade-window 家族）共享同一归并语义，窗宽 >> 偏移幅度（~1s），行为与 v1 已发布
+  语义一致，无需改动。
