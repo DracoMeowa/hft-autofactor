@@ -205,7 +205,9 @@ hftaf-explore screen --dates 20250701..20250731 [--protos my_idea] \
 `run` 带 panel-prefix 因果检验：任一截断点不一致即整体拒绝并删除其分区；
 `screen` 做 RankIC/NW + 库内去重 + purged IS/OOS 预筛。退出码：0 成功；
 1 有拒绝/运行失败；2 用法/配置错误。原型规格持久化在
-`{out_root}/explore/prototypes/`（内置原型见 `explore/registry.py`）。
+`{out_root}/explore/prototypes/`（内置原型见 `explore/registry.py`；一个完整的
+外部规格示例见 [`examples/prototypes/oir_z_300s_spec.py`](examples/prototypes/oir_z_300s_spec.py)，
+用 `hftaf-explore add --spec examples/prototypes/oir_z_300s_spec.py` 注册）。
 
 ### `hftaf-digest`（评估后反馈摘要，驱动下一轮假设）
 
