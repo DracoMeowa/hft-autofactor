@@ -19,6 +19,12 @@ Usage::
 inclusive ``START..END`` range, which is expanded against the existing
 parquet day partitions (``dt=YYYYMMDD``).
 
+``--panel-dir DIR`` loads the panel from an archived directory of day
+partitions (``dt=YYYYMMDD.parquet`` files or ``dt=YYYYMMDD/`` dirs) instead
+of the pipeline parquet store -- the route for explore-lane prototype factors
+whose column lives in the explore panel, not the production parquet
+(spec section 7 "因子列来源: explore panel join").
+
 Track-B mode (#86, ``--matrix``)
 --------------------------------
 Instead of the full position simulation, runs the frozen 24-cell conditional
@@ -81,10 +87,13 @@ def _resolve_dates(parquet_dir: Path, spec: str) -> list[str]:
         dates: list[str] = []
         if parquet_dir.is_dir():
             for p in sorted(parquet_dir.iterdir()):
-                if p.is_dir() and p.name.startswith("dt="):
-                    d = p.name[3:]
-                    if start <= d <= end:
-                        dates.append(d)
+                if not p.name.startswith("dt="):
+                    continue
+                d = p.name[3:]
+                if d.endswith(".parquet"):
+                    d = d[: -len(".parquet")]
+                if start <= d <= end:
+                    dates.append(d)
         if not dates:
             raise ValueError(
                 f"no parquet partitions dt={start}..{end} under {parquet_dir} "
@@ -171,8 +180,13 @@ def _run_matrix_mode(
 
     eval_dates: list[str] | None = None
     if args.eval_dates:
+        partition_root = (
+            Path(args.panel_dir)
+            if args.panel_dir
+            else Path(cfg.out_root) / "parquet"
+        )
         try:
-            eval_dates = _resolve_dates(Path(cfg.out_root) / "parquet", args.eval_dates)
+            eval_dates = _resolve_dates(partition_root, args.eval_dates)
         except ValueError as exc:
             print(f"error: --eval-dates: {exc}")
             return 2
@@ -287,6 +301,11 @@ def _build_parser() -> argparse.ArgumentParser:
                    help="matrix mode: trading window inside --dates "
                         "(same syntax); rows outside it feed the trailing "
                         "regime history only. Default: all --dates")
+    p.add_argument("--panel-dir", default=None,
+                   help="load the panel from an archived directory of day "
+                        "partitions (dt=YYYYMMDD.parquet files or "
+                        "dt=YYYYMMDD/ dirs) instead of the pipeline parquet "
+                        "store -- for explore-lane prototype factors")
     return p
 
 
@@ -308,44 +327,84 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"error: cannot load config {args.config}: {exc}")
         return 2
 
-    try:
-        dates = _resolve_dates(Path(cfg.out_root) / "parquet", args.dates)
-    except ValueError as exc:
-        print(f"error: {exc}")
-        return 2
-
     instruments = None
     if args.instruments:
         instruments = [s.strip() for s in args.instruments.split(",") if s.strip()]
 
-    derived_spec = DERIVED_FACTORS.get(args.factor)
-    load_factors = (
-        list(derived_spec.sources) if derived_spec is not None else [args.factor]
-    )
-    try:
-        panel = load_panel(cfg, dates, instruments=instruments, factors=load_factors)
-    except (FileNotFoundError, ValueError) as exc:
-        print(f"error: {exc}")
-        return 2
-    if panel.height == 0:
-        print(f"error: no rows for {len(dates)} dates")
-        return 2
-    if derived_spec is not None:
-        # Admitted explore-lane factors are not materialized in the parquet;
-        # recompute them from base columns exactly as the admitted spec did.
-        try:
-            panel = materialize_derived(panel, args.factor)
-        except (KeyError, ValueError) as exc:
-            print(f"error: cannot derive factor {args.factor!r}: {exc}")
+    derived_spec = None
+    if args.panel_dir:
+        # Archived panel (explore lane): the factor column is already
+        # materialized; load the day partitions directly.
+        panel_dir = Path(args.panel_dir)
+        if not panel_dir.is_dir():
+            print(f"error: --panel-dir is not a directory: {panel_dir}")
             return 2
-        print(
-            f"derived factor {args.factor!r} materialized from panel columns "
-            f"({derived_spec.doc})"
+        try:
+            dates = _resolve_dates(panel_dir, args.dates)
+        except ValueError as exc:
+            print(f"error: {exc}")
+            return 2
+        files: list[Path] = []
+        missing: list[str] = []
+        for d in dates:
+            flat = panel_dir / ("dt=%s.parquet" % d)
+            part_dir = panel_dir / ("dt=%s" % d)
+            if flat.is_file():
+                files.append(flat)
+            elif part_dir.is_dir():
+                files.extend(sorted(part_dir.glob("*.parquet")))
+            else:
+                missing.append(d)
+        if missing:
+            print(f"error: --panel-dir partitions missing for dates: "
+                  f"{missing[:5]}{'...' if len(missing) > 5 else ''}")
+            return 2
+        panel = pl.read_parquet([str(f) for f in files])
+        if instruments:
+            panel = panel.filter(pl.col("instrument").is_in(instruments))
+        if panel.height == 0:
+            print(f"error: no rows for {len(dates)} dates under {panel_dir}")
+            return 2
+        if args.factor not in panel.columns:
+            print(f"error: factor column {args.factor!r} missing from the "
+                  f"--panel-dir panel ({panel_dir})")
+            return 2
+        print(f"panel: {panel.height} rows / {len(dates)} dates from "
+              f"{panel_dir} (factor {args.factor!r} pre-materialized)")
+    else:
+        try:
+            dates = _resolve_dates(Path(cfg.out_root) / "parquet", args.dates)
+        except ValueError as exc:
+            print(f"error: {exc}")
+            return 2
+        derived_spec = DERIVED_FACTORS.get(args.factor)
+        load_factors = (
+            list(derived_spec.sources) if derived_spec is not None else [args.factor]
         )
-    elif args.factor not in panel.columns:
-        print(f"error: factor column {args.factor!r} missing from the parquet "
-              f"partitions for {len(dates)} dates")
-        return 2
+        try:
+            panel = load_panel(cfg, dates, instruments=instruments, factors=load_factors)
+        except (FileNotFoundError, ValueError) as exc:
+            print(f"error: {exc}")
+            return 2
+        if panel.height == 0:
+            print(f"error: no rows for {len(dates)} dates")
+            return 2
+        if derived_spec is not None:
+            # Admitted explore-lane factors are not materialized in the parquet;
+            # recompute them from base columns exactly as the admitted spec did.
+            try:
+                panel = materialize_derived(panel, args.factor)
+            except (KeyError, ValueError) as exc:
+                print(f"error: cannot derive factor {args.factor!r}: {exc}")
+                return 2
+            print(
+                f"derived factor {args.factor!r} materialized from panel columns "
+                f"({derived_spec.doc})"
+            )
+        elif args.factor not in panel.columns:
+            print(f"error: factor column {args.factor!r} missing from the parquet "
+                  f"partitions for {len(dates)} dates")
+            return 2
 
     try:
         params_yaml = (
