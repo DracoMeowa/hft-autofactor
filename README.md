@@ -122,6 +122,14 @@ pytest python                    # testpaths = python/tests
 hftaf factors  --dates 20250701,20250702 [--channels 1,2,3] [--workers 4] \
                [--overwrite] [--dry-run]
 
+# Stage 1 回放缓存：改完引擎后单资产/单通道因子迭代从分钟级降到秒级
+hftaf factors  --dates 20250701..20250930 --channels 5 --cache build      # 一次性，≈一次 raw 跑数
+hftaf factors  --dates 20250701..20250930 --channels 5 --cache use        # 秒级重算
+hftaf factors  --dates 20250701..20250930 --channels 5 --cache build \
+               --cache-instruments 588000                                  # 只缓存单标的（更小）
+hftaf factors  --dates 20250701..20250930 --channels 5 --cache use \
+               --cache-instruments 588000
+
 # Stage 3: raw CSV → parquet 日分区
 hftaf convert  --dates 20250701..20250705 [--overwrite] [--instruments 588000]
 
@@ -132,6 +140,13 @@ hftaf eval     --dates 20250701..20250731 [--factors oir,ofi_60s] [--horizons 15
 # Stage 2: 防穿越 mask 验证（canary 必须失败）
 hftaf mask     --dates 20250701 [--k 4]      # k = 每 job 截断点数
 ```
+
+`--cache build/use`：build 把原始输入按 (date, channel) 流式扫一遍写成回放缓存
+（`{out_root}/cache/{date}/{ex}_ch{ch}[/codes]`，成本≈一次 raw 跑数，按输入尺寸
+skip-if-built）；use 直接从缓存重算因子行（全通道缓存与 raw 输出**逐字节一致**，
+写入标准 raw CSV；`--cache-instruments` 限定的缓存只含这些标的，重算写入
+`raw/{date}/{ex}_ch{ch}_replay_{codes}.csv`，不会覆盖全市场生产 CSV）。引擎重建后
+迭代因子只花几秒。
 
 `--instruments`（convert/eval）把面板限制为单标的（如 588000 试点）：
 convert 会把过滤值写进分区 sidecar（`factors.parquet.meta.json`），skip-if-done

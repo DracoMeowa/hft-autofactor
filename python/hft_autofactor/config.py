@@ -57,6 +57,11 @@ class PipelineConfig:
         return self.out_root / "logs"
 
     @property
+    def cache_dir(self) -> Path:
+        """Replay-cache root: ``cache/{date}/{ex}_ch{ch}[/codes]`` per job."""
+        return self.out_root / "cache"
+
+    @property
     def golden_dir(self) -> Path:
         return self.validation_dir / "golden"
 

@@ -428,21 +428,43 @@ def engine_cli_args(
     out_csv: Path,
     canaries: bool = False,
     build_id: str | None = None,
+    build_cache_dir: Path | None = None,
+    cache_instruments: Sequence[str] | None = None,
+    use_cache_dir: Path | None = None,
 ) -> list[str]:
-    """Build the canonical hftaf-engine CLI argument list."""
+    """Build the canonical hftaf-engine CLI argument list.
+
+    Replay-cache modes (mutually exclusive):
+
+    * ``build_cache_dir`` -- stream the raw inputs once and write the cache
+      (``--out`` is omitted; the engine ignores output in build mode).
+    * ``use_cache_dir`` -- recompute factor rows from an existing cache
+      (``--ticks``/``--snapshots`` are omitted; the engine ignores them in
+      replay mode and cross-checks exchange/date/channel against the cache
+      meta).
+    """
+    if build_cache_dir is not None and use_cache_dir is not None:
+        raise ValueError("build_cache_dir and use_cache_dir are mutually exclusive")
     args = [
         "--exchange", exchange,
         "--date", date,
         "--channel", str(channel),
-        "--ticks", str(tick_gz),
-        "--snapshots", str(snapshot_gz),
-        "--out", str(out_csv),
-        "--horizons", ",".join(str(h) for h in cfg.horizons_s),
     ]
+    if use_cache_dir is None:
+        args += ["--ticks", str(tick_gz), "--snapshots", str(snapshot_gz)]
+    if build_cache_dir is None:
+        args += ["--out", str(out_csv)]
+    args += ["--horizons", ",".join(str(h) for h in cfg.horizons_s)]
     if cfg.factors:
         args += ["--factors", ",".join(cfg.factors)]
     if canaries:
         args.append("--canaries")
+    if build_cache_dir is not None:
+        args += ["--build-cache", str(build_cache_dir)]
+        if cache_instruments:
+            args += ["--cache-instruments", ",".join(cache_instruments)]
+    if use_cache_dir is not None:
+        args += ["--use-cache", str(use_cache_dir)]
     args += ["--build-id", build_id or build_id_for(cfg.engine_bin)]
     return args
 

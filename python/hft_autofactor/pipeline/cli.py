@@ -7,6 +7,15 @@ Examples::
     hftaf eval     --dates 20250603..20250630
     hftaf mask     --dates 20250603 --k 4
 
+Replay cache (fast factor iteration)::
+
+    hftaf factors  --dates 20250701 --channels 5 --cache build
+    hftaf factors  --dates 20250701 --channels 5 --cache use        # seconds
+    hftaf factors  --dates 20250701..20250930 --channels 5 --cache build \
+                   --cache-instruments 588000                        # 1 asset
+    hftaf factors  --dates 20250701..20250930 --channels 5 --cache use \
+                   --cache-instruments 588000
+
 Single-instrument pilot (e.g. 588000)::
 
     hftaf convert  --dates 20250701..20250930 --instruments 588000
@@ -85,6 +94,25 @@ def build_parser() -> argparse.ArgumentParser:
     p_fac.add_argument("--workers", type=int, default=None)
     p_fac.add_argument("--overwrite", action="store_true")
     p_fac.add_argument("--dry-run", action="store_true")
+    p_fac.add_argument(
+        "--cache",
+        choices=["build", "use"],
+        default=None,
+        help="replay-cache mode: 'build' streams the raw inputs once into "
+             "cache/{date}/{ex}_ch{ch} (one-time, costs the same as a raw "
+             "run); 'use' recomputes factor rows from that cache in seconds "
+             "instead of minutes -- the fast path for factor iteration after "
+             "an engine rebuild",
+    )
+    p_fac.add_argument(
+        "--cache-instruments",
+        default=None,
+        help="comma list of instrument codes to scope the cache to, e.g. "
+             "588000 (default: whole channel). A scoped replay only holds "
+             "those instruments' events, so it writes "
+             "raw/{date}/{ex}_ch{ch}_replay_{codes}.csv instead of the "
+             "production raw CSV",
+    )
 
     p_conv = sub.add_parser("convert", help="raw CSV -> day parquet partitions")
     p_conv.add_argument("--dates", required=True)
@@ -148,6 +176,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             max_workers=args.workers,
             overwrite=args.overwrite,
             dry_run=args.dry_run,
+            cache=args.cache,
+            cache_instruments=_parse_str_list(args.cache_instruments),
         )
         n_bad = 0
         for r in results:

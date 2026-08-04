@@ -119,8 +119,69 @@ def _log_path(cfg: PipelineConfig, job: DayJob) -> Path:
     return cfg.logs_dir / job.date / f"{job.exchange}_ch{job.channel}.log"
 
 
-def _run_one_job(cfg: PipelineConfig, job: DayJob) -> JobResult:
+def cache_dir_for(
+    cfg: PipelineConfig, job: DayJob, instruments: Sequence[str] | None = None
+) -> Path:
+    """Deterministic replay-cache directory for one job.
+
+    Whole-channel cache: ``cache/{date}/{ex}_ch{ch}``.  An instrument-scoped
+    cache nests under it, one directory per sorted code set
+    (``cache/{date}/{ex}_ch{ch}/588000``), so a whole-channel and a
+    single-instrument cache for the same job never collide.
+    """
+    base = cfg.cache_dir / job.date / f"{job.exchange}_ch{job.channel}"
+    if instruments:
+        base = base / "+".join(sorted(instruments))
+    return base
+
+
+def replay_out_csv(
+    cfg: PipelineConfig, job: DayJob, instruments: Sequence[str] | None = None
+) -> Path:
+    """Where a replay writes its rows.
+
+    Replay of a WHOLE-channel cache reproduces the production raw output
+    byte-for-byte, so it targets the standard raw CSV.  Replay of an
+    instrument-scoped cache only holds those instruments' events, so it must
+    not overwrite the full production CSV -- it writes a side file instead.
+    """
+    if not instruments:
+        return job.out_csv
+    codes = "+".join(sorted(instruments))
+    return cfg.raw_dir / job.date / f"{job.exchange}_ch{job.channel}_replay_{codes}.csv"
+
+
+def _cache_uptodate(
+    cfg: PipelineConfig, job: DayJob, instruments: Sequence[str] | None
+) -> bool:
+    """Skip-if-built: cache meta exists and matches the current input sizes."""
+    meta_path = cache_dir_for(cfg, job, instruments) / "meta.json"
+    if not meta_path.is_file():
+        return False
+    try:
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        return (
+            int(meta.get("tick_bytes", -1)) == job.tick_gz.stat().st_size
+            and int(meta.get("snapshot_bytes", -1)) == job.snapshot_gz.stat().st_size
+        )
+    except (OSError, ValueError, json.JSONDecodeError):
+        return False
+
+
+def _run_one_job(
+    cfg: PipelineConfig,
+    job: DayJob,
+    *,
+    cache: str | None = None,
+    cache_instruments: Sequence[str] | None = None,
+) -> JobResult:
     cfg.ensure_dirs()
+    cache_dir = cache_dir_for(cfg, job, cache_instruments) if cache else None
+    out_csv = (
+        replay_out_csv(cfg, job, cache_instruments)
+        if cache == "use"
+        else job.out_csv
+    )
     args = engine_cli_args(
         cfg,
         exchange=job.exchange,
@@ -128,16 +189,23 @@ def _run_one_job(cfg: PipelineConfig, job: DayJob) -> JobResult:
         channel=job.channel,
         tick_gz=job.tick_gz,
         snapshot_gz=job.snapshot_gz,
-        out_csv=job.out_csv,
+        out_csv=out_csv,
+        build_cache_dir=cache_dir if cache == "build" else None,
+        cache_instruments=cache_instruments if cache == "build" else None,
+        use_cache_dir=cache_dir if cache == "use" else None,
     )
     started = time.monotonic()
     cp = run_engine(cfg.engine_bin, args)
     elapsed = time.monotonic() - started
 
     log_path = _log_path(cfg, job)
+    if cache:
+        log_path = log_path.with_name(f"{log_path.name}.cache-{cache}")
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_text = (
-        f"# hftaf-engine job {job.date} {job.exchange} ch{job.channel}\n"
+        f"# hftaf-engine job {job.date} {job.exchange} ch{job.channel}"
+        + (f" (cache={cache})" if cache else "")
+        + "\n"
         f"# args: {' '.join(str(a) for a in args)}\n"
         f"# returncode: {cp.returncode}\n"
         f"# elapsed_s: {elapsed:.2f}\n"
@@ -145,7 +213,12 @@ def _run_one_job(cfg: PipelineConfig, job: DayJob) -> JobResult:
     )
     log_path.write_text(log_text, encoding="utf-8")
 
-    ok = cp.returncode == 0 and job.out_csv.is_file()
+    if cache == "build":
+        # Build mode writes no factor CSV; success = the cache meta exists.
+        assert cache_dir is not None
+        ok = cp.returncode == 0 and (cache_dir / "meta.json").is_file()
+    else:
+        ok = cp.returncode == 0 and out_csv.is_file()
     return JobResult(
         job=job,
         status="ok" if ok else "failed",
@@ -163,8 +236,27 @@ def run_factor_stage(
     max_workers: int | None = None,
     overwrite: bool = False,
     dry_run: bool = False,
+    cache: str | None = None,
+    cache_instruments: Sequence[str] | None = None,
 ) -> list[JobResult]:
-    """Run the C++ factor/label engine over all discovered jobs."""
+    """Run the C++ factor/label engine over all discovered jobs.
+
+    ``cache`` selects a replay-cache mode instead of the normal raw run:
+
+    * ``"build"`` -- stream the raw inputs once and write
+      ``cache/{date}/{ex}_ch{ch}[/codes]`` (same cost as a raw run; do it
+      once per job).  Skip-if-built against the cache meta unless
+      ``overwrite``.
+    * ``"use"`` -- recompute factor rows from that cache in seconds instead
+      of minutes; never skipped (recomputation is the point, e.g. after an
+      engine rebuild).  Whole-channel replays write the standard raw CSV
+      (byte-identical to a raw run); instrument-scoped replays write
+      ``raw/{date}/{ex}_ch{ch}_replay_{codes}.csv`` so the full production
+      CSV is never clobbered by a partial one.
+    """
+    if cache not in (None, "build", "use"):
+        raise ValueError(f"cache must be None, 'build' or 'use', got {cache!r}")
+
     jobs = discover_jobs(cfg, dates)
     if channels is not None:
         wanted = set(int(c) for c in channels)
@@ -179,7 +271,16 @@ def run_factor_stage(
                 JobResult(job=job, status="dry_run", returncode=0,
                           elapsed_s=0.0, log_tail="")
             )
-        elif not overwrite and _meta_uptodate(job, cfg):
+        elif (
+            cache == "build"
+            and not overwrite
+            and _cache_uptodate(cfg, job, cache_instruments)
+        ):
+            results.append(
+                JobResult(job=job, status="skipped", returncode=0,
+                          elapsed_s=0.0, log_tail="cache up-to-date")
+            )
+        elif cache is None and not overwrite and _meta_uptodate(job, cfg):
             results.append(
                 JobResult(job=job, status="skipped", returncode=0,
                           elapsed_s=0.0, log_tail="up-to-date")
@@ -193,7 +294,13 @@ def run_factor_stage(
     workers = max(1, int(max_workers or cfg.max_workers))
     cfg.ensure_dirs()
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = {pool.submit(_run_one_job, cfg, job): job for job in runnable}
+        futures = {
+            pool.submit(
+                _run_one_job, cfg, job,
+                cache=cache, cache_instruments=cache_instruments,
+            ): job
+            for job in runnable
+        }
         for fut in as_completed(futures):
             results.append(fut.result())
     return results
