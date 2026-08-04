@@ -143,8 +143,8 @@ def choose_panel_cutoffs(
     return points
 
 
-def _scope_key_arrays(df: pl.DataFrame, cutoff: PanelCutoff) -> list[tuple]:
-    scoped = df.filter(cutoff.scope_expr()).sort(list(_KEY_COLS))
+def _key_arrays(scoped: pl.DataFrame) -> list[tuple]:
+    """Key tuples of an ALREADY scoped+sorted frame (date, instrument, ts_ms)."""
     return list(
         zip(
             scoped["date"].to_list(),
@@ -168,6 +168,10 @@ def compare_panel_prefix(
     NaN == NaN (warm-up must line up too).  Directional semantics mirror
     ``mask_test.compare_prefix``: truncated-present rows must equal the full
     run; full-prefix rows missing from the truncated output are flagged.
+
+    Cost note: the key sets are built ONCE per side (a previous revision
+    rebuilt ``set(f_keys)`` inside the membership comprehension, which was
+    O(n^2) and hung on full-day panels of a few 10^5 rows).
     """
     for df, tag in ((full_panel, "full"), (trunc_panel, "truncated")):
         for col in (*_KEY_COLS, column):
@@ -177,25 +181,25 @@ def compare_panel_prefix(
     f_scoped = full_panel.filter(cutoff.scope_expr()).sort(list(_KEY_COLS))
     t_scoped = trunc_panel.filter(cutoff.scope_expr()).sort(list(_KEY_COLS))
 
-    f_keys = _scope_key_arrays(full_panel, cutoff)
-    t_keys = _scope_key_arrays(trunc_panel, cutoff)
+    f_keys = _key_arrays(f_scoped)
+    t_keys = _key_arrays(t_scoped)
 
     n_scope = len(f_keys)
     first_diff: str | None = None
 
+    f_set = set(f_keys)
     t_set = set(t_keys)
-    extra = [k for k in t_keys if k not in set(f_keys)]
-    if extra:
-        d, inst, ts = extra[0]
+    extra = next((k for k in t_keys if k not in f_set), None)
+    if extra is not None:
+        d, inst, ts = extra
         first_diff = (
             f"row in truncated panel missing from full prefix: "
             f"date={d} instrument={inst} ts_ms={ts}"
         )
     if first_diff is None:
-        f_set = set(f_keys)
-        missing = [k for k in f_keys if k not in t_set]
-        if missing:
-            d, inst, ts = missing[0]
+        missing = next((k for k in f_keys if k not in t_set), None)
+        if missing is not None:
+            d, inst, ts = missing
             first_diff = (
                 f"row in full prefix missing from truncated panel: "
                 f"date={d} instrument={inst} ts_ms={ts}"

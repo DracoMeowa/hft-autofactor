@@ -264,6 +264,26 @@ def test_compare_prefix_null_equals_null_warmup():
     assert aug[proto.name].null_count() > 0  # warm-up really present
 
 
+def test_prefix_check_scales_linearly_on_large_panel():
+    """Regression: the prefix comparison must stay ~linear in prefix rows.
+
+    A previous revision of compare_panel_prefix rebuilt ``set(f_keys)``
+    inside the membership comprehension (O(n^2)); on a full-day smoke panel
+    (~10^5 rows in the late prefix) that hung for hours at 100% CPU.  This
+    24k-row panel finishes in ~1s once linear; the quadratic version needs
+    minutes, so the 30s budget is a wide, machine-independent margin.
+    """
+    import time
+
+    panel = make_panel(n_snap=6000)  # 2 days x 2 instruments x 6000 rows
+    proto = causal_proto()
+    t0 = time.monotonic()
+    report = panel_prefix_check(panel, proto, k=4)
+    elapsed = time.monotonic() - t0
+    assert report.passed is True
+    assert elapsed < 30.0, f"prefix check took {elapsed:.1f}s (quadratic regression?)"
+
+
 # --------------------------------------------------------------------- #
 # compute_prototype_column contract                                     #
 # --------------------------------------------------------------------- #
