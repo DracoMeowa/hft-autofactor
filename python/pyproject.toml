@@ -21,6 +21,8 @@ dev = ["pytest>=7.0"]
 [project.scripts]
 hftaf = "hft_autofactor.pipeline.cli:main"
 hftaf-backtest = "hft_autofactor.backtest.cli:main"
+hftaf-explore = "hft_autofactor.explore.cli:main"
+hftaf-digest = "hft_autofactor.digest.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
