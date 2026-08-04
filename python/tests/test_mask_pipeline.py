@@ -443,3 +443,54 @@ def test_mask_test_day_flags_leaky_engine_without_canary_check(
 def test_mask_test_day_unknown_job_raises(small_cfg):
     with pytest.raises(FileNotFoundError):
         mt.mask_test_day(small_cfg, "20250101", "sse", 1)
+
+
+# --------------------------------------------------------------------- #
+# run_mask_stage channel filter                                         #
+# --------------------------------------------------------------------- #
+def _make_inputs_channels(cfg, date: str, channels):
+    """Create tick streams for several channels sharing one snapshot file."""
+    day_dir = cfg.data_roots["sse"] / date[:6] / "csv_0603_081500"
+    day_dir.mkdir(parents=True, exist_ok=True)
+    write_snapshot_gz(day_dir / "1_snapshot.csv.gz", n_rows=40, start_ms=START_MS)
+    for ch in channels:
+        write_tick_gz(day_dir / f"1_channel_{ch}.csv.gz", n_rows=600,
+                      start_ms=START_MS, step_ms=200)
+    return day_dir
+
+
+def test_run_mask_stage_channels_filter(small_cfg, monkeypatch):
+    """channels=[5] restricts the stage to just that (date, channel) job."""
+    from hft_autofactor.pipeline import orchestrator
+
+    _make_inputs_channels(small_cfg, DATE, channels=[3, 5])
+    monkeypatch.setattr(mt, "run_engine", make_fake_engine())
+
+    report_path = orchestrator.run_mask_stage(
+        small_cfg, [DATE], k=2, channels=[5]
+    )
+    import json
+
+    summary = json.loads(report_path.read_text(encoding="utf-8"))
+    assert summary["n_jobs"] == 1
+    assert summary["n_passed"] == 1
+    assert summary["entries"][0]["channel"] == 5
+    # channel 5 raw output produced; channel 3 untouched
+    assert (small_cfg.raw_dir / DATE / "sse_ch5.csv").is_file()
+    assert not (small_cfg.raw_dir / DATE / "sse_ch3.csv").exists()
+
+
+def test_run_mask_stage_no_filter_runs_all_channels(small_cfg, monkeypatch):
+    """channels=None (default) keeps every discovered channel."""
+    from hft_autofactor.pipeline import orchestrator
+
+    _make_inputs_channels(small_cfg, DATE, channels=[3, 5])
+    monkeypatch.setattr(mt, "run_engine", make_fake_engine())
+
+    report_path = orchestrator.run_mask_stage(small_cfg, [DATE], k=2)
+    import json
+
+    summary = json.loads(report_path.read_text(encoding="utf-8"))
+    assert summary["n_jobs"] == 2
+    assert summary["n_passed"] == 2
+    assert sorted(e["channel"] for e in summary["entries"]) == [3, 5]

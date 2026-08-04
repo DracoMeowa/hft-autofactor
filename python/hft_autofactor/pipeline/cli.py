@@ -110,6 +110,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_mask = sub.add_parser("mask", help="lookahead mask validation (Stage 2)")
     p_mask.add_argument("--dates", required=True)
     p_mask.add_argument("--k", type=int, default=4, help="truncation points per job")
+    p_mask.add_argument(
+        "--channels",
+        default=None,
+        help="comma list of channels to restrict the test to, e.g. 5 "
+        "(default: every discovered channel)",
+    )
 
     return parser
 
@@ -193,7 +199,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
 
     if args.command == "mask":
-        report = orchestrator.run_mask_stage(cfg, dates, k=args.k)
+        report = orchestrator.run_mask_stage(
+            cfg, dates, k=args.k, channels=_parse_int_list(args.channels)
+        )
         import json
 
         summary = json.loads(report.read_text(encoding="utf-8"))

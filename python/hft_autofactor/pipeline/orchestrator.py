@@ -363,16 +363,27 @@ def run_eval_stage(
 
 
 def run_mask_stage(
-    cfg: PipelineConfig, dates: Sequence[str], *, k: int = 4
+    cfg: PipelineConfig,
+    dates: Sequence[str],
+    *,
+    k: int = 4,
+    channels: Sequence[int] | None = None,
 ) -> Path:
     """Run the lookahead mask test for every discovered job with data.
 
     Jobs whose raw output does not exist yet are produced by the engine as
     part of the test.  Passed jobs also store a golden hash under
     ``validation/golden`` for future regression checks.
+
+    ``channels`` optionally restricts the test to a subset of channels
+    (e.g. the single channel holding a pilot instrument).  ``None`` means
+    every discovered channel, matching the factors stage behaviour.
     """
     cfg.ensure_dirs()
     jobs = discover_jobs(cfg, dates)
+    if channels is not None:
+        keep = set(channels)
+        jobs = [j for j in jobs if j.channel in keep]
     entries: list[dict] = []
     for job in jobs:
         entry: dict = {
