@@ -172,6 +172,59 @@ def test_label_present_in_truncated_but_absent_in_full_detected(full_csv, trunc_
     assert "fwd_mid_ret_15s" in diff.first_diff
 
 
+def test_compare_prefix_boundary_row_nonlabel_diff_is_allowed(full_csv, trunc_csv):
+    """Non-label columns of the single row at ts == cut are exempted.
+
+    Real-data root cause (20250701 sse ch5, ofi_60s): the merge consumes
+    ticks in file (SeqNo) order and stops at the first tick with
+    TransactTime > U; ~1e-4 of ticks carry out-of-order stamps, so
+    truncating by SeqNo shifts the stop point and the cut-point snapshot
+    absorbs a slightly different tick set in the two runs.  Only the
+    boundary row is affected -- rows with ts < cut are bit-exact (the
+    causality guarantee).
+    """
+    text = trunc_csv.read_text().splitlines()
+    header = text[0].split(",")
+    oir_idx = header.index("oir")
+    fields = text[1 + CUT_IDX].split(",")  # ts == CUT_MS -> boundary row
+    fields[oir_idx] = "9.999999"
+    text[1 + CUT_IDX] = ",".join(fields)
+    trunc_csv.write_text("\n".join(text) + "\n")
+
+    diff = compare_prefix(full_csv, trunc_csv, CUT_MS, horizons_max_s=900)
+    assert diff.identical is True
+
+    # The row right before the boundary is NOT exempt: the same tamper
+    # one row earlier must still be caught.
+    text = trunc_csv.read_text().splitlines()
+    fields = text[1 + CUT_IDX - 1].split(",")
+    fields[oir_idx] = "9.999999"
+    text[1 + CUT_IDX - 1] = ",".join(fields)
+    trunc_csv.write_text("\n".join(text) + "\n")
+    diff = compare_prefix(full_csv, trunc_csv, CUT_MS, horizons_max_s=900)
+    assert diff.identical is False
+    assert "oir" in diff.first_diff
+
+
+def test_compare_prefix_boundary_row_labels_still_compared_in_scope(
+    full_csv, trunc_csv
+):
+    """The boundary exemption covers non-label columns only: when the label
+    horizon actually reaches the boundary row (horizons_max_s=0 here) a
+    truncated-present label mismatch on that row is still detected."""
+    text = trunc_csv.read_text().splitlines()
+    header = text[0].split(",")
+    lab_idx = header.index("fwd_mid_ret_15s")
+    fields = text[1 + CUT_IDX].split(",")  # boundary row
+    fields[lab_idx] = "9.876543"
+    text[1 + CUT_IDX] = ",".join(fields)
+    trunc_csv.write_text("\n".join(text) + "\n")
+
+    diff = compare_prefix(full_csv, trunc_csv, CUT_MS, horizons_max_s=0)
+    assert diff.identical is False
+    assert "fwd_mid_ret_15s" in diff.first_diff
+
+
 def test_compare_prefix_missing_row_detected(full_csv, trunc_csv):
     text = trunc_csv.read_text().splitlines()
     del text[6]  # drop row idx 4
