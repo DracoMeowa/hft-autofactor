@@ -14,8 +14,11 @@ import pytest
 from hft_autofactor.backtest.costs import (
     HANDLING_FEE_EXEMPT_CATEGORIES,
     CostModel,
+    ShortCostModel,
     load_cost_models,
+    load_short_cost_model,
     round_trip_cost_bps,
+    short_borrow_cost_bps,
     side_cost_cny,
 )
 
@@ -213,3 +216,72 @@ def test_divergent_exemption_list_raises(tmp_path: Path) -> None:
 def test_missing_file_raises(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError):
         load_cost_models(tmp_path / "nope.yaml")
+
+
+# --------------------------------------------------------------------------- #
+# Securities-lending (融券) borrow cost (#86, #129)
+# --------------------------------------------------------------------------- #
+def test_load_short_cost_model_absent_section_returns_none(
+    synthetic_yaml: Path,
+) -> None:
+    assert load_short_cost_model(synthetic_yaml) is None
+
+
+def test_load_short_cost_model_parses_section(tmp_path: Path) -> None:
+    p = tmp_path / "sl.yaml"
+    p.write_text(
+        SYNTHETIC_YAML
+        + "\nsecurities_lending:\n"
+        "  borrow_rate_annual: 0.08\n"
+        "  min_charge_days: 1.0\n"
+        "  day_count_base: 360.0\n"
+        "  source: 'test'\n",
+        encoding="utf-8",
+    )
+    m = load_short_cost_model(p)
+    assert isinstance(m, ShortCostModel)
+    assert m.borrow_rate_annual == pytest.approx(0.08)
+    assert m.min_charge_days == pytest.approx(1.0)
+    assert m.day_count_base == pytest.approx(360.0)
+    assert m.source == "test"
+
+
+def test_load_short_cost_model_validation(tmp_path: Path) -> None:
+    p = tmp_path / "bad.yaml"
+    p.write_text(
+        "securities_lending:\n  borrow_rate_annual: 12.0\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError):
+        load_short_cost_model(p)
+    p.write_text(
+        "securities_lending:\n  borrow_rate_annual: 0.08\n  day_count_base: 0\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError):
+        load_short_cost_model(p)
+
+
+def test_real_params_yaml_securities_lending() -> None:
+    path = _real_yaml()
+    if path is None:
+        pytest.skip("real etf_backtest_params.yaml not present in repo")
+    m = load_short_cost_model(path)
+    assert m is not None
+    assert m.borrow_rate_annual == pytest.approx(0.08)
+    assert m.min_charge_days == pytest.approx(1.0)
+    assert m.day_count_base == pytest.approx(360.0)
+
+
+def test_short_borrow_cost_bps_formula() -> None:
+    m = ShortCostModel(
+        borrow_rate_annual=0.08, min_charge_days=1.0, day_count_base=360.0
+    )
+    # the 1-day minimum dominates all sub-day horizons (T+1 repay rule)
+    assert short_borrow_cost_bps(m, 15.0) == pytest.approx(0.08 / 360.0 * 1e4)
+    assert short_borrow_cost_bps(m, 900.0) == pytest.approx(0.08 / 360.0 * 1e4)
+    # multi-day holds bill calendar days
+    assert short_borrow_cost_bps(m, 3 * 86_400.0) == pytest.approx(
+        3 * 0.08 / 360.0 * 1e4
+    )
+    with pytest.raises(ValueError):
+        short_borrow_cost_bps(m, -0.5)

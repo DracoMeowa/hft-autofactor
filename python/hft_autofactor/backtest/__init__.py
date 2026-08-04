@@ -9,11 +9,21 @@ enforces A-share settlement rules (T+1 sell-lock for equity ETFs via
 and realized round-trip costs per commission scenario, and gates factor
 admission on net-of-cost survival in ALL scenarios.
 """
+from .conditional import (
+    MatrixConfig,
+    MatrixResult,
+    cell_keys,
+    run_conditional_matrix,
+    write_matrix_report,
+)
 from .costs import (
     HANDLING_FEE_EXEMPT_CATEGORIES,
     CostModel,
+    ShortCostModel,
     load_cost_models,
+    load_short_cost_model,
     round_trip_cost_bps,
+    short_borrow_cost_bps,
     side_cost_cny,
 )
 from .derived import (
@@ -44,9 +54,18 @@ __all__ = [
     # costs
     "HANDLING_FEE_EXEMPT_CATEGORIES",
     "CostModel",
+    "ShortCostModel",
     "load_cost_models",
+    "load_short_cost_model",
     "side_cost_cny",
     "round_trip_cost_bps",
+    "short_borrow_cost_bps",
+    # conditional profitability matrix (track B, #86)
+    "MatrixConfig",
+    "MatrixResult",
+    "cell_keys",
+    "run_conditional_matrix",
+    "write_matrix_report",
     # derived factors
     "DERIVED_FACTORS",
     "DerivedFactor",

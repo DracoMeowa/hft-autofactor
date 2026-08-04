@@ -319,3 +319,51 @@ def test_stage2_oos_gate_pass_and_fail():
     passed3, details3 = stage2_oos_gate(is_st, oos_flip, cfg)
     assert passed3 is False
     assert details3["sign_ok"] is False
+
+
+# --------------------------------------------------------------------- #
+# two-sided gates (#86): reversal factors are legal                       #
+# --------------------------------------------------------------------- #
+def test_stage1_screen_negative_ic_admitted_with_direction(tmp_path):
+    """A significantly NEGATIVE IC is admitted as a reversal signal (#86):
+    the gate is two-sided and reports direction = sign(mean IC)."""
+    ledger = TrialLedger(tmp_path / "ledger.jsonl")
+    reversal = ICStats("iopv_premium_mom", 900, n_obs=200, mean_ic=-0.05,
+                       ic_std=0.04, icir=-1.25, t_stat_nw=-4.5, n_eff=180.0,
+                       win_rate=0.7)
+    weak = ICStats("wdi", 900, n_obs=200, mean_ic=0.001, ic_std=0.05,
+                   icir=0.02, t_stat_nw=0.3, n_eff=150.0, win_rate=0.51)
+    df = stage1_screen([reversal, weak], ledger, GateConfig(), noise_floors={})
+    by_factor = {r["factor"]: r for r in df.to_dicts()}
+    assert by_factor["iopv_premium_mom"]["passed"] is True
+    assert by_factor["iopv_premium_mom"]["direction"] == -1
+    assert by_factor["wdi"]["passed"] is False
+    assert by_factor["wdi"]["direction"] == 1  # sign reported even when failing
+
+
+def test_stage1_screen_negative_t_below_hurdle_still_fails(tmp_path):
+    """Two-sided changes the sign semantics only -- no threshold relaxed."""
+    ledger = TrialLedger(tmp_path / "ledger.jsonl")
+    # |t| = 2.5 < hurdle floor 3.0: fails exactly as the positive twin would
+    st = ICStats("rev", 900, n_obs=200, mean_ic=-0.05, ic_std=0.04,
+                 icir=-1.25, t_stat_nw=-2.5, n_eff=180.0, win_rate=0.7)
+    df = stage1_screen([st], ledger, GateConfig(), noise_floors={})
+    assert df["passed"][0] is False
+    assert df["direction"][0] == -1
+
+
+def test_stage2_oos_gate_two_sided_negative():
+    """OOS confirmation of a reversal factor: negative t must clear |t|>=2."""
+    cfg = GateConfig()
+    is_st = ICStats("rev", 900, 100, -0.05, 0.03, -1.67, -5.0, 90.0, 0.7)
+    oos_ok = ICStats("rev", 900, 30, -0.035, 0.03, -1.17, -2.5, 25.0, 0.6)
+    passed, details = stage2_oos_gate(is_st, oos_ok, cfg)
+    assert passed is True
+    assert details["direction"] == -1
+    assert details["oos_t_ok"] is True  # abs(-2.5) >= 2.0
+
+    # |t| = 1.5 OOS fails even with perfect sign retention
+    oos_weak = ICStats("rev", 900, 30, -0.035, 0.03, -1.17, -1.5, 25.0, 0.6)
+    passed2, details2 = stage2_oos_gate(is_st, oos_weak, cfg)
+    assert passed2 is False
+    assert details2["oos_t_ok"] is False

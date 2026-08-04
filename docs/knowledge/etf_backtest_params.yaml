@@ -58,6 +58,20 @@ settlement:
     bought_stocks: "usable for subscription same day, not sellable same day"
   backtest_inventory_rule: "sellable_qty(t) = holdings(t-1)"
 
+securities_lending:              # 融券 borrow cost — short legs of the #86 conditional matrix (#129 research 2026-08-05)
+  borrow_rate_annual: 0.08       # conservative default 8%/yr; market 4-6%, historical posted 10.6%, sensitivity band 4-10.6%
+  min_charge_days: 1.0           # minimum billing granularity: ONE calendar day even for intraday borrows
+  day_count_base: 360.0          # accrual = calendar days / 360 (standard 两融 contract clause)
+  source: >-
+    #129 research (2026-08-05): 融资融券交易实施细则 art.16 — units sold short
+    can only be repaid (买券还券) from the NEXT trading day, so the shortest
+    realizable short hold is overnight and every short trade carries >=1 day of
+    borrow plus an overnight gap exposure the H-second label does not measure.
+    Accrual on calendar days over a 360 base, min 1 day. 588000 margin-eligible
+    since 2020-11 listing; margin ratio >=80% since 2023-10-30; securities-lending
+    sells subject to the uptick rule (申报价 >= 最新成交价); 转融券 suspended since
+    2024-07 (scarce supply); 588000 has no dividend history (no compensation cost).
+
 creation_redemption:
   broker_fee_max: 0.005          # <=0.5% all-in incl. exchange/CSDC fees (159915 prospectus 2026-02)
   min_unit_example: { ticker: "159915", units: 1000000 }

@@ -38,7 +38,10 @@ import yaml
 __all__ = [
     "HANDLING_FEE_EXEMPT_CATEGORIES",
     "CostModel",
+    "ShortCostModel",
     "load_cost_models",
+    "load_short_cost_model",
+    "short_borrow_cost_bps",
     "side_cost_cny",
     "round_trip_cost_bps",
 ]
@@ -69,6 +72,60 @@ class CostModel:
     regulatory_fee_rate: float = 0.0
     transfer_fee_rate: float = 0.0
     stamp_duty_rate: float = 0.0  # always 0 for ETF units
+
+
+#: Seconds in one calendar day (borrow accrual granularity).
+SECONDS_PER_DAY: float = 86_400.0
+
+#: Securities-lending day-count convention: calendar days over a 360 base,
+#: minimum ONE day charged even for same-day borrows (#129 research:
+#: standard margin-trading contract clause).
+DAYS_PER_YEAR_BASE: float = 360.0
+
+
+@dataclass(frozen=True)
+class ShortCostModel:
+    """Securities-lending (融券) borrow cost for short legs (#86, #129).
+
+    ``borrow_rate_annual`` is the annualized borrow fee as a fraction of
+    notional; accrual is calendar-day based over a ``day_count_base`` of 360
+    with a minimum billing of ``min_charge_days`` days::
+
+        cost_bps = rate * max(hold_days, min_charge_days) / day_count_base * 1e4
+
+    REGULATORY CONSTRAINT (#129 finding, 融资融券交易实施细则 art. 16): units
+    sold short via securities lending can only be repaid (买券还券) from the
+    NEXT trading day -- an intraday short round trip is not executable.  The
+    shortest realizable short hold is overnight, so every short trade in the
+    conditional matrix carries (a) at least one day of borrow and (b) an
+    overnight gap exposure that the H-second label does NOT measure.  The
+    matrix therefore labels short cells with a ``T+1_repay`` settlement note
+    and the overnight risk is documented as unmeasured rather than priced.
+    Parameters live in the ``securities_lending`` section of
+    etf_backtest_params.yaml; while that section is absent, short legs run
+    uncosted and are descriptive-only (never admitted).
+    """
+
+    borrow_rate_annual: float
+    min_charge_days: float = 1.0
+    day_count_base: float = DAYS_PER_YEAR_BASE
+    source: str = ""  # provenance note (research task / broker schedule)
+
+
+def short_borrow_cost_bps(model: ShortCostModel, horizon_s: float) -> float:
+    """Borrow cost of one short trade held ``horizon_s`` seconds, in bps of
+    entry notional.  Applies the minimum billing granularity; with the
+    regulatory T+1 repayment rule the effective hold is always >= 1 day.
+    """
+    if horizon_s < 0:
+        raise ValueError(f"horizon_s must be >= 0, got {horizon_s}")
+    hold_days = max(float(horizon_s) / SECONDS_PER_DAY, float(model.min_charge_days))
+    return (
+        float(model.borrow_rate_annual)
+        * hold_days
+        / float(model.day_count_base)
+        * 1e4
+    )
 
 
 def _read_yaml(params_yaml: str | Path) -> Mapping[str, Any]:
@@ -149,6 +206,49 @@ def load_cost_models(
     if missing:
         raise ValueError(f"commission scenarios missing from params file: {missing}")
     return models
+
+
+def load_short_cost_model(params_yaml: str | Path) -> ShortCostModel | None:
+    """Load the securities-lending (融券) borrow model, or None if absent.
+
+    Reads the optional ``securities_lending`` section of
+    etf_backtest_params.yaml (populated by the #129 research)::
+
+        securities_lending:
+          borrow_rate_annual: 0.08     # fraction of notional per year
+          min_charge_days: 1.0         # minimum billing granularity
+          day_count_base: 360.0        # calendar-day convention
+          source: "..."                # provenance note
+
+    While the section is missing, short legs in the conditional matrix run
+    without a borrow model and are flagged descriptive-only -- they can
+    never pass the track-B gate on an uncosted short.
+    """
+    doc = _read_yaml(params_yaml)
+    sl = doc.get("securities_lending")
+    if not isinstance(sl, Mapping):
+        return None
+    rate = sl.get("borrow_rate_annual")
+    if rate is None:
+        return None
+    rate = float(rate)
+    if not (0.0 <= rate <= 1.0):
+        raise ValueError(
+            f"securities_lending.borrow_rate_annual must be a fraction in "
+            f"[0, 1], got {rate}"
+        )
+    min_days = float(sl.get("min_charge_days", 1.0))
+    if min_days < 0:
+        raise ValueError(f"min_charge_days must be >= 0, got {min_days}")
+    base = float(sl.get("day_count_base", DAYS_PER_YEAR_BASE))
+    if base <= 0:
+        raise ValueError(f"day_count_base must be > 0, got {base}")
+    return ShortCostModel(
+        borrow_rate_annual=rate,
+        min_charge_days=min_days,
+        day_count_base=base,
+        source=str(sl.get("source", "")),
+    )
 
 
 def side_cost_cny(

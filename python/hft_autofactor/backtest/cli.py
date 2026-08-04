@@ -18,6 +18,19 @@ Usage::
 ``--dates`` accepts either a comma-separated list of YYYYMMDD days or an
 inclusive ``START..END`` range, which is expanded against the existing
 parquet day partitions (``dt=YYYYMMDD``).
+
+Track-B mode (#86, ``--matrix``)
+--------------------------------
+Instead of the full position simulation, runs the frozen 24-cell conditional
+profitability matrix of ``docs/design/eval-redesign-86.md``: direction x
+entry-threshold tau x volatility regime, non-overlapping carry-free trades,
+net of the taker cost stack and (for shorts) the securities-lending borrow
+cost.  ``--direction`` supplies the track-A ``ic_direction`` and fixes the
+primary cell; ``--eval-dates`` restricts trading to a window inside
+``--dates`` (rows outside it feed the trailing regime history only).
+Reports go to ``--matrix-out`` (default ``{out_root}/matrix/{factor}_h{H}/``)
+and every cell is appended to the trial ledger at stage="matrix_cell" before
+the primary gate is read.
 """
 from __future__ import annotations
 
@@ -29,11 +42,13 @@ from typing import Sequence
 
 import polars as pl
 
-from .costs import load_cost_models
+from .conditional import MatrixConfig, run_conditional_matrix, write_matrix_report
+from .costs import load_cost_models, load_short_cost_model
 from .derived import DERIVED_FACTORS, materialize_derived
 from .engine import InstrumentMeta, run_backtest
 from .metrics import gate_on_costs, summarize_results
 from .signals import PositionRule
+from ..eval.gating import TrialLedger
 
 __all__ = ["main"]
 
@@ -132,6 +147,89 @@ def _load_settlement_and_mechanics(params_yaml: Path) -> dict:
     }
 
 
+def _run_matrix_mode(
+    args,
+    cfg,
+    panel: pl.DataFrame,
+    dates: list[str],
+    scenarios: list[str],
+    models: dict,
+    settle: dict,
+    params_yaml: Path,
+) -> int:
+    """Track-B conditional profitability matrix (#86).
+
+    Frozen 24-cell set, primary-cell-only admission gate; every cell is
+    ledgered at stage="matrix_cell" before the gate reads any threshold.
+    """
+    scen_models = {s: models[s] for s in scenarios}
+    try:
+        short_costs = load_short_cost_model(params_yaml)
+    except Exception as exc:
+        print(f"error: {exc}")
+        return 2
+
+    eval_dates: list[str] | None = None
+    if args.eval_dates:
+        try:
+            eval_dates = _resolve_dates(Path(cfg.out_root) / "parquet", args.eval_dates)
+        except ValueError as exc:
+            print(f"error: --eval-dates: {exc}")
+            return 2
+        outside = [d for d in eval_dates if d not in set(dates)]
+        if outside:
+            print(f"error: --eval-dates outside --dates: {outside[:5]}")
+            return 2
+
+    ledger = TrialLedger(cfg.reports_dir / "trial_ledger.jsonl")
+    result = run_conditional_matrix(
+        panel,
+        args.factor,
+        int(args.horizon),
+        scen_models,
+        MatrixConfig(),
+        ic_direction=int(args.direction),
+        eval_dates=eval_dates,
+        etf_categories=settle["instrument_categories"],
+        short_costs=short_costs,
+        ledger=ledger,
+    )
+    out_dir = (
+        Path(args.matrix_out)
+        if args.matrix_out
+        else Path(cfg.out_root) / "matrix" / f"{args.factor}_h{args.horizon}"
+    )
+    report_path = write_matrix_report(out_dir, result)
+
+    print(
+        f"matrix factor={args.factor} horizon={args.horizon}s "
+        f"ic_direction={result.ic_direction:+d} primary="
+        f"{result.primary_cell['direction']}/tau={result.primary_cell['tau']}/"
+        f"{result.primary_cell['regime']}"
+    )
+    borrow_note = (
+        "none (shorts descriptive-only)"
+        if short_costs is None
+        else "%s/yr min %sd" % (short_costs.borrow_rate_annual, short_costs.min_charge_days)
+    )
+    print(
+        f"  trades={result.trades.height}  cells={result.cells.height}  "
+        f"borrow_model={borrow_note}"
+    )
+    for scen, v in result.primary.get("scenarios", {}).items():
+        verdict = "PASS" if v["pass"] else "FAIL"
+        print(
+            "  %18s: %s  net=%.3fbp  t=%.2f  n=%d/%dd"
+            % (scen, verdict, v["mean_net_edge_bps"], v["t_nw_daily"],
+               v["n_trades"], v["n_days"])
+        )
+        for r in v.get("reasons", []):
+            print(f"    - {r}")
+    print(f"primary gate: {'PASS' if result.primary.get('passed') else 'FAIL'}")
+    print(f"report: {report_path}")
+    return 0
+
+
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="hftaf-backtest",
@@ -158,7 +256,11 @@ def _build_parser() -> argparse.ArgumentParser:
                    help="add the +0.3bp/side regulatory+transfer fee sensitivity")
     p.add_argument("--entry-z", type=float, default=2.0)
     p.add_argument("--exit-z", type=float, default=0.5)
-    p.add_argument("--direction", type=int, default=1, choices=(1, -1))
+    p.add_argument("--direction", type=int, default=1, choices=(1, -1),
+                   help="position direction (full sim); in --matrix mode this "
+                        "is the track-A ic_direction = sign(mean IC) and fixes "
+                        "the primary cell (1 = long primary, -1 = short/"
+                        "reversal primary)")
     p.add_argument("--max-units", type=int, default=100_000)
     p.add_argument("--base-units", type=int, default=0,
                    help="inventory floor (底仓): targets oscillate around "
@@ -175,6 +277,16 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--out", default=None,
                    help="output directory (default: {out_root}/backtest/"
                         "{factor}_h{horizon})")
+    p.add_argument("--matrix", action="store_true",
+                   help="run the track-B conditional profitability matrix "
+                        "(#86) instead of the full position simulation")
+    p.add_argument("--matrix-out", default=None,
+                   help="matrix report directory (default: {out_root}/matrix/"
+                        "{factor}_h{horizon})")
+    p.add_argument("--eval-dates", default=None,
+                   help="matrix mode: trading window inside --dates "
+                        "(same syntax); rows outside it feed the trailing "
+                        "regime history only. Default: all --dates")
     return p
 
 
@@ -257,6 +369,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"error: unknown commission scenario(s): {unknown}; "
               f"available: {sorted(models)}")
         return 2
+
+    if args.matrix:
+        return _run_matrix_mode(args, cfg, panel, dates, scenarios, models,
+                                settle, params_yaml)
 
     # --- per-instrument meta: settlement class comes from the category map --
     t0, t1 = settle["t_plus_0"], settle["t_plus_1"]

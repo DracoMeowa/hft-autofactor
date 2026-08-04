@@ -12,7 +12,14 @@ count N drives every threshold:
                        thresholds are read, so N can never be understated
 
 Stage 2 then applies the pristine-OOS gate: retention >= 0.5 with sign
-consistency, OOS t >= 2.0 and a minimum win rate.
+consistency, |OOS t| >= 2.0 and a minimum win rate.
+
+Direction convention (#86, 2026-08-05): both gates are TWO-SIDED.  A factor
+with a significantly negative IC is admitted with ``direction = -1``
+(reversal signal); ``direction = sign(mean IC)`` is reported on every row
+and consumed by the conditional-profitability matrix (track B, see
+``docs/design/eval-redesign-86.md``).  Making the gates two-sided changes
+the sign semantics only -- no threshold value is relaxed.
 """
 from __future__ import annotations
 
@@ -137,6 +144,11 @@ def _bhy_pass(p_values: Sequence[float], q: float) -> list[bool]:
     if best_k >= 0:
         passed[order[: best_k + 1]] = True
     return passed.tolist()
+
+
+#: Public aliases used by the track-B conditional matrix (#86), which
+#: reports a cross-cell BHY column without re-implementing the step-up.
+bhy_pass = _bhy_pass
 
 
 def deflated_sharpe_pvalue(
@@ -284,6 +296,18 @@ def _p_value_two_sided(t: float) -> float:
     return float(min(1.0, 2.0 * (1.0 - norm_cdf(abs(t)))))
 
 
+def _direction(mean_ic: float) -> int:
+    """Tradeable direction implied by the IC sign (#86): +1 long-on-high,
+    -1 reversal (short-on-high / long-on-low), 0 undetermined."""
+    if not math.isfinite(mean_ic) or mean_ic == 0.0:
+        return 0
+    return 1 if mean_ic > 0.0 else -1
+
+
+#: Public alias for the track-B conditional matrix (#86) report columns.
+p_value_two_sided = _p_value_two_sided
+
+
 def stage1_screen(
     stats: Sequence[ICStats],
     ledger: TrialLedger,
@@ -292,16 +316,18 @@ def stage1_screen(
 ) -> pl.DataFrame:
     """Screen candidate (factor, horizon) ICStats through the Stage-1 gates.
 
-    Gates: |mean IC| >= per-horizon floor; |ICIR| >= min_icir; NW t >=
-    max(3, sqrt(2 ln N)) with N from the ledger; |mean IC| above the
-    permutation noise floor (when provided); BHY-FDR q <= fdr_q over the
-    batch.  Every candidate is appended to the ledger at stage="stage1"
-    BEFORE the hurdle is read.
+    Gates: |mean IC| >= per-horizon floor; |ICIR| >= min_icir;
+    |NW t| >= max(3, sqrt(2 ln N)) (TWO-SIDED since #86: significantly
+    negative IC is admitted as a reversal signal with direction=-1) with N
+    from the ledger; |mean IC| above the permutation noise floor (when
+    provided); BHY-FDR q <= fdr_q over the batch.  Every candidate is
+    appended to the ledger at stage="stage1" BEFORE the hurdle is read.
     """
     if not stats:
         return pl.DataFrame(
             schema={
-                "factor": pl.Utf8, "horizon_s": pl.Int32, "n_obs": pl.UInt32,
+                "factor": pl.Utf8, "horizon_s": pl.Int32, "direction": pl.Int8,
+                "n_obs": pl.UInt32,
                 "mean_ic": pl.Float64, "icir": pl.Float64, "t_stat_nw": pl.Float64,
                 "n_trials": pl.UInt32, "t_hurdle_min": pl.Float64,
                 "noise_floor": pl.Float64, "p_value": pl.Float64,
@@ -320,6 +346,7 @@ def stage1_screen(
                 "icir": s.icir,
                 "t_stat_nw": s.t_stat_nw,
                 "n_obs": s.n_obs,
+                "direction": _direction(s.mean_ic),
             },
         )
 
@@ -334,12 +361,13 @@ def stage1_screen(
         floor = noise_floors.get((s.factor, s.horizon_s), float("nan"))
         abs_mean = abs(s.mean_ic) if math.isfinite(s.mean_ic) else 0.0
         abs_icir = abs(s.icir) if math.isfinite(s.icir) else 0.0
+        abs_t = abs(s.t_stat_nw) if math.isfinite(s.t_stat_nw) else 0.0
         above_noise = not math.isfinite(floor) or abs_mean >= floor
         passed = bool(
             abs_mean >= min_ic
             and abs_icir >= cfg.min_icir
             and math.isfinite(s.t_stat_nw)
-            and s.t_stat_nw >= hurdle
+            and abs_t >= hurdle
             and above_noise
             and fp
         )
@@ -347,6 +375,7 @@ def stage1_screen(
             {
                 "factor": s.factor,
                 "horizon_s": s.horizon_s,
+                "direction": _direction(s.mean_ic),
                 "n_obs": s.n_obs,
                 "mean_ic": s.mean_ic,
                 "icir": s.icir,
@@ -371,14 +400,17 @@ def stage2_oos_gate(
     """Pristine-OOS confirmation, evaluated exactly once per factor.
 
     Requires: retention |OOS|/|IS| >= cfg.min_retention with the same sign,
-    OOS NW t >= cfg.min_oos_t, OOS win rate >= MIN_OOS_WIN_RATE, and the
-    OOS |mean IC| clearing the per-horizon floor.  (McLean-Pontiff document
-    ~32% IS->OOS decay on average; below 0.5 retention is overfit territory.)
+    |OOS NW t| >= cfg.min_oos_t (TWO-SIDED since #86), OOS win rate >=
+    MIN_OOS_WIN_RATE (win rate is defined relative to the mean-IC sign, so
+    it already works for reversal factors), and the OOS |mean IC| clearing
+    the per-horizon floor.  (McLean-Pontiff document ~32% IS->OOS decay on
+    average; below 0.5 retention is overfit territory.)
     """
     from .splits import is_oos_retention
 
     details: dict[str, Any] = {
         "horizon_s": is_stats.horizon_s,
+        "direction": _direction(is_stats.mean_ic),
         "is_mean_ic": is_stats.mean_ic,
         "oos_mean_ic": oos_stats.mean_ic,
     }
@@ -396,7 +428,7 @@ def stage2_oos_gate(
         and is_stats.mean_ic != 0.0
         and math.copysign(1.0, is_stats.mean_ic) == math.copysign(1.0, oos_stats.mean_ic)
     )
-    t_ok = math.isfinite(oos_stats.t_stat_nw) and oos_stats.t_stat_nw >= cfg.min_oos_t
+    t_ok = math.isfinite(oos_stats.t_stat_nw) and abs(oos_stats.t_stat_nw) >= cfg.min_oos_t
     win_ok = math.isfinite(oos_stats.win_rate) and oos_stats.win_rate >= MIN_OOS_WIN_RATE
     min_ic = cfg.min_rank_ic.get(is_stats.horizon_s, 0.02)
     level_ok = (
