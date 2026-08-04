@@ -47,7 +47,7 @@ class IFactor {
 // v1 registry — names are the CSV column names, in this order. Formulas/citations in
 // docs/knowledge/microstructure_factors.md; exact normalization constants in docs/architecture.md.
 //  snapshot family: quoted_spread_ticks  (ask1-bid1 in ticks)
-//                   microprice_dev       ((ask1*bidQ+bid1*askQ)/(bidQ+askQ) - mid), bps of mid
+//                   microprice_dev       ((ask1*bidQ+bid1*askQ)/(bidQ+aq))/(bidQ+askQ) - mid), bps of mid
 //                   oir                  (bidQ-askQ)/(bidQ+askQ) at best level
 //                   wdi                  exp(-k/2)-weighted 5-level depth imbalance, normalized to [-1,1]
 //                   book_slope           mean OLS slope of ln(cum depth) vs distance-from-mid (bp), levels 0..4
@@ -59,6 +59,16 @@ class IFactor {
 //                   cancel_ratio_60s     n_cancel/(n_cancel+n_add) over trailing 60s
 //  canaries (only with --canaries): future_mid_15s, future_trade_sign  (deliberate look-ahead;
 //  mask test MUST fail when these are present)
+//
+//  OPT-IN wishlist columns (buildable via --factors but NOT in kDefaultFactorNames,
+//  so already-produced runs keep their skip-if-done sidecars valid; materialized
+//  per instrument on demand — see docs/roadmap/panel-columns-wishlist.md):
+//   snapshot family: cum_trade_vol       cumulative-since-open TradeVolume pass-through
+//                                          (NaN on intra-day decrease => feed anomaly)
+//   tick family:     avg_trade_size_60s      mean per-trade volume over trailing 60s
+//                    n_trades_60s            trade count over trailing 60s (arrival rate)
+//                    large_trade_share_60s   volume share of the largest ceil(n/10) trades
+//                    trade_gap_ms            ms since the most recent trade (no 60s warm-up)
 std::vector<std::unique_ptr<IFactor>> make_default_registry();
 std::vector<std::unique_ptr<IFactor>> make_registry(const std::vector<std::string>& names, bool include_canaries = false);
 

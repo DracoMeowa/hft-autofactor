@@ -39,3 +39,25 @@
 - 新增列 = 一次 C++ 引擎改动 + 对目标日期区间**重跑一遍**；A/B 组所有列合并进同一次重跑。
 - 重跑范围按需：单标的试点期只重跑该标的所需 channel；多资产期全量重跑一次后落缓存（考虑同时落解析后的列式中间格式到 `/data/factor_lzt`，此后不再碰原始 gz）。
 - 每次物化在 meta/sidecar 记录列清单与版本，skip-if-done 按列清单失效。
+
+## 物化记录
+
+### 2026-08-05 第一批（iter-002 候选解锁，588000 试点）
+
+已实现为 **opt-in 因子列**（`--factors` 显式指定；未进 `kDefaultFactorNames`，
+避免使已产出的全市场 run 的 skip-if-done sidecar 失效）：
+
+| 列 | 对应本清单条目 | 说明 |
+|---|---|---|
+| `cum_trade_vol` | A 组 cum_trade_vol | 快照 TradeVolume 直通；日内递减 ⇒ NaN |
+| `trade_gap_ms` | B 组 trade_gap_ms | 距上笔成交毫秒数（瞬时值） |
+| `n_trades_60s` | B 组（成交计数，trade_arrival_burst 所需） | trailing 60s 成交笔数 |
+| `avg_trade_size_60s` | B 组 trade_size_mean | trailing 60s 平均单笔规模 |
+| `large_trade_share_60s` | B 组（大单结构） | 最大 ceil(n/10) 笔的成交量占比（自归一化阈值） |
+
+范围决定：本批只物化 library/candidates.json 两个 needs_materialization 候选
+（`large_trade_share_60s`、`trade_arrival_burst`）所需列；A 组其余（bid/ask_num_orders、
+total_bid/ask_vol、OHLC）与 B 组其余（big_trade_flow、order_lifetime、book_event_intensity、
+时段编码）**留待多资产阶段一次性批量物化**（届时默认注册表扩容 + 全量重跑）。
+固定金额阈值的大单列（`big_trade_flow_buy/sell`，TrdMoney 阈值）与
+signed 大单占比变体作为后续候选，不在本批。

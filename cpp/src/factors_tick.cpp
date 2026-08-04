@@ -12,12 +12,14 @@
 // whose cancel decode is unreliable (see decode.cpp / docs/data_dictionary.md).
 #include "hftaf/factors.hpp"
 #include "hftaf/decode.hpp"  // order_is_cancel / cancel_decode_reliable
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <deque>
 #include <limits>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace hftaf {
 
@@ -277,6 +279,134 @@ class CancelRatio60s final : public TickFactorBase {
 };
 
 // ---------------------------------------------------------------------------
+// Trade-size / trade-arrival family (wishlist materialization, opt-in via
+// --factors; NOT in kDefaultFactorNames so already-produced runs keep their
+// skip-if-done sidecars valid).
+//
+// Shared base: causal trailing-60s deque of ALL trades. '-' prints (aggressor
+// side unattributable) are INCLUDED here: volume and timestamp are known and
+// these statistics are side-blind by design (the signed analogues are
+// ofi_60s / trade_imbalance_60s). Trades with volume <= 0 are malformed and
+// skipped. Warm-up follows the v1 contract: a window value is emitted only
+// once (t - first_trade_time) >= 60s and the window is non-empty.
+// ---------------------------------------------------------------------------
+class TradeWindow60sBase : public TickFactorBase {
+ public:
+  void on_instrument_day_start(const Symbol& inst) override {
+    TickFactorBase::on_instrument_day_start(inst);
+    trades_.erase(inst);
+    first_trade_.erase(inst);
+  }
+
+  void on_tick(const TickEvent& t, const BookState&) override {
+    if (!t.is_trade || t.volume <= 0) return;
+    if (first_trade_.find(t.instrument) == first_trade_.end())
+      first_trade_[t.instrument] = t.time;
+    auto& dq = trades_[t.instrument];
+    dq.push_back(Trd{t.time, t.volume});
+    while (!dq.empty() && dq.front().ts < t.time - kWindowMs) dq.pop_front();
+  }
+
+  void on_snapshot(const Snapshot& s, const BookState&) override {
+    auto& dq = trades_[s.instrument];
+    while (!dq.empty() && dq.front().ts < s.time - kWindowMs) dq.pop_front();
+    auto fit = first_trade_.find(s.instrument);
+    if (fit == first_trade_.end() || s.time - fit->second < kWindowMs || dq.empty())
+      return store(s.instrument, kNan);
+    store(s.instrument, compute(dq));
+  }
+
+ protected:
+  struct Trd { TsMs ts; QtyI volume; };
+  virtual double compute(const std::deque<Trd>& dq) const = 0;
+  std::unordered_map<Symbol, std::deque<Trd>, SymbolHash> trades_;
+  std::unordered_map<Symbol, TsMs, SymbolHash> first_trade_;
+};
+
+// avg_trade_size_60s = mean per-trade volume (fund units) over trailing 60s.
+class AvgTradeSize60s final : public TradeWindow60sBase {
+ public:
+  const std::string& name() const override { static const std::string n = "avg_trade_size_60s"; return n; }
+
+ protected:
+  double compute(const std::deque<Trd>& dq) const override {
+    QtyI total = 0;
+    for (const auto& e : dq) total += e.volume;
+    if (total <= 0) return kNan;
+    return static_cast<double>(total) / static_cast<double>(dq.size());
+  }
+};
+
+// n_trades_60s = trade count over trailing 60s (arrival rate; the raw input
+// for burst-vs-baseline prototypes such as trade_arrival_burst).
+class NTrades60s final : public TradeWindow60sBase {
+ public:
+  const std::string& name() const override { static const std::string n = "n_trades_60s"; return n; }
+
+ protected:
+  double compute(const std::deque<Trd>& dq) const override {
+    return static_cast<double>(dq.size());
+  }
+};
+
+// large_trade_share_60s = share of trailing-60s volume carried by the
+// largest ceil(n/10) trades (at least 1): a self-normalizing measure of how
+// concentrated flow is in large prints (Kyle 1985; Bouchaud et al. 2004
+// square-root impact => large trades carry disproportionate information).
+// The quantile cut is endogenous to the same trailing window, so the column
+// is causal and comparable across instruments without a fixed size threshold.
+// The top-k volume sum is tie-invariant: equal sizes contribute equally no
+// matter which of them land beyond the cut.
+class LargeTradeShare60s final : public TradeWindow60sBase {
+ public:
+  const std::string& name() const override { static const std::string n = "large_trade_share_60s"; return n; }
+
+ protected:
+  double compute(const std::deque<Trd>& dq) const override {
+    std::vector<QtyI> sizes;
+    sizes.reserve(dq.size());
+    QtyI total = 0;
+    for (const auto& e : dq) { sizes.push_back(e.volume); total += e.volume; }
+    if (total <= 0) return kNan;
+    const std::size_t n = sizes.size();
+    const std::size_t k_large = std::max<std::size_t>(1, (n + 9) / 10);  // ceil(n/10)
+    std::nth_element(sizes.begin(), sizes.begin() + (n - k_large), sizes.end());
+    QtyI big = 0;
+    for (std::size_t i = n - k_large; i < n; ++i) big += sizes[i];
+    return static_cast<double>(big) / static_cast<double>(total);
+  }
+};
+
+// trade_gap_ms = ms elapsed since the most recent trade, sampled at snapshot
+// time (inter-trade duration; small <=> high arrival rate). Instantaneous
+// statistic: defined from the first trade onward, no 60s warm-up. The lunch
+// break appears as a large gap -- a recurring daily seasonality that
+// downstream trailing z-scoring absorbs.
+class TradeGapMs final : public TickFactorBase {
+ public:
+  const std::string& name() const override { static const std::string n = "trade_gap_ms"; return n; }
+
+  void on_instrument_day_start(const Symbol& inst) override {
+    TickFactorBase::on_instrument_day_start(inst);
+    last_trade_.erase(inst);
+  }
+
+  void on_tick(const TickEvent& t, const BookState&) override {
+    if (!t.is_trade) return;
+    last_trade_[t.instrument] = t.time;
+  }
+
+  void on_snapshot(const Snapshot& s, const BookState&) override {
+    auto it = last_trade_.find(s.instrument);
+    if (it == last_trade_.end()) return store(s.instrument, kNan);
+    store(s.instrument, static_cast<double>(s.time - it->second));
+  }
+
+ private:
+  std::unordered_map<Symbol, TsMs, SymbolHash> last_trade_;
+};
+
+// ---------------------------------------------------------------------------
 // CANARIES — deliberate look-ahead, shipped only behind --canaries.
 // The engine finalizes canary rows kCanaryHorizonMs late (value_at), so these
 // factors can illegitimately see the future. The mask test MUST fail when
@@ -379,6 +509,10 @@ std::unique_ptr<IFactor> make_tick_factor(const std::string& name) {
   if (name == "trade_imbalance_60s") return std::make_unique<TradeImbalance60s>();
   if (name == "order_arrival_60s") return std::make_unique<OrderArrival60s>();
   if (name == "cancel_ratio_60s") return std::make_unique<CancelRatio60s>();
+  if (name == "avg_trade_size_60s") return std::make_unique<AvgTradeSize60s>();
+  if (name == "n_trades_60s") return std::make_unique<NTrades60s>();
+  if (name == "large_trade_share_60s") return std::make_unique<LargeTradeShare60s>();
+  if (name == "trade_gap_ms") return std::make_unique<TradeGapMs>();
   if (name == "future_mid_15s") return std::make_unique<FutureMid15s>();
   if (name == "future_trade_sign") return std::make_unique<FutureTradeSign>();
   return nullptr;

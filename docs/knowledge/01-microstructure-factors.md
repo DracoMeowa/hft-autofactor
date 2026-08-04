@@ -463,3 +463,20 @@ eval 阶段 IC 表：`oir` 0.21–0.25（t 8–16）、`microprice_dev` 0.21–0
 
 - 2026-08-04: 由 `docs/microstructure_factors.md` 全量合并汉化入库；追加 §16 smoke 观测与
   本项目现状注记。原文件保留为 legacy 镜像。
+- 2026-08-05: 新增 5 个 **opt-in** wishlist 列（`--factors` 显式指定才构建，不进
+  `kDefaultFactorNames`，已产出 run 的 skip-if-done sidecar 不受影响）：
+  - `avg_trade_size_60s`（tick 族）：trailing 60s 平均每笔成交量（含 '-' 成交；
+    量/时间已知，方向归属对规模统计无关）。warm-up 与 v1 60s 窗一致。
+  - `n_trades_60s`（tick 族）：trailing 60s 成交笔数（到达率；trade_arrival_burst
+    类原型的原始输入，burst = n_trades_60s / 自身 trailing baseline）。
+  - `large_trade_share_60s`（tick 族）：trailing 60s 中最大 ceil(n/10) 笔（至少 1 笔）
+    承载的成交量占比。自归一化的大单集中度（Kyle 1985；Bouchaud et al. 2004 平方根
+    冲击 ⇒ 大单信息量不成比例）。阈值内生于同窗分布 ⇒ 因果且跨标的可比；
+    top-k 量和在并列处不变（等量成交贡献相同）。
+  - `trade_gap_ms`（tick 族）：快照时点距上一笔成交的毫秒数（瞬时统计，无 60s warm-up，
+    自首笔成交起有定义）。午休表现为大 gap —— 日内季节性由下游 trailing z 吸收。
+  - `cum_trade_vol`（快照族）：快照 TradeVolume（日内累计）直通列，供下游派生
+    （量节奏、VWAP 偏离、放量/缩量）；本身水平值非 alpha。日内递减 ⇒ NaN（喂数异常），
+    恢复至前高以上后恢复输出。
+  - 用途：iter-002 物化 `large_trade_share_60s` 与 `trade_arrival_burst` 两个
+    needs_materialization 候选（library/candidates.json）。

@@ -171,6 +171,33 @@ class IopvPremium final : public SnapshotFactorBase {
   }
 };
 
+// cum_trade_vol = pass-through of the snapshot's cumulative-since-open
+// TradeVolume (raw state input for downstream derivation -- volume rhythm,
+// VWAP deviation, participation shifts -- not a level alpha by itself; the
+// explore lane and backtest derive windowed deltas from it). Monotone within
+// a day by construction; an intra-day DECREASE (feed reset / decode anomaly)
+// emits NaN rather than a spurious drop, and emission resumes once the
+// series recovers above the pre-drop level. Opt-in via --factors (not in
+// kDefaultFactorNames), like the other wishlist columns.
+class CumTradeVol final : public SnapshotFactorBase {
+ public:
+  const std::string& name() const override { static const std::string n = "cum_trade_vol"; return n; }
+  void on_instrument_day_start(const Symbol& inst) override {
+    SnapshotFactorBase::on_instrument_day_start(inst);
+    prev_.erase(inst);
+  }
+  void on_snapshot(const Snapshot& s, const BookState&) override {
+    auto it = prev_.find(s.instrument);
+    if (it != prev_.end() && s.cum_trade_volume < it->second)
+      return store(s.instrument, kNan);   // intra-day decrease => feed anomaly
+    prev_[s.instrument] = s.cum_trade_volume;
+    store(s.instrument, static_cast<double>(s.cum_trade_volume));
+  }
+
+ private:
+  std::unordered_map<Symbol, QtyI, SymbolHash> prev_;
+};
+
 // rv_60s / rv_300s = sqrt(sum of squared 3s log-mid returns) over the trailing
 // window. We sample mid at each snapshot; consecutive-snapshot log returns are
 // accumulated in fixed order.
@@ -242,6 +269,7 @@ std::unique_ptr<IFactor> make_snapshot_factor(const std::string& name) {
   if (name == "wdi") return std::make_unique<WDI>();
   if (name == "book_slope") return std::make_unique<BookSlope>();
   if (name == "iopv_premium") return std::make_unique<IopvPremium>();
+  if (name == "cum_trade_vol") return std::make_unique<CumTradeVol>();
   if (name == "rv_60s") return std::make_unique<RealizedVol>(60);
   if (name == "rv_300s") return std::make_unique<RealizedVol>(300);
   return nullptr;
