@@ -34,9 +34,10 @@ Rows inside ``horizon_s`` of a continuous-session boundary (lunch or close)
 are untradable: labels never span those boundaries, so no position may be
 opened there.  A position still open on the last tradable row before an
 intraday untradable gap (lunch break, flagged data interval) is force-flat
-there (subject to the T+1 sellable pool); the day's FINAL row is exempt --
-closing inventory chains into the next day as the sellable pool (底仓 model),
-and the overnight mark-to-market gap is credited by ``run_backtest``.
+there down to the inventory floor ``base_units`` (subject to the T+1
+sellable pool); the day's FINAL row is exempt -- closing inventory chains
+into the next day as the sellable pool (底仓 model), and the overnight
+mark-to-market gap is credited by ``run_backtest``.
 
 PnL accounting
 --------------
@@ -288,6 +289,11 @@ def simulate_day(
             f"PositionRule.max_position_units={rule.max_position_units} must be a "
             f"multiple of the lot size {lot}"
         )
+    if rule.base_units % lot != 0:
+        raise ValueError(
+            f"PositionRule.base_units={rule.base_units} must be a "
+            f"multiple of the lot size {lot}"
+        )
     t0 = meta.settlement == "T+0"
 
     ts = np.asarray(day.ts_ms)
@@ -341,13 +347,16 @@ def simulate_day(
     for i in range(n):
         m_i = float(mark[i])
         tgt = float(targets[i])
-        # Never carry a position into an intraday untradable gap (lunch break,
-        # flagged data interval): flatten on the last tradable row before it.
-        # The day's final row is exempt -- closing inventory chains into the
-        # next day as the T+1 sellable pool (底仓 model).
+        # Never carry a speculative deviation into an intraday untradable gap
+        # (lunch break, flagged data interval): flatten on the last tradable
+        # row before it -- to the inventory floor ``base_units`` when a 底仓
+        # rule is in use (the base position carries through the gap), to 0
+        # for the plain long/flat rule.  The day's final row is exempt --
+        # closing inventory chains into the next day as the T+1 sellable pool
+        # (底仓 model).
         force_flat = bool(tradable[i]) and i + 1 < n and not bool(tradable[i + 1])
         if force_flat:
-            tgt = 0.0
+            tgt = float(rule.base_units)
         fill_i = 0.0
 
         # A decision at row i consumes z[i - lag]; rows whose decision input

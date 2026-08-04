@@ -10,15 +10,17 @@ on the snapshot at time ``t`` can only be actuated at ``t + lag``.
 
 Position rule
 -------------
-``position_from_z`` implements a hysteresis (entry/exit band) rule:
+``position_from_z`` implements a hysteresis (entry/exit band) rule around
+the inventory floor ``base_units`` (default 0):
 
-* enter a position of ``direction * max_position_units`` when ``|z|`` first
-  reaches ``entry_z`` (sign of ``z * direction`` chooses long vs short);
+* enter the same-side band when ``|z|`` first reaches ``entry_z`` (sign of
+  ``z * direction`` chooses the band) -- target ``max_position_units``;
 * hold it while ``exit_z <= |z| < entry_z`` (or z is NaN: no signal, keep the
   established state);
-* exit to 0 when ``|z|`` falls below ``exit_z``;
-* reverse directly to the opposite side when ``|z| >= entry_z`` with the
-  opposite sign;
+* exit to the floor ``base_units`` when ``|z|`` falls below ``exit_z``;
+* reverse directly to the opposite band when ``|z| >= entry_z`` with the
+  opposite sign -- target ``2 * base_units - max_position_units`` (negative
+  when ``base_units < max_position_units / 2``; engines clip to 0);
 * rows where ``tradable`` is False force the position to 0 and reset the
   state (a fresh entry signal is required afterwards);
 * positions are shifted by ``signal_lag_rows`` (the actuation lag).
@@ -123,13 +125,30 @@ def zscore_column(
 
 @dataclass
 class PositionRule:
-    """Hysteresis position rule applied to a causal z-score signal."""
+    """Hysteresis position rule applied to a causal z-score signal.
+
+    ``base_units`` is the inventory floor (底仓): targets are expressed as
+    ``base_units + state * (max_position_units - base_units)`` with ``state``
+    in {-1, 0, +1}, so with no entry signal the target is ``base_units``
+    rather than 0, a same-side entry moves to ``max_position_units``, and an
+    opposite-side entry moves to ``2 * base_units - max_position_units``
+    (negative when ``base_units < max_position_units / 2``; downstream
+    engines clip negative targets to 0 -- no spot shorting).  With
+    ``base_units = max_position_units / 2`` and matching initial inventory
+    this is the classic A-share T+1 底仓做T construction: exits sell down to
+    the base from the T+1 sellable pool, so intraday round trips become
+    possible.  ``base_units`` must satisfy
+    ``0 <= base_units <= max_position_units``; the engine additionally
+    requires it to be a multiple of the lot size.  The default 0 reproduces
+    the plain long/flat rule.
+    """
 
     entry_z: float = 2.0
     exit_z: float = 0.5
     direction: int = 1  # +1: high factor => long; -1: inverted
     max_position_units: int = 100_000  # multiple of lot
     signal_lag_rows: int = 1  # actuation lag, tradability margin (>= 1)
+    base_units: int = 0  # inventory floor (底仓); 0 = plain long/flat
 
 
 def position_from_z(
@@ -139,15 +158,18 @@ def position_from_z(
 ) -> np.ndarray:
     """Target position in fund units per row from a z-score signal.
 
-    Returns a float array of signed targets: ``0`` (flat) or
-    ``±rule.max_position_units``.  Rows where ``tradable`` is False are forced
-    to 0 and reset the hysteresis state.  Decisions use z shifted back by
-    ``rule.signal_lag_rows`` rows (tradability margin), so the position at
-    row ``t`` depends only on ``z[t - lag]`` and earlier -- never the future.
+    Returns a float array of targets expressed around the inventory floor:
+    ``base_units`` (no signal), ``max_position_units`` (same-side entry) or
+    ``2 * base_units - max_position_units`` (opposite-side entry; possibly
+    negative -- downstream engines clip to 0, there is no spot shorting).
+    Rows where ``tradable`` is False are forced to 0 and reset the hysteresis
+    state.  Decisions use z shifted back by ``rule.signal_lag_rows`` rows
+    (tradability margin), so the position at row ``t`` depends only on
+    ``z[t - lag]`` and earlier -- never the future.
 
     Note: A-share ETF spot markets have no shorting; downstream engines clip
     negative targets to 0 (``direction=-1`` therefore trades the inverted
-    signal long/flat).
+    signal long/flat around the base floor).
     """
     z = np.asarray(z, dtype=np.float64)
     tradable = np.asarray(tradable, dtype=bool)
@@ -166,6 +188,12 @@ def position_from_z(
         raise ValueError(f"direction must be +1 or -1, got {rule.direction}")
     if rule.max_position_units < 0:
         raise ValueError("max_position_units must be >= 0")
+    if not (0 <= rule.base_units <= rule.max_position_units):
+        raise ValueError(
+            "require 0 <= base_units <= max_position_units, got "
+            f"base_units={rule.base_units}, "
+            f"max_position_units={rule.max_position_units}"
+        )
     if rule.signal_lag_rows < 1:
         raise ValueError(
             f"signal_lag_rows must be >= 1 (tradability margin), "
@@ -178,6 +206,8 @@ def position_from_z(
     entry = float(rule.entry_z)
     exit_ = float(rule.exit_z)
     max_units = float(rule.max_position_units)
+    base = float(rule.base_units)
+    deviation = max_units - base  # band size around the inventory floor
     direction = int(rule.direction)
 
     state = 0  # 0 flat, +1 long, -1 short (pre-clip target sign)
@@ -208,5 +238,5 @@ def position_from_z(
                 if wanted != state:
                     state = wanted  # direct reversal at the entry band
             # NaN z (signal dropout): hold the established state
-        pos[i] = state * max_units
+        pos[i] = base + state * deviation
     return pos

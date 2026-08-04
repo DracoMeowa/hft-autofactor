@@ -160,6 +160,11 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--exit-z", type=float, default=0.5)
     p.add_argument("--direction", type=int, default=1, choices=(1, -1))
     p.add_argument("--max-units", type=int, default=100_000)
+    p.add_argument("--base-units", type=int, default=0,
+                   help="inventory floor (底仓): targets oscillate around "
+                        "this many units; pair with matching --inventory to "
+                        "enable T+1 intraday round trips (底仓做T). "
+                        "0 = plain long/flat")
     p.add_argument("--signal-lag", type=int, default=1)
     p.add_argument("--z-window", type=int, default=100,
                    help="causal z-score window in rows")
@@ -279,6 +284,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         direction=args.direction,
         max_position_units=args.max_units,
         signal_lag_rows=args.signal_lag,
+        base_units=args.base_units,
     )
 
     results = {}
@@ -323,6 +329,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "direction": args.direction,
             "max_position_units": args.max_units,
             "signal_lag_rows": args.signal_lag,
+            "base_units": args.base_units,
         },
         "z_window_rows": args.z_window,
         "initial_inventory_units": inventory,
