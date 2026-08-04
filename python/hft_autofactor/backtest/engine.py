@@ -110,6 +110,7 @@ _PER_DAY_SCHEMA: dict[str, object] = {
     "gap_pnl_cny": pl.Float64,
     "position_end_units": pl.Float64,
     "peak_position_units": pl.Float64,
+    "avg_position_units": pl.Float64,
     "mark_end_cny": pl.Float64,
     "traded_units": pl.Float64,
     "traded_notional_cny": pl.Float64,
@@ -611,6 +612,11 @@ def run_backtest(
                     "position_end_units": float(res.sellable_end_units),
                     "peak_position_units": (
                         float(res.position.max()) if res.position.size else 0.0
+                    ),
+                    # Mean intraday holding: weights the mark-to-market drift
+                    # when attributing PnL into carry beta vs timing alpha.
+                    "avg_position_units": (
+                        float(res.position.mean()) if res.position.size else 0.0
                     ),
                     # Final-row mark (mid, fallback last): the same mark the
                     # overnight-gap accounting chains into the next day.
