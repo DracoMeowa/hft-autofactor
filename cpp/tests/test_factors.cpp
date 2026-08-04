@@ -217,6 +217,34 @@ static void test_registry() {
   int canaries = 0;
   for (auto& f : withc) canaries += f->is_canary() ? 1 : 0;
   CHECK_EQ(canaries, 2);
+
+  // Hard guard: naming a canary in --factors without the canaries flag is
+  // refused (would otherwise smuggle a look-ahead column into output).
+  bool canary_refused = false;
+  try {
+    make_registry({"future_mid_15s"}, false);
+  } catch (const std::exception&) {
+    canary_refused = true;
+  }
+  CHECK(canary_refused);
+  bool canary_refused2 = false;
+  try {
+    make_registry({"oir", "future_trade_sign"}, false);
+  } catch (const std::exception&) {
+    canary_refused2 = true;
+  }
+  CHECK(canary_refused2);
+
+  // With the flag set, an explicitly named canary is built exactly once
+  // (not duplicated by the implicit canary append). A non-empty names list
+  // builds ONLY the named factors, so the registry holds the named canary
+  // plus the one appended canary it did not name.
+  auto withc_named = make_registry({"future_mid_15s"}, true);
+  CHECK_EQ((int)withc_named.size(), 2);
+  int named_canaries = 0;
+  for (auto& f : withc_named)
+    named_canaries += (f->name() == "future_mid_15s") ? 1 : 0;
+  CHECK_EQ(named_canaries, 1);
 }
 
 int main() {

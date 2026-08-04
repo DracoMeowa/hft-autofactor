@@ -1,5 +1,6 @@
 // hftaf/factory.cpp — registry construction: name -> factor instance.
 #include "hftaf/factors.hpp"
+#include <algorithm>
 #include <stdexcept>
 
 namespace hftaf {
@@ -45,6 +46,15 @@ std::vector<std::unique_ptr<IFactor>> make_registry(const std::vector<std::strin
   for (const auto& n : wanted) {
     auto f = make_one(n);
     if (!f) throw std::invalid_argument("unknown factor name: " + n);
+    // Hard guard: canary factors look ahead by design. They may only be built
+    // when the canaries flag is set (the mask-test uses them to prove the
+    // validator catches look-ahead); a plain --factors list must never smuggle
+    // a leaky column into production-shaped output.
+    if (f->is_canary() && !include_canaries) {
+      throw std::invalid_argument(
+          "canary factor '" + n + "' refused: look-ahead factors are only built "
+          "when the canaries flag is set");
+    }
     reg.push_back(std::move(f));
   }
   if (include_canaries) {
