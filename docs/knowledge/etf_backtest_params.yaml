@@ -1,0 +1,89 @@
+# fee_table_v1 — A-share ETF backtest engine parameters (SSE + SZSE)
+# Sources & caveats: see docs/etf_cost_market_structure.md
+# Rates are per-side unless noted. bp = 1e-4.
+meta:
+  version: fee_table_v1
+  date: "2026-08-04"
+  scope: ["SSE ETF", "SZSE ETF"]
+
+fees:
+  stamp_duty:
+    rate_per_side: 0.0          # ETF units exempt (Stamp Duty Law: taxable = stocks/depository receipts only)
+  handling_fee:                 # 经手费, exchange fee, per side
+    rate_per_side: 0.00004      # 0.4bp, SSE official table (updated 2026-01); SZSE same rate (flag: secondary sources)
+    exempt_categories: ["money_etf", "bond_etf"]   # SSE 暂免; SZSE consistent
+    block_trade_rate_multiplier: 0.5
+  regulatory_fee:               # 证管费
+    rate_per_side_base: 0.0
+    rate_per_side_conservative: 0.00002   # 0.2bp; applicability to fund trades unverified
+    verify: true
+  transfer_fee:                 # 过户费
+    rate_per_side_base: 0.0
+    rate_per_side_conservative: 0.00001   # 0.1bp; possibly only cross-market ETFs
+    verify: true
+  commission:
+    scenarios:
+      retail_default:    { rate_per_side: 0.00025, min_per_order_cny: 5.0 }
+      retail_negotiated: { rate_per_side: 0.00010, min_per_order_cny: 5.0 }
+      institutional:     { rate_per_side: 0.00005, min_per_order_cny: 0.0 }  # 免五 negotiable
+    money_etf_commission: 0.0   # typical broker practice
+
+cost_formula:
+  per_side: "max(commission_rate * notional, min_commission) + handling_fee * notional * (1 if category not in [money_etf, bond_etf]) + regulatory_fee + transfer_fee"
+  round_trip: "cost_buy + cost_sell + spread_or_slippage_cost"
+
+trading_mechanics:
+  tick_size_cny: 0.001
+  lot_size_units: 100
+  max_order_units: 1000000
+  odd_lot: "sellable in one order"
+  block_trade_min: { units: 2000000, notional_cny: 2000000 }
+  price_limit:
+    pct: 0.10                    # ±10% vs prior close, both exchanges, incl. ChiNext/STAR-tracking ETFs
+    rounding: "round to tick (SSE rule 3.3.17)"
+  sessions:
+    opening_auction: { start: "09:15", end: "09:25", no_cancel_from: "09:20", match_at: "09:25" }
+    continuous: { am: ["09:30", "11:30"], pm: ["13:00", "15:00"] }
+    close:
+      SSE: { closing_auction: false, close_price: "VWAP of last 1 minute (rule 4.1.3)" }
+      SZSE: { closing_auction: ["14:57", "15:00"], no_cancel: true, close_price: "auction" }
+
+settlement:
+  t_plus_1: ["equity_etf"]       # bought units cannot be sold same day
+  t_plus_0: ["bond_etf", "money_etf", "gold_etf", "commodity_etf", "commodity_futures_etf", "cross_border_etf"]
+  equity_etf_share_rules:        # SSE ETF detail rules art.22 (Shanghai/cross-market index ETFs)
+    subscribed_units: "sellable same day, not redeemable same day"
+    bought_units: "redeemable same day, not sellable same day"
+    redeemed_stocks: "sellable same day, not usable for subscription same day"
+    bought_stocks: "usable for subscription same day, not sellable same day"
+  backtest_inventory_rule: "sellable_qty(t) = holdings(t-1)"
+
+creation_redemption:
+  broker_fee_max: 0.005          # <=0.5% all-in incl. exchange/CSDC fees (159915 prospectus 2026-02)
+  min_unit_example: { ticker: "159915", units: 1000000 }
+  orders_cancellable: false
+  otc_cash_subscription_fee: 0.0005   # 159915 off-exchange
+  otc_cash_redemption_fee: 0.0015     # 159915 off-exchange
+
+spread_depth_tiers:              # directional defaults — calibrate empirically from own L2 snapshots
+  liquid:
+    turnover_cny_day_gt: 1.0e+9
+    quoted_spread: "1 tick (~2-3bp at 3.5-4 CNY), time-avg 1-2bp"
+    depth_best_cny_ge: 1.0e+7
+    example: "510300"
+  mid:
+    turnover_cny_day: [1.0e+8, 1.0e+9]
+    quoted_spread_bps: [3, 8]
+    stress_spread_bps: [10, 15]
+    depth_best_cny: "~1e6"
+    example: "159915"
+  illiquid:
+    turnover_cny_day_lt: 1.0e+8
+    quoted_spread_bps: [20, 100]
+    note: "hollow book, market-maker dependent; effective spread 5-20x liquid tier"
+  intraday_pattern: "U-shaped; wider 09:30-09:45 and 14:45-15:00"
+
+verification_flags:              # combined worst-case impact <=0.3bp/side; does not block backtesting
+  - "SZSE official fee page inaccessible (WAF); 0.004% + bond/money ETF exemption corroborated by two independent secondary sources"
+  - "regulatory_fee applicability to fund trades: settle with one real broker settlement statement"
+  - "transfer_fee applicability to ETF secondary trades: settle with one real broker settlement statement"
