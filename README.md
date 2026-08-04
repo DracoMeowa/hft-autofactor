@@ -123,14 +123,20 @@ hftaf factors  --dates 20250701,20250702 [--channels 1,2,3] [--workers 4] \
                [--overwrite] [--dry-run]
 
 # Stage 3: raw CSV → parquet 日分区
-hftaf convert  --dates 20250701..20250705 [--overwrite]
+hftaf convert  --dates 20250701..20250705 [--overwrite] [--instruments 588000]
 
 # Stage 4: IC/RankIC 评估 + 门控报告
-hftaf eval     --dates 20250701..20250731 [--factors oir,ofi_60s] [--horizons 15,60,300]
+hftaf eval     --dates 20250701..20250731 [--factors oir,ofi_60s] [--horizons 15,60,300] \
+               [--instruments 588000]
 
 # Stage 2: 防穿越 mask 验证（canary 必须失败）
 hftaf mask     --dates 20250701 [--k 4]      # k = 每 job 截断点数
 ```
+
+`--instruments`（convert/eval）把面板限制为单标的（如 588000 试点）：
+convert 会把过滤值写进分区 sidecar（`factors.parquet.meta.json`），skip-if-done
+据此区分「过滤分区」与「全市场分区」；eval 在标的数 < 5 时自动跳过截面 IC
+（单标的无截面），全部门控改用按日时间序列 RankIC（Newey-West t）。
 
 退出码：0 成功；1 有失败 job；2 配置/参数错误。
 
