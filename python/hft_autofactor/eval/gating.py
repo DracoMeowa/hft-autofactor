@@ -183,6 +183,12 @@ def permutation_noise_floor(
     distributions and day structure are preserved while the timestamp
     alignment -- and thus any true signal -- is destroyed.  The returned
     value is the noise floor a real factor's |mean IC| must exceed.
+
+    Single-instrument panels (e.g. the 588000 pilot) are covered by the same
+    rule: with one instrument the (date, instrument) blocks collapse to
+    (date) blocks, so the time series is shuffled within each trading day and
+    labels never leak across days.  The floor then calibrates the per-day
+    time-series RankIC that the 1-instrument gates use.
     """
     col_l = label_column(horizon_s, label)
     for col in ("date", "instrument", factor, col_l):
