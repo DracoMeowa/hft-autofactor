@@ -11,7 +11,7 @@ from typing import Mapping
 
 import polars as pl
 
-from .engine import BacktestResult
+from .engine import ANN_TRADING_DAYS, BacktestResult
 
 __all__ = ["summarize_results", "gate_on_costs"]
 
@@ -20,9 +20,17 @@ _SUMMARY_SCHEMA: dict[str, object] = {
     "n_days": pl.Int64,
     "n_trades": pl.Int64,
     "total_pnl_cny": pl.Float64,
+    "gross_pnl_cny": pl.Float64,
     "total_fees_cny": pl.Float64,
+    "total_slippage_cny": pl.Float64,
     "sharpe_annualized": pl.Float64,
+    "ann_return_pct": pl.Float64,
+    "hit_rate_days": pl.Float64,
     "max_drawdown_cny": pl.Float64,
+    "max_drawdown_pct": pl.Float64,
+    "capital_basis_cny": pl.Float64,
+    "mean_daily_pnl_cny": pl.Float64,
+    "avg_daily_traded_notional_cny": pl.Float64,
     "turnover_units_per_day": pl.Float64,
     "realized_round_trip_cost_bps": pl.Float64,
     "capacity_proxy_cny": pl.Float64,
@@ -42,19 +50,94 @@ def _capacity_proxy_cny(result: BacktestResult) -> float:
     return float(peak) if peak is not None else 0.0
 
 
+def _capital_basis_cny(result: BacktestResult) -> float:
+    """Capital basis (CNY) for return/drawdown ratios: peak position notional.
+
+    Max over instrument-days of ``peak_position_units * mark_end_cny`` -- the
+    largest capital the strategy actually had working at a closing mark.
+    Returns 0.0 when the frame lacks the columns or never held a position.
+    """
+    per_day = result.per_day
+    if (
+        per_day.height == 0
+        or "peak_position_units" not in per_day.columns
+        or "mark_end_cny" not in per_day.columns
+    ):
+        return 0.0
+    notionals = per_day["peak_position_units"] * per_day["mark_end_cny"]
+    notionals = notionals.filter(notionals.is_finite())
+    if notionals.len() == 0:
+        return 0.0
+    peak = notionals.max()
+    return float(peak) if peak is not None else 0.0
+
+
+def _daily_net_pnl(result: BacktestResult) -> pl.DataFrame:
+    """Net PnL summed per calendar date across instruments."""
+    if result.per_day.height == 0:
+        return pl.DataFrame({"date": [], "pnl_cny": []})
+    return (
+        result.per_day.group_by("date")
+        .agg(pl.col("pnl_cny").sum().alias("pnl_cny"))
+    )
+
+
+def _hit_rate_days(result: BacktestResult) -> float:
+    """Fraction of trading days with positive NET PnL."""
+    daily = _daily_net_pnl(result)
+    if daily.height == 0:
+        return 0.0
+    wins = int((daily["pnl_cny"] > 0).sum())
+    return wins / daily.height
+
+
+def _sum_column(result: BacktestResult, name: str) -> float:
+    if result.per_day.height == 0 or name not in result.per_day.columns:
+        return 0.0
+    total = result.per_day[name].sum()
+    return float(total) if total is not None else 0.0
+
+
 def summarize_results(results: Mapping[str, BacktestResult]) -> pl.DataFrame:
-    """One summary row per commission scenario."""
+    """One summary row per commission scenario.
+
+    PnL ladder: ``gross_pnl_cny`` is net PnL BEFORE the commission stack
+    (spread/slippage/depth-impact are already inside the fills, hence inside
+    gross); ``total_fees_cny`` is the commission drag; ``total_pnl_cny`` is
+    fully net.  ``capital_basis_cny`` (peak position notional) converts the
+    CNY figures into ``ann_return_pct`` / ``max_drawdown_pct``.
+    """
     rows = []
     for name, r in results.items():
+        capital = _capital_basis_cny(r)
+        mean_daily = float(r.total_pnl_cny) / r.n_days if r.n_days > 0 else 0.0
+        ann_return_pct = (
+            mean_daily * ANN_TRADING_DAYS / capital * 100.0 if capital > 0 else 0.0
+        )
+        max_dd_pct = (
+            float(r.max_drawdown_cny) / capital * 100.0 if capital > 0 else 0.0
+        )
         rows.append(
             {
                 "scenario": str(name),
                 "n_days": int(r.n_days),
                 "n_trades": int(r.n_trades),
                 "total_pnl_cny": float(r.total_pnl_cny),
+                "gross_pnl_cny": float(r.total_pnl_cny) + float(r.total_fees_cny),
                 "total_fees_cny": float(r.total_fees_cny),
+                "total_slippage_cny": _sum_column(r, "slippage_cost_cny"),
                 "sharpe_annualized": float(r.sharpe_annualized),
+                "ann_return_pct": float(ann_return_pct),
+                "hit_rate_days": float(_hit_rate_days(r)),
                 "max_drawdown_cny": float(r.max_drawdown_cny),
+                "max_drawdown_pct": float(max_dd_pct),
+                "capital_basis_cny": float(capital),
+                "mean_daily_pnl_cny": float(mean_daily),
+                "avg_daily_traded_notional_cny": (
+                    _sum_column(r, "traded_notional_cny") / r.n_days
+                    if r.n_days > 0
+                    else 0.0
+                ),
                 "turnover_units_per_day": float(r.turnover_units_per_day),
                 "realized_round_trip_cost_bps": float(r.realized_round_trip_cost_bps),
                 "capacity_proxy_cny": _capacity_proxy_cny(r),

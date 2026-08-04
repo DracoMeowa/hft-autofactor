@@ -108,6 +108,8 @@ _PER_DAY_SCHEMA: dict[str, object] = {
     "slippage_cost_cny": pl.Float64,
     "gap_pnl_cny": pl.Float64,
     "position_end_units": pl.Float64,
+    "peak_position_units": pl.Float64,
+    "mark_end_cny": pl.Float64,
     "traded_units": pl.Float64,
     "traded_notional_cny": pl.Float64,
 }
@@ -598,6 +600,12 @@ def run_backtest(
                     "slippage_cost_cny": float(res.slippage_cost_cny),
                     "gap_pnl_cny": float(gap),
                     "position_end_units": float(res.sellable_end_units),
+                    "peak_position_units": (
+                        float(res.position.max()) if res.position.size else 0.0
+                    ),
+                    # Final-row mark (mid, fallback last): the same mark the
+                    # overnight-gap accounting chains into the next day.
+                    "mark_end_cny": float(mark[-1]) if mark.size > 0 else float("nan"),
                     "traded_units": float(np.abs(res.trades_units).sum()),
                     "traded_notional_cny": traded_notional,
                 }

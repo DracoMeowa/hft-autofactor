@@ -16,6 +16,12 @@ from .costs import (
     round_trip_cost_bps,
     side_cost_cny,
 )
+from .derived import (
+    DERIVED_FACTORS,
+    DerivedFactor,
+    is_derived,
+    materialize_derived,
+)
 from .engine import (
     ANN_TRADING_DAYS,
     BacktestResult,
@@ -41,6 +47,11 @@ __all__ = [
     "load_cost_models",
     "side_cost_cny",
     "round_trip_cost_bps",
+    # derived factors
+    "DERIVED_FACTORS",
+    "DerivedFactor",
+    "is_derived",
+    "materialize_derived",
     # execution
     "TICK_CNY",
     "cross_spread_fill",

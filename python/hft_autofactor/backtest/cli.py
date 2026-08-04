@@ -30,6 +30,7 @@ from typing import Sequence
 import polars as pl
 
 from .costs import load_cost_models
+from .derived import DERIVED_FACTORS, materialize_derived
 from .engine import InstrumentMeta, run_backtest
 from .metrics import gate_on_costs, summarize_results
 from .signals import PositionRule
@@ -200,14 +201,33 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.instruments:
         instruments = [s.strip() for s in args.instruments.split(",") if s.strip()]
 
+    derived_spec = DERIVED_FACTORS.get(args.factor)
+    load_factors = (
+        list(derived_spec.sources) if derived_spec is not None else [args.factor]
+    )
     try:
-        panel = load_panel(cfg, dates, instruments=instruments, factors=[args.factor])
+        panel = load_panel(cfg, dates, instruments=instruments, factors=load_factors)
     except (FileNotFoundError, ValueError) as exc:
         print(f"error: {exc}")
         return 2
-    if panel.height == 0 or args.factor not in panel.columns:
-        print(f"error: no rows (or factor column {args.factor!r} missing) for "
-              f"{len(dates)} dates")
+    if panel.height == 0:
+        print(f"error: no rows for {len(dates)} dates")
+        return 2
+    if derived_spec is not None:
+        # Admitted explore-lane factors are not materialized in the parquet;
+        # recompute them from base columns exactly as the admitted spec did.
+        try:
+            panel = materialize_derived(panel, args.factor)
+        except (KeyError, ValueError) as exc:
+            print(f"error: cannot derive factor {args.factor!r}: {exc}")
+            return 2
+        print(
+            f"derived factor {args.factor!r} materialized from panel columns "
+            f"({derived_spec.doc})"
+        )
+    elif args.factor not in panel.columns:
+        print(f"error: factor column {args.factor!r} missing from the parquet "
+              f"partitions for {len(dates)} dates")
         return 2
 
     try:
@@ -289,6 +309,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     report = {
         "factor": args.factor,
+        "derived": derived_spec is not None,
+        "derived_doc": derived_spec.doc if derived_spec is not None else None,
         "horizon_s": int(args.horizon),
         "dates": dates,
         "n_dates": len(dates),
