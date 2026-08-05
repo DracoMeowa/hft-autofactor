@@ -606,7 +606,7 @@ static void test_short_window_flow_factors() {
   CHECK(bei->value(inst, v));
   CHECK_NEAR(v, 3.0 / 60.0, 1e-12);                   // e4 + e5 + e6
   CHECK(ofi15->value(inst, v));
-  CHECK_NEAR(v, 200.0 / 2800.0, 1e-12);               // whale +200, mean depth 2800
+  CHECK_NEAR(v, 600.0 / 8600.0, 1e-12);               // e4+e5+e6 all inside 15s
   CHECK(ofi60->value(inst, v));
   CHECK_NEAR(v, 600.0 / 8600.0, 1e-12);               // 200 / (8600/3), depths 3000/2800/2800
 }
