@@ -1,0 +1,114 @@
+[
+  {
+    "name": "ofi_accel_15_60",
+    "family": "short_window_flow",
+    "hypothesis": "Book-flow acceleration: ofi_15s - ofi_60s contrasts the freshest 15s of order-book-delta flow with the trailing minute. Positive acceleration = passive demand speeding up now, predicting 15-30s continuation; negative = exhaustion. Uses the true 15s engine column (not smoothed legs like the rejected ofi_fast_slow), raw delta form matching the round-1 fast book-momentum cluster.",
+    "columns_used": ["ofi_15s", "ofi_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ti_accel_15_60",
+    "family": "short_window_flow",
+    "hypothesis": "Aggressor-flow acceleration: trade_imbalance_15s - trade_imbalance_60s. Marketable buying intensifying right now sweeps the touch and precedes 15-30s continuation; both legs bounded [-1,1] so the gap is scale-free. Active-channel counterpart of ofi_accel_15_60; not an EWMA state (ti_ewm_accel_120s already registered).",
+    "columns_used": ["trade_imbalance_15s", "trade_imbalance_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_accel_z_180s",
+    "family": "short_window_flow",
+    "hypothesis": "Acceleration surprise: z-score of the 30s-vs-60s OFI gap over trailing 180s fires only when book-flow acceleration is unusual for this instrument-day, isolating fresh-informed-participant step-changes that continue at 15-60s, rather than sustained fast tape already priced in. Regime-relative distinct from the raw gap.",
+    "columns_used": ["ofi_30s", "ofi_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_15s_z_120s",
+    "family": "short_window_flow",
+    "hypothesis": "Short-window book-flow surprise: z(ofi_15s, 120s) resolves placement/cancel bursts at quarter-minute scale that the minute-averaged ofi_60s smooths away; informed limit flow arrives in such bursts (CKS 2014) and precedes 15-60s continuation. Local 120s reference tracks regime changes. Dedup gate will test rank corr vs ofi_60s (0.85 limit).",
+    "columns_used": ["ofi_15s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ti_15s_z_120s",
+    "family": "short_window_flow",
+    "hypothesis": "Short-window aggression surprise: z(trade_imbalance_15s, 120s) flags imbalance readings extreme vs the instrument's recent aggression regime -- the footprint of a marketable program order dominating the tape now; Kyle persistence gives 15-60s drift. Distinct from the slow 120-300s ti_ewm_state/accum cluster; no EWMA used.",
+    "columns_used": ["trade_imbalance_15s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "netbuy_pressure_delta_60s",
+    "family": "short_window_flow",
+    "hypothesis": "Buildup/exhaustion of aggressive buying: 60s change of (buy_vol_60s - sell_vol_60s)/(buy+sell) isolates whether net buying is building or fading now, independent of level; the rising edge = fresh one-sided participant preceding 15-60s continuation. Built from new side-attributed volumes whose normalization differs from engine trade_imbalance_60s; diff is the main decorrelation lever.",
+    "columns_used": ["buy_vol_60s", "sell_vol_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "netbuy_pressure_z_120s",
+    "family": "short_window_flow",
+    "hypothesis": "Unusual aggressive one-sidedness, regime-relative: z over trailing 120s of the net buy pressure ratio flags minutes where aggressive flow is unusually one-sided for this instrument-day; sustained above-norm buying predicts 15-60s continuation. Independent decomposition of aggressive direction from buy/sell volumes vs the engine TI normalization.",
+    "columns_used": ["buy_vol_60s", "sell_vol_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ltns_z_180s",
+    "family": "short_window_flow",
+    "hypothesis": "Signed institutional footprint surprise: z(large_trade_net_share_60s, 180s) flags episodes where the largest ~10% of prints are unusually one-sided. Unlike the direction-free large_trade_share level that died in iter-002, this column carries whale direction; institutional execution lives in the size tail, so an unusually signed tail predicts 15-60s persistence.",
+    "columns_used": ["large_trade_net_share_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ltns_x_ti_60s",
+    "family": "short_window_flow",
+    "hypothesis": "Whale/crowd direction confirmation: large_trade_net_share_60s x trade_imbalance_60s is large-positive only when the biggest tickets AND overall aggression point the same way (high-conviction continuation); opposite signs mark absorption/iceberg (reversal). Both terms signed and bounded so the interaction carries direction -- distinct from the rejected unsigned ti_z_x_large_share.",
+    "columns_used": ["large_trade_net_share_60s", "trade_imbalance_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ltns_delta_60s",
+    "family": "short_window_flow",
+    "hypothesis": "Turning of the whale footprint: 60s change of signed large-trade net share isolates the fresh component -- the moment large flow starts/stops/reverses -- rather than the persistent level already in the price. A turn toward positive predicts 15-60s continuation up. Captures large-flow TIMING, orthogonal to ltns_x_ti_60s confirmation.",
+    "columns_used": ["large_trade_net_share_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_z_x_intensity_z",
+    "family": "short_window_flow",
+    "hypothesis": "Attention-gated book flow: z(ofi_60s,120s) x z(book_event_intensity_60s,180s). OFI during an unusually fast-rebuilding book reflects broad deliberate positioning and moves price quickly; the same imbalance on a dead tape may be one stale quote. Up-weights flow arriving when the market is paying attention. Direction from OFI, intensity scales conviction (conditions-over-levels).",
+    "columns_used": ["ofi_60s", "book_event_intensity_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ti_z_x_intensity_z",
+    "family": "short_window_flow",
+    "hypothesis": "Attention-gated aggression: z(trade_imbalance_60s,120s) x z(book_event_intensity_60s,180s). Aggression arriving while the book is actively re-quoted is contested and re-priced within seconds (meaningful, continues 15-60s); the same imbalance against a stale book decays. Active-channel mirror of ofi_z_x_intensity_z.",
+    "columns_used": ["trade_imbalance_60s", "book_event_intensity_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "intensity_z_180s",
+    "family": "short_window_flow",
+    "hypothesis": "Activity/attention regime: z(book_event_intensity_60s, 180s) flags minutes when the book rebuilds unusually fast -- an information-arrival regime accompanying creation/redemption and informed re-pricing with short-horizon drift persistence. Direction-symmetric alone; main value as the conditioning leg of the intensity interactions, but the regime itself can carry predictive content.",
+    "columns_used": ["book_event_intensity_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_concord_15_60",
+    "family": "short_window_flow",
+    "hypothesis": "Cross-window book-flow conviction: sign x min(|ofi_15s|,|ofi_60s|) when same sign else 0. Min caps strength at the weaker leg so conviction requires BOTH windows; persistent same-sign OFI across timescales is the queue-investment signature preceding 15-30s continuation (OFI power monotone in persistence). A persistence filter, distinct from the acceleration gap factors.",
+    "columns_used": ["ofi_15s", "ofi_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ti_concord_15_60",
+    "family": "short_window_flow",
+    "hypothesis": "Cross-window aggression conviction: sign x min(|TI_15s|,|TI_60s|) when same sign else 0, bounded [-1,1] and scale-free. Persistent one-sided aggression from quarter-minute to full-minute marks a program working through the book (continues 15-30s); disagreement = noise. Active-channel mirror of ofi_concord_15_60.",
+    "columns_used": ["trade_imbalance_15s", "trade_imbalance_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_per_depth_z_300s",
+    "family": "short_window_flow",
+    "hypothesis": "Strain-per-depth: z of ofi_60s/(depth_bid5+depth_ask5) over 300s converts flow into the strain the book must absorb (Kyle-lambda: impact inversely related to depth). Unusually high strain-for-depth means the pressured side gives way at 15-60s. Liquidity-normalized pressure no registered factor provides; deep books shrink, thin books amplify the signal.",
+    "columns_used": ["ofi_60s", "depth_bid5", "depth_ask5"],
+    "target_horizons": [15, 30, 60]
+  }
+]

@@ -1,0 +1,100 @@
+[
+  {
+    "name": "range_width_delta_120s",
+    "family": "day_range_ohlc",
+    "hypothesis": "120s change of the day-range ratio (high-low)/mid measures the SPEED of information arrival: a fast-widening envelope flags an active discovery regime whose drift persists (volatility/info clustering); a stalling envelope marks exhaustion. Delta form isolates regime change from the dead slow level.",
+    "columns_used": ["high_px", "low_px", "mid_px"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "range_width_z_300s",
+    "family": "day_range_ohlc",
+    "hypothesis": "Trailing-300s z of the day-range ratio: self-normalized regime trigger firing when the envelope is unusually wide (fresh expansion, drift persists) or narrow (compression, reversion dominates) vs the day's own recent history; strips the mechanical intraday range growth and cross-day scale.",
+    "columns_used": ["high_px", "low_px", "mid_px"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "range_accel_60_300",
+    "family": "day_range_ohlc",
+    "hypothesis": "Acceleration of range expansion (60s width-delta minus 300s width-delta): positive = discovery speeding up (emerging info shock, burst continues), negative = deceleration/absorption (exhaustion, reversal odds rise). Second derivative isolates regime turning points.",
+    "columns_used": ["high_px", "low_px", "mid_px"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "mid_roll_range_pos_300s",
+    "family": "day_range_ohlc",
+    "hypothesis": "Position of mid within the trailing-300s range: LOCAL anchoring/stop-zone proximity at the 5-minute battleground scale that scalpers actually defend; recycles many times a day so it tracks fast anchor shifts and decorrelates from the whole-day cumulative champion.",
+    "columns_used": ["mid_px"],
+    "target_horizons": [15, 30, 60, 300]
+  },
+  {
+    "name": "net_extreme_drift_600s",
+    "family": "day_range_ohlc",
+    "hypothesis": "Signed net migration of the day's extremes over 600s (bps the high climbed minus bps the low fell), size-weighted: one-sided boundary rewriting is the informed side's footprint; stop cascades make such migration persist. Magnitude weighting separates conviction from single-tick probes.",
+    "columns_used": ["high_px", "low_px", "mid_px"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "extreme_recency_asym",
+    "family": "day_range_ohlc",
+    "hypothesis": "Bounded relative recency of the two day boundaries (since_last_low - since_last_high)/(sum): positive when the day-HIGH is the fresher event = upside breakout mode (stop triggers, attention, momentum algos follow the fresher boundary); decays to neutral while both bounds go untouched.",
+    "columns_used": ["high_px", "low_px", "ts_ms"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "bars_since_extreme",
+    "family": "day_range_ohlc",
+    "hypothesis": "Rows since the last refresh of EITHER day extreme = containment-spell duration: short = active exploration (drift alive), long = coiling inside stale bounds while stops accumulate beyond both boundaries; while the coil persists the prior impulse decays, favoring reversion over continuation.",
+    "columns_used": ["high_px", "low_px", "ts_ms"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "dev_from_open_bps",
+    "family": "day_range_ohlc",
+    "hypothesis": "Stretch from the opening auction in bps: the open is the day's first high-participation consensus and an ETF arbitrage/execution anchor; deviation without fresh information accumulates reversion pressure (inventory and arbitrage pull price back), a whole-day accumulation state for 300-900s.",
+    "columns_used": ["mid_px", "open_px"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "range_pos_x_ofi_z",
+    "family": "day_range_ohlc",
+    "hypothesis": "Champion interaction: centered day-range position x z(OFI). Buy-heavy flow near the day-high presses into the breakout zone (stop-cascade fuel or absorption); buy-heavy flow near the day-low is defense at support -- the same flow carries zone-dependent implications. Composes the two round-1 winning principles.",
+    "columns_used": ["mid_px", "ofi_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "range_pos_x_wdi",
+    "family": "day_range_ohlc",
+    "hypothesis": "Champion interaction: centered day-range position x 5-level depth imbalance. A bid-heavy book near the day-high reads as queue build-up into resistance (breakout intent or trap); the same book near the day-low reads as accumulation at support -- book pressure amplified or flipped by the anchoring zone.",
+    "columns_used": ["mid_px", "wdi"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "range_pos_x_spread_z",
+    "family": "day_range_ohlc",
+    "hypothesis": "Champion interaction: centered day-range position x spread z. Wide-for-recent spreads AT a day boundary flag market-maker withdrawal exactly where stops cluster (adverse selection ahead of boundary resolution); tight quoting at boundaries is confident absorption. Spread works only as a condition (round-1 lesson).",
+    "columns_used": ["mid_px", "quoted_spread_ticks"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "overnight_gap_x_range_pos",
+    "family": "day_range_ohlc",
+    "hypothesis": "Overnight context disambiguates position: gap=(open-pre_close)/pre_close x centered position. Near day-high on a gap-UP day = overnight gains held and extended (two timeframes agree, continuation); near day-high on a gap-DOWN day = full overnight recovery already spent (exhaustion, rejection). Gap alone is day-constant; the product varies intraday.",
+    "columns_used": ["mid_px", "open_px", "pre_close_px"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "recent_range_share_300s",
+    "family": "day_range_ohlc",
+    "hypothesis": "Volatility recency: share of the day's total mid-range contained in the trailing 300s, bounded [0,1]. High = boundaries are being made NOW (fresh discovery, drift persists); low = quiet inside an envelope built earlier (consolidation, reversion favored). Separates WHEN range was made from how big it is.",
+    "columns_used": ["mid_px"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "roll_range_width_z_300s",
+    "family": "day_range_ohlc",
+    "hypothesis": "Local squeeze/release trigger: trailing-300s range width z-scored vs its own trailing-300s history. Falling z = contracting envelope (squeeze/coiling before abrupt resolution); rising z = local envelope exploding (volatility clustering implies burst persistence). Stationary local vol state, unlike cumulative day-width z.",
+    "columns_used": ["mid_px"],
+    "target_horizons": [30, 60, 300]
+  }
+]

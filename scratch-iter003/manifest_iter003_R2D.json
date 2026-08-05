@@ -1,0 +1,100 @@
+[
+  {
+    "name": "iopv_vel_z_300s",
+    "family": "R2D",
+    "hypothesis": "IOPV is the arbitrage anchor; when the NAV benchmark moves unusually fast vs its trailing-300s self (z of the batch-2 iopv_velocity column), a fundamental re-pricing is underway that the ETF mid follows with the creation/redemption lag. Velocity spikes mark onset episodes -> continuation in the velocity direction at 60-900s. NOT a premium-level factor (that lane died 0/8): input is the anchor's rate of change, transform is regime-relative z.",
+    "columns_used": ["iopv_velocity"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "iopv_vel_drift_300s",
+    "family": "R2D",
+    "hypothesis": "Trailing-300s mean of iopv_velocity = sustained drift of the arbitrage anchor (direction PERSISTENCE, the brief's rolling_mean object): 5 minutes of one-signed NAV velocity is a genuine basket trend regime, not refresh noise, and arb flow keeps working the ETF toward the moving anchor -> continuation at 300-900s. Decorrelates from the sibling z exactly in decaying episodes.",
+    "columns_used": ["iopv_velocity"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "iopv_vel_x_ofi_z",
+    "family": "R2D",
+    "hypothesis": "z of (iopv_velocity x ofi_60s) isolates unusual JOINT episodes of the two arbitrage-chain legs: NAV drift and ETF book flow agreeing (large positive product) = positioning already aligned with the moving anchor -> continuation; disagreeing = flow fighting the anchor, flow tends to lose -> mid moves with velocity. Velocity-x-flow interaction, structurally different from the dead premium-level x flow forms (ofi_x_premium_sign, prem_x_ofi).",
+    "columns_used": ["iopv_velocity", "ofi_60s"],
+    "target_horizons": [60, 300]
+  },
+  {
+    "name": "ti15_accum_300s",
+    "family": "R2D",
+    "hypothesis": "300s accumulation of the batch-2 15s trade imbalance: same meta-order-pressure object as the registered ti_accum_300s but sampled at 4x the rate (overlapping 15s windows), so it turns within ~15-30s of regime onset and resolves burst structure the 60s-based accumulator smooths away -> continuation at 300-900s, decorrelated from the sibling cluster (rho 0.86-0.96 internally) during onset/flip episodes.",
+    "columns_used": ["trade_imbalance_15s"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "netvol_accum_300s",
+    "family": "R2D",
+    "hypothesis": "Trailing-300s mean of raw signed aggressive volume (buy_vol_60s - sell_vol_60s): restores the MAGNITUDE dimension every ratio-based accumulator normalizes away; square-root impact law ties displacement to absolute signed volume worked, so imbalance in high-participation phases predicts continued drift at 300-900s. The brief's literal (buy-sell)/(buy+sell) ratio equals trade_imbalance_60s by engine definition and would clone ti_accum_300s; raw signed volume is the dedup-safe realization.",
+    "columns_used": ["buy_vol_60s", "sell_vol_60s"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "large_net_accum_300s",
+    "family": "R2D",
+    "hypothesis": "300s accumulation of large_trade_net_share_60s (signed net share of the largest ~10% trades): institutional/informed prints are directional and driven by multi-minute execution schedules, so a sustained net large-print direction persists and predicts continuation at 300-900s. Distinct from the dead large_share_mom_300s (IS-dead delta of UNSIGNED share): this carries sign information and is an accumulation, not a level-momentum.",
+    "columns_used": ["large_trade_net_share_60s"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "ti_pos_frac_300s",
+    "family": "R2D",
+    "hypothesis": "Fraction of trailing 100 rows with trade_imbalance_60s > 0 = direction DURATION rather than intensity: 95 snapshots of weak-but-persistent buying is the signature of a patient sliced meta-order (Kyle 1985) that continues at 300-900s; ~0.5 marks balanced churn. Sign-frequency statistic ignores |TI| entirely, so it is nearly orthogonal to the crowded magnitude accumulator cluster by construction.",
+    "columns_used": ["trade_imbalance_60s"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "ofi_pos_frac_300s",
+    "family": "R2D",
+    "hypothesis": "Fraction of trailing 100 rows with ofi_60s > 0 = persistence of the PASSIVE/book channel direction: a book rebuilt on one side for 5 minutes is stealth accumulation via resting orders -> drift in that direction at 300-900s. OFI magnitude/momentum variants died OOS in round 1; the sign-frequency regime measure is a different object (duration, not size).",
+    "columns_used": ["ofi_60s"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "event_intens_z_300s",
+    "family": "R2D",
+    "hypothesis": "book_event_intensity_60s z-scored vs trailing 300s = information-arrival regime detector: feed-event rate is self-exciting (Hawkes), so unusually high heat marks an episode onset that persists for minutes, with information-driven flow continuing in its direction at 60-900s; unusually quiet tape is noise drift. z removes the U-shaped time-of-day seasonality of raw event counts.",
+    "columns_used": ["book_event_intensity_60s"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "ofi_z_x_intens_regime",
+    "family": "R2D",
+    "hypothesis": "Gated interaction (brief direction 4): z(ofi_60s, 300s) x z(60s-smoothed book_event_intensity, 300s reference). Unusual book-building under a HOT slow activity regime is informed positioning -> continuation with full weight; the same flow deviation under a cold regime is inventory noise, gated toward zero. Swaps the round-1-passing spread-state gate (ofi_z_x_spread_z) for the activity-state gate.",
+    "columns_used": ["ofi_60s", "book_event_intensity_60s"],
+    "target_horizons": [60, 300]
+  },
+  {
+    "name": "range_pos_delta_300s",
+    "family": "R2D",
+    "hypothesis": "100-row diff of position-in-day-range (the round-1 champion mid_day_range_pos, recomputed inline from mid_px): fast approach toward the day-high anchor zone where the documented rejection regime bites hardest -> drift down; fast fall toward day-low support -> mirror. Differencing the bounded [0,1] state strips the level's anchoring component (decorrelates from the library level) and normalizes by range scale (distinct from price momentum).",
+    "columns_used": ["mid_px"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "range_pos_delta_x_ti",
+    "family": "R2D",
+    "hypothesis": "Range-position 300s delta x trade_imbalance_60s: flow CONFIRMATION of runs through the range. Running at the day high with aggressive buying still active = chase flow absorbed into strength (exhaustion) -> down-drift (negative IC, extending the champion's rejection regime); falling under selling -> up-drift at support. Unconfirmed runs (TI~0) score ~0 by construction. Interaction of the champion's delta with the strongest short-horizon information variable.",
+    "columns_used": ["mid_px", "trade_imbalance_60s"],
+    "target_horizons": [60, 300]
+  },
+  {
+    "name": "ntrades_pace_z_300s",
+    "family": "R2D",
+    "hypothesis": "z of the 300s-smoothed n_trades_60s (brief direction 6: rolling_mean THEN z, the slow-regime twin of R2-C's raw trade_count_z_300s): unusually dense 5-minute pacing regimes persist via Hawkes clustering and algorithm ramping; on 588000 round-1 evidence the contrarian edge lives in overheated states (near-day-high rejection, negative 900s IC of log_mid_ret_120s/signed_rv_60s) -> high pacing z predicts reversion at 300-900s. Smoothing first removes snapshot noise and intraday seasonality.",
+    "columns_used": ["n_trades_60s"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "size_regime_z_300s",
+    "family": "R2D",
+    "hypothesis": "z of the 300s-smoothed avg_trade_size_60s (brief direction 6: rolling_mean then z): the composition regime of participation -- unusually large average prints = institutional/algorithmic parents whose schedules persist for minutes and whose flow impact decays slowly (square-root law), vs retail-dust churn. Regime shifts predict continuation of institutional episodes / reversion of churn at 300-900s; distinct from dead large_trade_share_level (different input and transform).",
+    "columns_used": ["avg_trade_size_60s"],
+    "target_horizons": [300, 900]
+  }
+]

@@ -1,0 +1,100 @@
+[
+  {
+    "name": "fullbook_imb_mom_60s",
+    "family": "R2C",
+    "hypothesis": "60s momentum of the whole-book bid/ask volume imbalance (total_bid_vol/total_ask_vol): a wider liquidity-pressure measure than 5-level wdi. Fresh one-sided queue build-up across ALL levels precedes upward queue-reactive impact at 15-60s; momentum form strips the dead level regime, extending the round-1 strongest cluster (book-imbalance momenta) to the uncrowded full-book base.",
+    "columns_used": ["total_bid_vol", "total_ask_vol"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "fullbook_imb_z_300s",
+    "family": "R2C",
+    "hypothesis": "Trailing-300s z of full-book imbalance: the outer queue aggregates patient institutional/creation-redemption positioning, so z-extremes mark sustained commitment regimes (bid-skewed reservoir refills the touch -> one-sided drift) aimed at 300-900s where accumulation/regime state passed in the eval-v2 re-screen.",
+    "columns_used": ["total_bid_vol", "total_ask_vol"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "hidden_imb_mom_60s",
+    "family": "R2C",
+    "hypothesis": "60s momentum of the hidden-layer imbalance (full-book minus top-5 volume per side): deliberate outer-level posting is intent-bearing, so fresh net hidden bid pressure arriving now precedes upward touch migration within 15-60s. Orthogonal base to wdi/full-book momenta, which are dominated by the top levels.",
+    "columns_used": ["total_bid_vol", "total_ask_vol", "depth_bid5", "depth_ask5"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "hidden_imb_mom_300s",
+    "family": "R2C",
+    "hypothesis": "300s momentum of hidden-layer imbalance integrates a full meta-order slicing cycle: institutions refresh outer-level quotes for minutes while the touch shows only the current slice, so a sustained 5-minute hidden-imbalance drift is the slow footprint of directional accumulation/distribution, carrying into 300-900s returns.",
+    "columns_used": ["total_bid_vol", "total_ask_vol", "depth_bid5", "depth_ask5"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "conc_imb_mom_60s",
+    "family": "R2C",
+    "hypothesis": "60s momentum of depth-concentration asymmetry (top-5 share of each side's full-book volume, bid minus ask): captures WHICH side is migrating liquidity toward the executable head. Bids moving front while asks retreat deep = urgent buyers vs patient sellers -> upward impact at 15-60s. Scale-free shares, orthogonal to volume imbalance.",
+    "columns_used": ["depth_bid5", "depth_ask5", "total_bid_vol", "total_ask_vol"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "conc_imb_z_300s",
+    "family": "R2C",
+    "hypothesis": "Trailing-300s z of concentration asymmetry: persistent placement-style regime (durably head-heavy bid vs deep ask structure = one-sided market-making/inventory program). Regime form separates sustained posture from transient migration; slow structural variable for 300-900s horizons.",
+    "columns_used": ["depth_bid5", "depth_ask5", "total_bid_vol", "total_ask_vol"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "top5_book_div_mom_60s",
+    "family": "R2C",
+    "hypothesis": "60s momentum of (wdi minus full-book imbalance): isolates the executable tip leading vs lagging the broad queue. Touch bid pressure rising faster than the whole book = urgency front-loaded at the touch -> queue consumption and upward continuation at 15-60s; lead-lag misalignment invisible to either imbalance alone.",
+    "columns_used": ["wdi", "total_bid_vol", "total_ask_vol"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "top5_book_div_z_300s",
+    "family": "R2C",
+    "hypothesis": "Trailing-300s z of the touch-vs-book divergence: persistently positive z = displayed touch strength unsupported by the deep queue (thin-backed, fragile -> hypothesized downward drift at 300-900s); persistently negative z = deep supported floor. Gap also maximizes on sign conflict (|wdi|+|fbi|).",
+    "columns_used": ["wdi", "total_bid_vol", "total_ask_vol"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "trade_size_z_300s",
+    "family": "R2C",
+    "hypothesis": "Trailing-300s z of log average trade size = granularity regime (institutional tickets vs retail dust relative to recent self). Unusually large average tickets flag inventory-driven creation/redemption block windows that market makers absorb -> hypothesized short-horizon reversion (negative IC) at 60-900s; regime-z avoids the dead raw-level class.",
+    "columns_used": ["avg_trade_size_60s"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "trade_size_mom_60s",
+    "family": "R2C",
+    "hypothesis": "60s change of log average trade size = granularity switching speed: abrupt within-minute size expansion flags block execution arriving NOW (blocks cannot hide); block flow on this growth ETF hypothesized buy-skewed (creation-side baskets) -> mildly positive IC at 15-60s; log-difference is scale-free.",
+    "columns_used": ["avg_trade_size_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "trade_count_z_300s",
+    "family": "R2C",
+    "hypothesis": "Trailing-300s z of trades-per-minute = participation/attention regime: bursts of many small trades are retail/algorithmic attention that institutional marginal price-setters trade against -> hypothesized contrarian reversion (negative IC) at 60-900s. Arrival-intensity axis complementary to the ticket-size axis.",
+    "columns_used": ["n_trades_60s"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "size_z_x_ti_30s",
+    "family": "R2C",
+    "hypothesis": "Granularity-regime surge (z of log avg trade size, 300s) x concurrent fast 30s trade imbalance (magnitude-weighted): large prints with fresh one-sided aggression = informed/institutional execution on a specific side (Kyle) -> continuation of that direction at 15-30s; balanced aggression scores ~0. Refines round-1 size_x_direction via faster magnitude-weighted direction and longer size regime.",
+    "columns_used": ["avg_trade_size_60s", "trade_imbalance_30s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "size_z_x_ofi_z",
+    "family": "R2C",
+    "hypothesis": "Size-regime z x OFI-regime z (both trailing 300s): large tickets coinciding with unusually strong directional book building = passive and active channels simultaneously in informed mode (iceberg layering with blocks) -> high-conviction direction continues at 15-60s. Distinct from ofi_ti_agree (sign share) and flow_divergence family.",
+    "columns_used": ["avg_trade_size_60s", "ofi_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "vol_tempo_z_300s",
+    "family": "R2C",
+    "hypothesis": "z-score of the 30s growth rate of cumulative traded volume (log diff over 10 rows, z vs trailing 300s): tape accelerating beyond its regime = crowded participation episode that exhausts quickly as MM liquidity restocks -> hypothesized reversion (negative IC) at 30-300s; a tempo STATE complement to the direction-signed volume surprises (vol_rate_x_ti, vol_confirmed_mom).",
+    "columns_used": ["cum_trade_vol"],
+    "target_horizons": [30, 60, 300]
+  }
+]
