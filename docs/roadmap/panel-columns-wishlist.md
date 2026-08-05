@@ -68,3 +68,22 @@ signed 大单占比变体作为后续候选，不在本批。
 2026-08-05（二））。修复：负值截断为 0（决策时刻该成交已知 ⇒ "刚发生"），
 回归测试 `test_trade_gap_skew_clamp`。该截断属于本列语义约定；未来若需保留
 负值的变体应另立新列。
+
+补记（同日，物化完成与成本实测）：
+
+- 全链路已完成并验证：引擎重建（#136）→ 缓存 replay 全通道重跑 66 交易日
+  （stage1 缓存 build + stage2 replay，`--factors` opt-in 五列）→
+  stage3 convert 重写 66 个 42 列分区（含 5380537 的非交易日 skip 修复）→
+  服务器 `/data/factor_lzt/scripts/verify_mat17.py` 全 PASS
+  （66 分区、42 列、trade_gap_ms ≥ 0、large_trade_share ∈ [0,1]、
+  cum_trade_vol 日内单调、仅 588000）。
+- **成本实测**（修正此前误引的 "0.4s/天"；0.4s 是 #94 审计中标的级
+  replay 写 side-file 的测量值，convert 不读 side-file，物化走全通道 replay）：
+  - stage1 缓存 build（一次性）：wall 104.8 min，均值 353.7s/天 CPU；
+  - stage2 全通道 replay（因子列重算 + 重写生产 CSV）：wall 31 min，
+    均值 102.8s/天 CPU，I/O 主导（每天 ~0.5-1GB 缓存读 + ~180MB CSV 写），
+    与因子列数量基本无关；
+  - stage3 convert：秒级/天。
+- 两候选（large_trade_share_level、trade_arrival_burst）已于 eval v2 下
+  完成首测，均 rejected（详见 /data/factor_lzt/iterations/eval_v2_iter002.md
+  与 library/candidates.json，6e849bb）。
