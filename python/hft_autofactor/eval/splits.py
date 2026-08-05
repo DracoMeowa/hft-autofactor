@@ -31,10 +31,18 @@ def purged_day_splits(
     """Walk-forward folds over sorted trading days.
 
     Test blocks are consecutive non-overlapping windows of ``n_test_days``
-    days.  For a test block starting at index ``s``, training uses days
-    ``[: s - embargo_days]`` (anchored) or the last ``rolling_train_days``
-    of those (rolling).  Folds whose embargo leaves no training days are
-    skipped -- the first test block therefore never starts at day 0.
+    days, RIGHT-ALIGNED so the LAST block ends on the final date (the
+    leading partial block, if ``n`` is not divisible by ``n_test_days``,
+    never becomes test data).  For a test block starting at index ``s``,
+    training uses days ``[: s - embargo_days]`` (anchored) or the last
+    ``rolling_train_days`` of those (rolling).  Folds whose embargo leaves
+    no training days are skipped -- the first test block therefore never
+    starts at day 0.
+
+    Right-alignment matters for consumers that treat ``splits[-1]`` as the
+    canonical OOS evaluation (explore screen): left-aligned tiling would
+    leave a short remainder block (e.g. 66 days, 5-day folds -> a 1-day
+    last fold) whose Newey-West t is degenerate.
     """
     if mode not in ("anchored", "rolling"):
         raise ValueError(f"unknown mode {mode!r} (use 'anchored' or 'rolling')")
@@ -48,7 +56,7 @@ def purged_day_splits(
     ordered = sorted(set(dates))
     n = len(ordered)
     splits: list[Split] = []
-    for s in range(0, n, n_test_days):
+    for s in range(n % n_test_days, n, n_test_days):
         test = ordered[s : s + n_test_days]
         train_end = s - embargo_days
         if train_end <= 0 or not test:

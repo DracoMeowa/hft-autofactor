@@ -203,6 +203,22 @@ def test_purged_day_splits_validation_errors():
     assert purged_day_splits(["20250601"], n_test_days=3) == []
 
 
+def test_purged_day_splits_right_aligns_tail():
+    """Regress the remainder-fold bug: when n is not divisible by
+    n_test_days the LAST fold must still be a full window ending on the
+    final date (a left-aligned tiling left a 1-day fold, which made the
+    explore screen's canonical OOS block degenerate: NW t on 1 obs = 0)."""
+    days = DATES + ["20250613"]  # 13 days; 13 % 3 == 1
+    splits = purged_day_splits(days, n_test_days=3, mode="anchored", embargo_days=1)
+    assert len(splits) == 3
+    assert all(len(s.test_dates) == 3 for s in splits)
+    # the canonical (last) fold covers the final 3 days with a full train
+    assert splits[-1].test_dates == tuple(days[10:13])
+    assert splits[-1].train_dates == tuple(days[:9])
+    # the leading partial block [0:1) never becomes test data
+    assert days[0] not in {d for s in splits for d in s.test_dates}
+
+
 def test_split_is_frozen():
     s = Split(train_dates=("a",), test_dates=("b",))
     with pytest.raises(Exception):

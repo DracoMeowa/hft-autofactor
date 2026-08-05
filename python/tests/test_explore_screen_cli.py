@@ -192,6 +192,10 @@ def test_screen_passes_strong_novel_signal(explore_cfg):
         assert row["oos_mean_ic"] > 0.4
         assert row["retention_ok"] is True
         assert row["passed"] is True
+        # right-aligned folds: canonical split = last n_test_days (5) dates
+        # x 4 instruments OOS, the 6 earlier dates (minus embargo) IS
+        assert row["oos_n_obs"] == 5 * len(INSTRUMENTS)
+        assert row["is_n_obs"] == 6 * len(INSTRUMENTS)
     assert report.report_path is not None and report.report_path.is_file()
     payload = json.loads(report.report_path.read_text(encoding="utf-8"))
     assert payload["passed"] is True
