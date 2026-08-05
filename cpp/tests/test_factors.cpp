@@ -537,13 +537,14 @@ static void test_short_window_flow_factors() {
 
   // t0+17s: ofi_15s warm (16s >= 15s); e1 pruned (ts < 2s), e2/e3 kept with
   // contribs +300 (ask1 eaten) and -100 (bid1 eaten) at depths 2700/2600.
+  // OFI normalizes by MEAN best depth: 200 / (5300/2).
   // trade_imbalance_15s warm (15s >= 15s): (300-100)/(300+100) = 0.5.
   // Longer windows and the 60s family still warming.
   Snapshot s2 = make_snap(inst, t0 + 17000);
   book.apply_snapshot(s2);
   for (auto& f : reg) f->on_snapshot(s2, book);
   CHECK(ofi15->value(inst, v));
-  CHECK_NEAR(v, 200.0 / 5300.0, 1e-12);
+  CHECK_NEAR(v, 400.0 / 5300.0, 1e-12);
   CHECK(!ofi30->value(inst, v));
   CHECK(!ofi60->value(inst, v));
   CHECK(ti15->value(inst, v));
@@ -605,9 +606,9 @@ static void test_short_window_flow_factors() {
   CHECK(bei->value(inst, v));
   CHECK_NEAR(v, 3.0 / 60.0, 1e-12);                   // e4 + e5 + e6
   CHECK(ofi15->value(inst, v));
-  CHECK_NEAR(v, 200.0 / 5600.0, 1e-12);               // whale contrib vs e6 zero
+  CHECK_NEAR(v, 200.0 / 2800.0, 1e-12);               // whale +200, mean depth 2800
   CHECK(ofi60->value(inst, v));
-  CHECK_NEAR(v, 200.0 / 8600.0, 1e-12);               // e4+e5+e6, depths 3000/2800/2800
+  CHECK_NEAR(v, 600.0 / 8600.0, 1e-12);               // 200 / (8600/3), depths 3000/2800/2800
 }
 
 static void test_registry() {
