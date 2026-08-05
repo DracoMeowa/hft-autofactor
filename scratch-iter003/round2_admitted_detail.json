@@ -1,0 +1,2901 @@
+[
+ {
+  "name": "dev_from_open_bps",
+  "mechanism": "Stretch from the opening auction, in bps. The open is the day's first high-participation consensus price and a salient anchor for execution benchmarks and ETF creation/redemption arbitrage, which quote around open-referenced fair value. A mid stretched far from the open without fresh information accumulates reversion pressure: liquidity providers and arbitrageurs pull price back toward the anchored value, and inventory limits make one-sided drift away from the open increasingly expensive to sustain -- the further the deviation, the stronger the pull back. This is a whole-day ACCUMULATION state (not a rolling-window momentum): the anchor is fixed at 09:30 and the deviation integrates the entire session, which is exactly the slow-state horizon (300-900s) where round-1 winners lived.",
+  "max_abs_corr_vs_panel": 0.239,
+  "nearest_panel_factor": "cum_trade_vol",
+  "horizons": {
+   "15": {
+    "passed": true,
+    "is_mean_ic": -0.0712,
+    "is_t": -13.46,
+    "oos_mean_ic": -0.0864,
+    "oos_t": -5.7,
+    "retention": 1.213,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -2.7282,
+      "long_net_bps": -8.7282,
+      "short_gross_bps": -4.2556,
+      "short_net_bps": -10.2556,
+      "n_long": 418,
+      "n_short": 317,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": -1.4307,
+      "long_net_bps": -7.4307,
+      "short_gross_bps": -2.3983,
+      "short_net_bps": -8.3983,
+      "n_long": 1293,
+      "n_short": 1379,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": -0.9836,
+      "long_net_bps": -6.9836,
+      "short_gross_bps": -1.6098,
+      "short_net_bps": -7.6098,
+      "n_long": 2933,
+      "n_short": 2651,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "30": {
+    "passed": true,
+    "is_mean_ic": -0.0955,
+    "is_t": -12.25,
+    "oos_mean_ic": -0.1192,
+    "oos_t": -5.2,
+    "retention": 1.249,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -6.0716,
+      "long_net_bps": -12.0716,
+      "short_gross_bps": -8.4626,
+      "short_net_bps": -14.4626,
+      "n_long": 408,
+      "n_short": 317,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": -2.763,
+      "long_net_bps": -8.763,
+      "short_gross_bps": -4.6153,
+      "short_net_bps": -10.6153,
+      "n_long": 1280,
+      "n_short": 1374,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": -1.8203,
+      "long_net_bps": -7.8203,
+      "short_gross_bps": -3.0423,
+      "short_net_bps": -9.0423,
+      "n_long": 3070,
+      "n_short": 2689,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "60": {
+    "passed": true,
+    "is_mean_ic": -0.1295,
+    "is_t": -12.57,
+    "oos_mean_ic": -0.1609,
+    "oos_t": -5.05,
+    "retention": 1.243,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -11.0723,
+      "long_net_bps": -17.0723,
+      "short_gross_bps": -17.294,
+      "short_net_bps": -23.294,
+      "n_long": 399,
+      "n_short": 313,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": -4.7239,
+      "long_net_bps": -10.7239,
+      "short_gross_bps": -9.2159,
+      "short_net_bps": -15.2159,
+      "n_long": 1388,
+      "n_short": 1357,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": -3.3109,
+      "long_net_bps": -9.3109,
+      "short_gross_bps": -6.2424,
+      "short_net_bps": -12.2424,
+      "n_long": 3036,
+      "n_short": 2679,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "300": {
+    "passed": true,
+    "is_mean_ic": -0.2634,
+    "is_t": -17.25,
+    "oos_mean_ic": -0.3287,
+    "oos_t": -6.24,
+    "retention": 1.248,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -41.8797,
+      "long_net_bps": -47.8797,
+      "short_gross_bps": -57.7666,
+      "short_net_bps": -63.7666,
+      "n_long": 383,
+      "n_short": 313,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": -22.569,
+      "long_net_bps": -28.569,
+      "short_gross_bps": -43.7413,
+      "short_net_bps": -49.7413,
+      "n_long": 1304,
+      "n_short": 1245,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": -14.394,
+      "long_net_bps": -20.394,
+      "short_gross_bps": -28.6033,
+      "short_net_bps": -34.6033,
+      "n_long": 2631,
+      "n_short": 2590,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "900": {
+    "passed": true,
+    "is_mean_ic": -0.4208,
+    "is_t": -17.37,
+    "oos_mean_ic": -0.4975,
+    "oos_t": -8.79,
+    "retention": 1.182,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -81.0433,
+      "long_net_bps": -87.0433,
+      "short_gross_bps": -94.4078,
+      "short_net_bps": -100.4078,
+      "n_long": 344,
+      "n_short": 254,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": -59.0634,
+      "long_net_bps": -65.0634,
+      "short_gross_bps": -60.235,
+      "short_net_bps": -66.235,
+      "n_long": 1322,
+      "n_short": 1219,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": -40.2861,
+      "long_net_bps": -46.2861,
+      "short_gross_bps": -44.6962,
+      "short_net_bps": -50.6962,
+      "n_long": 2482,
+      "n_short": 2191,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "mid_roll_range_pos_300s",
+  "mechanism": "Position of mid within the trailing-300s high-low range: the LOCAL version of range-position anchoring. The round-1 champion mid_day_range_pos proved that position inside the day's envelope encodes anchoring/stop-zone proximity with negative IC at all five horizons; but intraday scalpers and execution algos defend the boundaries of the RECENT battle range, which recycle many times a day. A mid near the top of the last 5 minutes' range sits just under fresh supply and just-printed highs (rejection or breakout fuel on a much faster clock), near the bottom just over fresh demand. Because the rolling window drops stale extremes, this factor tracks fast anchor shifts and decorrelates from the whole-day cumulative champion.",
+  "max_abs_corr_vs_panel": 0.54,
+  "nearest_panel_factor": "ofi_60s",
+  "horizons": {
+   "15": {
+    "passed": false,
+    "is_mean_ic": -0.0442,
+    "is_t": -1.88,
+    "oos_mean_ic": -0.0056,
+    "oos_t": -0.61,
+    "retention": 0.127,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 0.0373,
+      "long_net_bps": -5.9627,
+      "short_gross_bps": -0.2475,
+      "short_net_bps": -6.2475,
+      "n_long": 4582,
+      "n_short": 4046,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 0.0373,
+      "long_net_bps": -5.9627,
+      "short_gross_bps": -0.2475,
+      "short_net_bps": -6.2475,
+      "n_long": 4582,
+      "n_short": 4046,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.0373,
+      "long_net_bps": -5.9627,
+      "short_gross_bps": -0.2475,
+      "short_net_bps": -6.2475,
+      "n_long": 4582,
+      "n_short": 4046,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "30": {
+    "passed": false,
+    "is_mean_ic": -0.0512,
+    "is_t": -1.52,
+    "oos_mean_ic": -0.0088,
+    "oos_t": -0.54,
+    "retention": 0.171,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 0.0779,
+      "long_net_bps": -5.9221,
+      "short_gross_bps": -0.3844,
+      "short_net_bps": -6.3844,
+      "n_long": 4559,
+      "n_short": 4038,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 0.0779,
+      "long_net_bps": -5.9221,
+      "short_gross_bps": -0.3844,
+      "short_net_bps": -6.3844,
+      "n_long": 4559,
+      "n_short": 4038,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.0779,
+      "long_net_bps": -5.9221,
+      "short_gross_bps": -0.3844,
+      "short_net_bps": -6.3844,
+      "n_long": 4559,
+      "n_short": 4038,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "60": {
+    "passed": false,
+    "is_mean_ic": -0.0523,
+    "is_t": -1.31,
+    "oos_mean_ic": -0.0259,
+    "oos_t": -1.49,
+    "retention": 0.495,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -0.0145,
+      "long_net_bps": -6.0145,
+      "short_gross_bps": -0.7364,
+      "short_net_bps": -6.7364,
+      "n_long": 4523,
+      "n_short": 4023,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": -0.0145,
+      "long_net_bps": -6.0145,
+      "short_gross_bps": -0.7364,
+      "short_net_bps": -6.7364,
+      "n_long": 4523,
+      "n_short": 4023,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": -0.0145,
+      "long_net_bps": -6.0145,
+      "short_gross_bps": -0.7364,
+      "short_net_bps": -6.7364,
+      "n_long": 4523,
+      "n_short": 4023,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "300": {
+    "passed": false,
+    "is_mean_ic": -0.0504,
+    "is_t": -3.05,
+    "oos_mean_ic": -0.0625,
+    "oos_t": -1.15,
+    "retention": 1.24,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 0.51,
+      "long_net_bps": -5.49,
+      "short_gross_bps": -2.4781,
+      "short_net_bps": -8.4781,
+      "n_long": 4225,
+      "n_short": 3862,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 0.51,
+      "long_net_bps": -5.49,
+      "short_gross_bps": -2.4781,
+      "short_net_bps": -8.4781,
+      "n_long": 4225,
+      "n_short": 3862,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.51,
+      "long_net_bps": -5.49,
+      "short_gross_bps": -2.4781,
+      "short_net_bps": -8.4781,
+      "n_long": 4225,
+      "n_short": 3862,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "900": {
+    "passed": true,
+    "is_mean_ic": -0.0818,
+    "is_t": -4.88,
+    "oos_mean_ic": -0.147,
+    "oos_t": -3.2,
+    "retention": 1.797,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -0.1765,
+      "long_net_bps": -6.1765,
+      "short_gross_bps": -11.002,
+      "short_net_bps": -17.002,
+      "n_long": 3706,
+      "n_short": 3383,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": -0.1765,
+      "long_net_bps": -6.1765,
+      "short_gross_bps": -11.002,
+      "short_net_bps": -17.002,
+      "n_long": 3706,
+      "n_short": 3383,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": -0.1765,
+      "long_net_bps": -6.1765,
+      "short_gross_bps": -11.002,
+      "short_net_bps": -17.002,
+      "n_long": 3706,
+      "n_short": 3383,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "range_pos_x_spread_z",
+  "mechanism": "Quoting stress located at the range zones: a spread unusually wide for its own recent history WHILE price sits near a day boundary flags market makers withdrawing exactly where resting stops cluster -- adverse-selection fear ahead of a boundary resolution. Wide-spread-near-high (positive interaction) warns the breakout zone is being treated as toxic: resolution, when it comes, tends to be sharp, and the side defending the level has information advantage; tight-spread-at-boundary is confident quoting and absorption. Bare spread level was IS-dead in round 1 while spread-z interactions passed 15s twice -- spread only carries signal as a CONDITION, and here the conditioning dimension is the range-position champion itself.",
+  "max_abs_corr_vs_panel": 0.1931,
+  "nearest_panel_factor": "total_ask_vol",
+  "horizons": {
+   "15": {
+    "passed": false,
+    "is_mean_ic": 0.0136,
+    "is_t": 2.97,
+    "oos_mean_ic": 0.0237,
+    "oos_t": 1.51,
+    "retention": 1.746,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -0.5791,
+      "long_net_bps": -6.5791,
+      "short_gross_bps": 0.1861,
+      "short_net_bps": -5.8139,
+      "n_long": 255,
+      "n_short": 263,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 0.3513,
+      "long_net_bps": -5.6487,
+      "short_gross_bps": 0.4147,
+      "short_net_bps": -5.5853,
+      "n_long": 1589,
+      "n_short": 1191,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.0452,
+      "long_net_bps": -5.9548,
+      "short_gross_bps": 0.5765,
+      "short_net_bps": -5.4235,
+      "n_long": 4297,
+      "n_short": 2360,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "30": {
+    "passed": true,
+    "is_mean_ic": 0.02,
+    "is_t": 3.3,
+    "oos_mean_ic": 0.038,
+    "oos_t": 2.01,
+    "retention": 1.903,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -0.6324,
+      "long_net_bps": -6.6324,
+      "short_gross_bps": -0.5301,
+      "short_net_bps": -6.5301,
+      "n_long": 254,
+      "n_short": 263,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 0.8688,
+      "long_net_bps": -5.1312,
+      "short_gross_bps": 1.3023,
+      "short_net_bps": -4.6977,
+      "n_long": 1584,
+      "n_short": 1191,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.2242,
+      "long_net_bps": -5.7758,
+      "short_gross_bps": 1.1671,
+      "short_net_bps": -4.8329,
+      "n_long": 4276,
+      "n_short": 2359,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "60": {
+    "passed": true,
+    "is_mean_ic": 0.0318,
+    "is_t": 3.86,
+    "oos_mean_ic": 0.0643,
+    "oos_t": 2.75,
+    "retention": 2.022,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 0.6151,
+      "long_net_bps": -5.3849,
+      "short_gross_bps": -0.3376,
+      "short_net_bps": -6.3376,
+      "n_long": 254,
+      "n_short": 263,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 2.2122,
+      "long_net_bps": -3.7878,
+      "short_gross_bps": 3.2334,
+      "short_net_bps": -2.7666,
+      "n_long": 1572,
+      "n_short": 1189,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.896,
+      "long_net_bps": -5.104,
+      "short_gross_bps": 2.6266,
+      "short_net_bps": -3.3734,
+      "n_long": 4233,
+      "n_short": 2348,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "300": {
+    "passed": true,
+    "is_mean_ic": 0.056,
+    "is_t": 3.73,
+    "oos_mean_ic": 0.1679,
+    "oos_t": 2.51,
+    "retention": 2.999,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -5.6143,
+      "long_net_bps": -11.6143,
+      "short_gross_bps": -3.2814,
+      "short_net_bps": -9.2814,
+      "n_long": 247,
+      "n_short": 253,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 11.6956,
+      "long_net_bps": 5.6956,
+      "short_gross_bps": 4.84,
+      "short_net_bps": -1.16,
+      "n_long": 1451,
+      "n_short": 1162,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 5.3466,
+      "long_net_bps": -0.6534,
+      "short_gross_bps": 6.0785,
+      "short_net_bps": 0.0785,
+      "n_long": 3966,
+      "n_short": 2264,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "900": {
+    "passed": true,
+    "is_mean_ic": 0.0726,
+    "is_t": 2.79,
+    "oos_mean_ic": 0.2738,
+    "oos_t": 3.84,
+    "retention": 3.77,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -23.5934,
+      "long_net_bps": -29.5934,
+      "short_gross_bps": 3.0526,
+      "short_net_bps": -2.9474,
+      "n_long": 230,
+      "n_short": 236,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 18.3071,
+      "long_net_bps": 12.3071,
+      "short_gross_bps": 24.0338,
+      "short_net_bps": 18.0338,
+      "n_long": 1277,
+      "n_short": 1050,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 10.8742,
+      "long_net_bps": 4.8742,
+      "short_gross_bps": 20.0513,
+      "short_net_bps": 14.0513,
+      "n_long": 3434,
+      "n_short": 2084,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "ti_accel_15_60",
+  "mechanism": "Aggressor-flow acceleration: trade_imbalance_15s - trade_imbalance_60s contrasts the freshest 15s of signed aggressive volume balance with the trailing minute. A positive value means marketable buying is intensifying RIGHT NOW relative to the minute context -- the aggressor is sweeping the touch faster than the recent pace, which consumes resting liquidity and precedes 15-30s continuation in the aggression direction. A negative value flags aggression exhaustion (buyers fading mid-minute) ahead of stalls or fades. Both legs are bounded in [-1,1], so the gap is scale-free across instruments and volume regimes (unlike qty-unit OFI gaps). Distinct channel from ofi_accel_15_60 by construction: accelerating aggression against decelerating book building is the urgent 'hit while liquidity pulls' state, and the two accelerations are only moderately correlated. Not an EWMA state (ti_ewm_accel_120s exists): this is a pure two-window engine-column difference at the fastest available resolution.",
+  "max_abs_corr_vs_panel": 0.6511,
+  "nearest_panel_factor": "trade_imbalance_15s",
+  "horizons": {
+   "15": {
+    "passed": true,
+    "is_mean_ic": 0.0777,
+    "is_t": 10.92,
+    "oos_mean_ic": 0.0464,
+    "oos_t": 3.91,
+    "retention": 0.597,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 0.6766,
+      "long_net_bps": -5.3234,
+      "short_gross_bps": 0.5074,
+      "short_net_bps": -5.4926,
+      "n_long": 240,
+      "n_short": 240,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 0.5649,
+      "long_net_bps": -5.4351,
+      "short_gross_bps": 0.3558,
+      "short_net_bps": -5.6442,
+      "n_long": 1194,
+      "n_short": 1194,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.5611,
+      "long_net_bps": -5.4389,
+      "short_gross_bps": 0.4629,
+      "short_net_bps": -5.5371,
+      "n_long": 2384,
+      "n_short": 2384,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "30": {
+    "passed": true,
+    "is_mean_ic": 0.074,
+    "is_t": 7.14,
+    "oos_mean_ic": 0.0545,
+    "oos_t": 3.54,
+    "retention": 0.736,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 1.2273,
+      "long_net_bps": -4.7727,
+      "short_gross_bps": 0.7142,
+      "short_net_bps": -5.2858,
+      "n_long": 240,
+      "n_short": 240,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 0.7217,
+      "long_net_bps": -5.2783,
+      "short_gross_bps": 0.6389,
+      "short_net_bps": -5.3611,
+      "n_long": 1190,
+      "n_short": 1190,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.692,
+      "long_net_bps": -5.308,
+      "short_gross_bps": 0.7479,
+      "short_net_bps": -5.2521,
+      "n_long": 2379,
+      "n_short": 2379,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "60": {
+    "passed": true,
+    "is_mean_ic": 0.0641,
+    "is_t": 5.72,
+    "oos_mean_ic": 0.0345,
+    "oos_t": 3.36,
+    "retention": 0.538,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 2.0633,
+      "long_net_bps": -3.9367,
+      "short_gross_bps": 1.3625,
+      "short_net_bps": -4.6375,
+      "n_long": 240,
+      "n_short": 240,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 0.765,
+      "long_net_bps": -5.235,
+      "short_gross_bps": 0.5991,
+      "short_net_bps": -5.4009,
+      "n_long": 1185,
+      "n_short": 1185,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.8439,
+      "long_net_bps": -5.1561,
+      "short_gross_bps": 0.7437,
+      "short_net_bps": -5.2563,
+      "n_long": 2369,
+      "n_short": 2369,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "300": {
+    "passed": false,
+    "is_mean_ic": 0.0368,
+    "is_t": 4.75,
+    "oos_mean_ic": 0.0138,
+    "oos_t": 2.47,
+    "retention": 0.376,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 0.6768,
+      "long_net_bps": -5.3232,
+      "short_gross_bps": -0.0357,
+      "short_net_bps": -6.0357,
+      "n_long": 230,
+      "n_short": 230,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 3.649,
+      "long_net_bps": -2.351,
+      "short_gross_bps": -1.6222,
+      "short_net_bps": -7.6222,
+      "n_long": 1145,
+      "n_short": 1145,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 3.8005,
+      "long_net_bps": -2.1995,
+      "short_gross_bps": -2.2148,
+      "short_net_bps": -8.2148,
+      "n_long": 2289,
+      "n_short": 2289,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "900": {
+    "passed": false,
+    "is_mean_ic": 0.0283,
+    "is_t": 5.0,
+    "oos_mean_ic": 0.013,
+    "oos_t": 1.15,
+    "retention": 0.461,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 7.1031,
+      "long_net_bps": 1.1031,
+      "short_gross_bps": -1.205,
+      "short_net_bps": -7.205,
+      "n_long": 210,
+      "n_short": 210,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 8.5542,
+      "long_net_bps": 2.5542,
+      "short_gross_bps": -3.9665,
+      "short_net_bps": -9.9665,
+      "n_long": 1045,
+      "n_short": 1045,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 7.1188,
+      "long_net_bps": 1.1188,
+      "short_gross_bps": -4.4833,
+      "short_net_bps": -10.4833,
+      "n_long": 2089,
+      "n_short": 2089,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "ofi_15s_z_120s",
+  "mechanism": "Short-window book-flow surprise: ofi_15s resolves order-book-delta flow over quarter-minute windows, where single placement/cancel bursts still dominate, instead of the minute-averaged ofi_60s that smooths them away. Z-scoring against the trailing 120s converts qty-scale flow into a comparable pressure-surprise: a reading of +2 says the book is being built one way at a rate two standard deviations above this instrument's last two minutes. Informed limit flow arrives in exactly such bursts (CKS 2014: OFI drives short-horizon price changes) and precedes 15-60s continuation in the burst direction. The short z-window keeps the reference regime local so the signal tracks intraday regime changes instead of the whole-day norm. Redundancy control: ofi_15s shares its formula with panel ofi_60s but over 1/4 of the window, and the 120s z removes the shared slow regime component; if rank correlation with ofi_60s still clears 0.85 the dedup gate will catch it, but the burst resolution is genuinely new information.",
+  "max_abs_corr_vs_panel": 0.7903,
+  "nearest_panel_factor": "ofi_15s",
+  "horizons": {
+   "15": {
+    "passed": true,
+    "is_mean_ic": 0.1397,
+    "is_t": 14.75,
+    "oos_mean_ic": 0.0938,
+    "oos_t": 4.83,
+    "retention": 0.672,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 1.9543,
+      "long_net_bps": -4.0457,
+      "short_gross_bps": 1.3634,
+      "short_net_bps": -4.6366,
+      "n_long": 240,
+      "n_short": 240,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 1.454,
+      "long_net_bps": -4.546,
+      "short_gross_bps": 1.2088,
+      "short_net_bps": -4.7912,
+      "n_long": 1189,
+      "n_short": 1189,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.3288,
+      "long_net_bps": -4.6712,
+      "short_gross_bps": 1.1092,
+      "short_net_bps": -4.8908,
+      "n_long": 2373,
+      "n_short": 2373,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "30": {
+    "passed": true,
+    "is_mean_ic": 0.1218,
+    "is_t": 12.52,
+    "oos_mean_ic": 0.0885,
+    "oos_t": 3.84,
+    "retention": 0.726,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 1.5958,
+      "long_net_bps": -4.4042,
+      "short_gross_bps": 1.3607,
+      "short_net_bps": -4.6393,
+      "n_long": 240,
+      "n_short": 240,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 1.9117,
+      "long_net_bps": -4.0883,
+      "short_gross_bps": 1.5904,
+      "short_net_bps": -4.4096,
+      "n_long": 1184,
+      "n_short": 1184,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.7813,
+      "long_net_bps": -4.2187,
+      "short_gross_bps": 1.2216,
+      "short_net_bps": -4.7784,
+      "n_long": 2368,
+      "n_short": 2368,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "60": {
+    "passed": true,
+    "is_mean_ic": 0.1002,
+    "is_t": 14.5,
+    "oos_mean_ic": 0.0563,
+    "oos_t": 3.12,
+    "retention": 0.561,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 2.0616,
+      "long_net_bps": -3.9384,
+      "short_gross_bps": -0.2476,
+      "short_net_bps": -6.2476,
+      "n_long": 239,
+      "n_short": 239,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 2.1042,
+      "long_net_bps": -3.8958,
+      "short_gross_bps": 0.7158,
+      "short_net_bps": -5.2842,
+      "n_long": 1179,
+      "n_short": 1179,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 2.174,
+      "long_net_bps": -3.826,
+      "short_gross_bps": 0.5253,
+      "short_net_bps": -5.4747,
+      "n_long": 2358,
+      "n_short": 2358,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "300": {
+    "passed": true,
+    "is_mean_ic": 0.0529,
+    "is_t": 15.35,
+    "oos_mean_ic": 0.0322,
+    "oos_t": 5.25,
+    "retention": 0.609,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 1.8112,
+      "long_net_bps": -4.1888,
+      "short_gross_bps": -3.7043,
+      "short_net_bps": -9.7043,
+      "n_long": 230,
+      "n_short": 230,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 2.0202,
+      "long_net_bps": -3.9798,
+      "short_gross_bps": 0.1631,
+      "short_net_bps": -5.8369,
+      "n_long": 1139,
+      "n_short": 1139,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 3.0444,
+      "long_net_bps": -2.9556,
+      "short_gross_bps": -0.4208,
+      "short_net_bps": -6.4208,
+      "n_long": 2278,
+      "n_short": 2278,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "900": {
+    "passed": true,
+    "is_mean_ic": 0.0359,
+    "is_t": 10.66,
+    "oos_mean_ic": 0.0225,
+    "oos_t": 5.33,
+    "retention": 0.626,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 4.7644,
+      "long_net_bps": -1.2356,
+      "short_gross_bps": -6.5143,
+      "short_net_bps": -12.5143,
+      "n_long": 210,
+      "n_short": 210,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 3.9824,
+      "long_net_bps": -2.0176,
+      "short_gross_bps": -1.2066,
+      "short_net_bps": -7.2066,
+      "n_long": 1039,
+      "n_short": 1039,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 5.899,
+      "long_net_bps": -0.101,
+      "short_gross_bps": -2.8946,
+      "short_net_bps": -8.8946,
+      "n_long": 2078,
+      "n_short": 2078,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "ofi_concord_15_60",
+  "mechanism": "Cross-window book-flow conviction: when the 15s and 60s OFI windows point the same direction, book building is consistent across timescales -- a sustained one-sided limit-flow investment rather than a flicker. The factor scores sign x min(|ofi_15s|,|ofi_60s|): the min caps strength at the WEAKER leg, so a strong fresh impulse contradicted (or unsupported) by the minute context scores low, and opposite signs score exactly 0. Persistent same-sign OFI across windows is the queue-investment signature that reliably precedes 15-30s continuation (OFI predictive power is monotone in its persistence, CKS 2014), whereas single-window flow flips constantly and is mostly noise. This is a PERSISTENCE/conviction filter, economically distinct from the acceleration factors (which measure the fast-minus-slow gap) -- here agreement itself, capped at the weaker leg, is the signal.",
+  "max_abs_corr_vs_panel": 0.8461,
+  "nearest_panel_factor": "ofi_15s",
+  "horizons": {
+   "15": {
+    "passed": true,
+    "is_mean_ic": 0.1508,
+    "is_t": 12.61,
+    "oos_mean_ic": 0.0863,
+    "oos_t": 10.13,
+    "retention": 0.572,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 2.2374,
+      "long_net_bps": -3.7626,
+      "short_gross_bps": 3.2435,
+      "short_net_bps": -2.7565,
+      "n_long": 240,
+      "n_short": 240,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 1.9296,
+      "long_net_bps": -4.0704,
+      "short_gross_bps": 1.6016,
+      "short_net_bps": -4.3984,
+      "n_long": 1194,
+      "n_short": 1194,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.2945,
+      "long_net_bps": -4.7055,
+      "short_gross_bps": 1.0419,
+      "short_net_bps": -4.9581,
+      "n_long": 2384,
+      "n_short": 2384,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "30": {
+    "passed": false,
+    "is_mean_ic": 0.138,
+    "is_t": 9.55,
+    "oos_mean_ic": 0.0646,
+    "oos_t": 7.85,
+    "retention": 0.468,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 3.1767,
+      "long_net_bps": -2.8233,
+      "short_gross_bps": 2.5351,
+      "short_net_bps": -3.4649,
+      "n_long": 240,
+      "n_short": 240,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 2.3614,
+      "long_net_bps": -3.6386,
+      "short_gross_bps": 1.3774,
+      "short_net_bps": -4.6226,
+      "n_long": 1190,
+      "n_short": 1190,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.5103,
+      "long_net_bps": -4.4897,
+      "short_gross_bps": 0.7268,
+      "short_net_bps": -5.2732,
+      "n_long": 2379,
+      "n_short": 2379,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "60": {
+    "passed": false,
+    "is_mean_ic": 0.12,
+    "is_t": 8.51,
+    "oos_mean_ic": 0.0242,
+    "oos_t": 1.39,
+    "retention": 0.202,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 4.1025,
+      "long_net_bps": -1.8975,
+      "short_gross_bps": 0.1381,
+      "short_net_bps": -5.8619,
+      "n_long": 240,
+      "n_short": 240,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 2.6181,
+      "long_net_bps": -3.3819,
+      "short_gross_bps": -0.4216,
+      "short_net_bps": -6.4216,
+      "n_long": 1185,
+      "n_short": 1185,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.3894,
+      "long_net_bps": -4.6106,
+      "short_gross_bps": -0.2847,
+      "short_net_bps": -6.2847,
+      "n_long": 2369,
+      "n_short": 2369,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "300": {
+    "passed": false,
+    "is_mean_ic": 0.0611,
+    "is_t": 4.21,
+    "oos_mean_ic": -0.0127,
+    "oos_t": -0.48,
+    "retention": 0.208,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -0.6436,
+      "long_net_bps": -6.6436,
+      "short_gross_bps": -9.0073,
+      "short_net_bps": -15.0073,
+      "n_long": 230,
+      "n_short": 230,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 0.5298,
+      "long_net_bps": -5.4702,
+      "short_gross_bps": -4.3618,
+      "short_net_bps": -10.3618,
+      "n_long": 1145,
+      "n_short": 1145,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.1863,
+      "long_net_bps": -4.8137,
+      "short_gross_bps": -3.4383,
+      "short_net_bps": -9.4383,
+      "n_long": 2289,
+      "n_short": 2289,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "900": {
+    "passed": false,
+    "is_mean_ic": 0.0098,
+    "is_t": 1.15,
+    "oos_mean_ic": -0.0502,
+    "oos_t": -1.37,
+    "retention": 5.117,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 2.6136,
+      "long_net_bps": -3.3864,
+      "short_gross_bps": -17.4056,
+      "short_net_bps": -23.4056,
+      "n_long": 210,
+      "n_short": 210,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 5.1215,
+      "long_net_bps": -0.8785,
+      "short_gross_bps": -8.8521,
+      "short_net_bps": -14.8521,
+      "n_long": 1045,
+      "n_short": 1045,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 4.9782,
+      "long_net_bps": -1.0218,
+      "short_gross_bps": -8.1688,
+      "short_net_bps": -14.1688,
+      "n_long": 2089,
+      "n_short": 2089,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "ofi_per_depth_z_300s",
+  "mechanism": "Strain-per-depth: the same raw OFI moves price very differently in a thin book and a deep book. Dividing ofi_60s by the 5-level depth stock (depth_bid5 + depth_ask5) converts flow into the strain the book is actually asked to absorb -- Kyle's-lambda intuition that price change per unit flow is inversely related to available depth. Unusually high strain-for-depth means the book is absorbing flow it cannot comfortably hold, so the pressured side gives way at 15-60s (positive strain against thin depth -> up-move as asks lift; negative -> down). The trailing-300s z flags strain regimes unusual for this instrument-day. Economically distinct from raw OFI z-factors: deep books mechanically shrink the signal and thin books amplify it, so this re-weights flow by the book's capacity to resist it -- a liquidity-normalized pressure no registered factor provides.",
+  "max_abs_corr_vs_panel": 0.7741,
+  "nearest_panel_factor": "ofi_60s",
+  "horizons": {
+   "15": {
+    "passed": true,
+    "is_mean_ic": 0.0946,
+    "is_t": 9.84,
+    "oos_mean_ic": 0.0538,
+    "oos_t": 4.43,
+    "retention": 0.569,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -0.0752,
+      "long_net_bps": -6.0752,
+      "short_gross_bps": 1.5248,
+      "short_net_bps": -4.4752,
+      "n_long": 235,
+      "n_short": 235,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 0.9464,
+      "long_net_bps": -5.0536,
+      "short_gross_bps": 0.5038,
+      "short_net_bps": -5.4962,
+      "n_long": 1169,
+      "n_short": 1169,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.8412,
+      "long_net_bps": -5.1588,
+      "short_gross_bps": 0.3578,
+      "short_net_bps": -5.6422,
+      "n_long": 2336,
+      "n_short": 2336,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "30": {
+    "passed": false,
+    "is_mean_ic": 0.0913,
+    "is_t": 7.29,
+    "oos_mean_ic": 0.0378,
+    "oos_t": 2.26,
+    "retention": 0.414,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 0.3003,
+      "long_net_bps": -5.6997,
+      "short_gross_bps": 0.6277,
+      "short_net_bps": -5.3723,
+      "n_long": 235,
+      "n_short": 235,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 1.2952,
+      "long_net_bps": -4.7048,
+      "short_gross_bps": -0.0153,
+      "short_net_bps": -6.0153,
+      "n_long": 1167,
+      "n_short": 1167,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.4423,
+      "long_net_bps": -4.5577,
+      "short_gross_bps": 0.1775,
+      "short_net_bps": -5.8225,
+      "n_long": 2331,
+      "n_short": 2331,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "60": {
+    "passed": false,
+    "is_mean_ic": 0.0844,
+    "is_t": 7.5,
+    "oos_mean_ic": 0.0172,
+    "oos_t": 0.49,
+    "retention": 0.204,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 1.9807,
+      "long_net_bps": -4.0193,
+      "short_gross_bps": -1.1934,
+      "short_net_bps": -7.1934,
+      "n_long": 235,
+      "n_short": 235,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 2.3537,
+      "long_net_bps": -3.6463,
+      "short_gross_bps": -0.7612,
+      "short_net_bps": -6.7612,
+      "n_long": 1162,
+      "n_short": 1162,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 2.2166,
+      "long_net_bps": -3.7834,
+      "short_gross_bps": -0.4806,
+      "short_net_bps": -6.4806,
+      "n_long": 2321,
+      "n_short": 2321,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "300": {
+    "passed": false,
+    "is_mean_ic": 0.0487,
+    "is_t": 6.67,
+    "oos_mean_ic": 0.025,
+    "oos_t": 1.6,
+    "retention": 0.514,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 0.034,
+      "long_net_bps": -5.966,
+      "short_gross_bps": 3.2389,
+      "short_net_bps": -2.7611,
+      "n_long": 225,
+      "n_short": 225,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 1.5377,
+      "long_net_bps": -4.4623,
+      "short_gross_bps": 0.2445,
+      "short_net_bps": -5.7555,
+      "n_long": 1122,
+      "n_short": 1122,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 3.1604,
+      "long_net_bps": -2.8396,
+      "short_gross_bps": 0.1637,
+      "short_net_bps": -5.8363,
+      "n_long": 2241,
+      "n_short": 2241,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "900": {
+    "passed": false,
+    "is_mean_ic": 0.0272,
+    "is_t": 4.53,
+    "oos_mean_ic": 0.0112,
+    "oos_t": 0.37,
+    "retention": 0.412,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 6.2798,
+      "long_net_bps": 0.2798,
+      "short_gross_bps": -1.292,
+      "short_net_bps": -7.292,
+      "n_long": 205,
+      "n_short": 205,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 6.5184,
+      "long_net_bps": 0.5184,
+      "short_gross_bps": -3.5838,
+      "short_net_bps": -9.5838,
+      "n_long": 1022,
+      "n_short": 1022,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 6.4229,
+      "long_net_bps": 0.4229,
+      "short_gross_bps": -3.8744,
+      "short_net_bps": -9.8744,
+      "n_long": 2041,
+      "n_short": 2041,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "fullbook_imb_mom_60s",
+  "mechanism": "Full-book pressure momentum: batch-2 total_bid_vol/total_ask_vol sum the ENTIRE visible book, not just five levels, so their normalized imbalance measures queued liquidity pressure across all prices, with the outer queue included. The 60s CHANGE of this full-book imbalance isolates fresh one-sided queue build-up or withdrawal happening now: a rising value means resting interest is arriving faster on the bid side at every level, which precedes upward queue-reactive impact as aggressors consume the thinning ask stack (Cont-Stoikov-Talreja pressure logic, generalized from 5 levels to the whole book). The momentum form strips the slowly varying level regime (the dead-end class per the iter-001/002 meta-lesson) and sits in the book-imbalance-momentum cluster that was round-1's strongest short-horizon family, but on a WIDER base than wdi/oir/depth5 deltas, so it is not a re-run of them.",
+  "max_abs_corr_vs_panel": 0.6032,
+  "nearest_panel_factor": "ofi_60s",
+  "horizons": {
+   "15": {
+    "passed": true,
+    "is_mean_ic": 0.1236,
+    "is_t": 9.63,
+    "oos_mean_ic": 0.089,
+    "oos_t": 6.46,
+    "retention": 0.72,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 3.3017,
+      "long_net_bps": -2.6983,
+      "short_gross_bps": 0.4888,
+      "short_net_bps": -5.5112,
+      "n_long": 240,
+      "n_short": 240,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 1.8932,
+      "long_net_bps": -4.1068,
+      "short_gross_bps": 1.1362,
+      "short_net_bps": -4.8638,
+      "n_long": 1194,
+      "n_short": 1194,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.4667,
+      "long_net_bps": -4.5333,
+      "short_gross_bps": 0.9154,
+      "short_net_bps": -5.0846,
+      "n_long": 2384,
+      "n_short": 2384,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "30": {
+    "passed": true,
+    "is_mean_ic": 0.1137,
+    "is_t": 7.97,
+    "oos_mean_ic": 0.0578,
+    "oos_t": 4.55,
+    "retention": 0.508,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 3.0015,
+      "long_net_bps": -2.9985,
+      "short_gross_bps": -1.187,
+      "short_net_bps": -7.187,
+      "n_long": 240,
+      "n_short": 240,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 2.1453,
+      "long_net_bps": -3.8547,
+      "short_gross_bps": 0.8749,
+      "short_net_bps": -5.1251,
+      "n_long": 1190,
+      "n_short": 1190,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.7183,
+      "long_net_bps": -4.2817,
+      "short_gross_bps": 0.6014,
+      "short_net_bps": -5.3986,
+      "n_long": 2379,
+      "n_short": 2379,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "60": {
+    "passed": false,
+    "is_mean_ic": 0.1027,
+    "is_t": 10.44,
+    "oos_mean_ic": 0.0142,
+    "oos_t": 1.04,
+    "retention": 0.138,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 2.127,
+      "long_net_bps": -3.873,
+      "short_gross_bps": -3.4914,
+      "short_net_bps": -9.4914,
+      "n_long": 240,
+      "n_short": 240,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 1.904,
+      "long_net_bps": -4.096,
+      "short_gross_bps": -1.139,
+      "short_net_bps": -7.139,
+      "n_long": 1185,
+      "n_short": 1185,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.1667,
+      "long_net_bps": -4.8333,
+      "short_gross_bps": -0.8594,
+      "short_net_bps": -6.8594,
+      "n_long": 2369,
+      "n_short": 2369,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "300": {
+    "passed": false,
+    "is_mean_ic": 0.0605,
+    "is_t": 6.48,
+    "oos_mean_ic": 0.0074,
+    "oos_t": 0.27,
+    "retention": 0.123,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 13.1866,
+      "long_net_bps": 7.1866,
+      "short_gross_bps": -7.9198,
+      "short_net_bps": -13.9198,
+      "n_long": 230,
+      "n_short": 230,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 5.14,
+      "long_net_bps": -0.86,
+      "short_gross_bps": -5.3016,
+      "short_net_bps": -11.3016,
+      "n_long": 1145,
+      "n_short": 1145,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 4.2655,
+      "long_net_bps": -1.7345,
+      "short_gross_bps": -5.279,
+      "short_net_bps": -11.279,
+      "n_long": 2289,
+      "n_short": 2289,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "900": {
+    "passed": false,
+    "is_mean_ic": 0.0277,
+    "is_t": 4.11,
+    "oos_mean_ic": 0.005,
+    "oos_t": 0.15,
+    "retention": 0.182,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -0.1542,
+      "long_net_bps": -6.1542,
+      "short_gross_bps": -3.3049,
+      "short_net_bps": -9.3049,
+      "n_long": 210,
+      "n_short": 210,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 3.1839,
+      "long_net_bps": -2.8161,
+      "short_gross_bps": 0.314,
+      "short_net_bps": -5.686,
+      "n_long": 1045,
+      "n_short": 1045,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 5.0219,
+      "long_net_bps": -0.9781,
+      "short_gross_bps": -1.212,
+      "short_net_bps": -7.212,
+      "n_long": 2089,
+      "n_short": 2089,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "fullbook_imb_z_300s",
+  "mechanism": "Broad-book pressure regime: the whole-book bid/ask imbalance z-scored against its own trailing-300s distribution. The outer queue aggregated by total_bid_vol/total_ask_vol is where patient institutional and ETF creation/redemption positioning parks, so the full-book ratio moves more slowly than top-of-book measures and its z-extremes mark sustained commitment regimes: an unusually bid-skewed whole book is a reservoir that keeps refilling the touch, supporting continued one-sided drift at 300-900s; the mirror flags sustained distribution. Z-scoring converts the non-stationary imbalance level into a regime state -- the structural slow-variable member of the full-book pair, aimed at the horizons where accumulation/regime state paid off in the eval-v2 re-screen.",
+  "max_abs_corr_vs_panel": 0.5809,
+  "nearest_panel_factor": "ofi_60s",
+  "horizons": {
+   "15": {
+    "passed": true,
+    "is_mean_ic": 0.1347,
+    "is_t": 9.52,
+    "oos_mean_ic": 0.0823,
+    "oos_t": 10.43,
+    "retention": 0.611,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 2.3549,
+      "long_net_bps": -3.6451,
+      "short_gross_bps": 0.6484,
+      "short_net_bps": -5.3516,
+      "n_long": 235,
+      "n_short": 235,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 1.5181,
+      "long_net_bps": -4.4819,
+      "short_gross_bps": 0.7785,
+      "short_net_bps": -5.2215,
+      "n_long": 1174,
+      "n_short": 1174,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.9485,
+      "long_net_bps": -5.0515,
+      "short_gross_bps": 0.9825,
+      "short_net_bps": -5.0175,
+      "n_long": 2346,
+      "n_short": 2346,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "30": {
+    "passed": false,
+    "is_mean_ic": 0.1291,
+    "is_t": 8.77,
+    "oos_mean_ic": 0.0627,
+    "oos_t": 4.01,
+    "retention": 0.486,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 1.8123,
+      "long_net_bps": -4.1877,
+      "short_gross_bps": 0.3278,
+      "short_net_bps": -5.6722,
+      "n_long": 235,
+      "n_short": 235,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 1.7728,
+      "long_net_bps": -4.2272,
+      "short_gross_bps": 0.7315,
+      "short_net_bps": -5.2685,
+      "n_long": 1172,
+      "n_short": 1172,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.0386,
+      "long_net_bps": -4.9614,
+      "short_gross_bps": 0.791,
+      "short_net_bps": -5.209,
+      "n_long": 2341,
+      "n_short": 2341,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "60": {
+    "passed": false,
+    "is_mean_ic": 0.1168,
+    "is_t": 10.78,
+    "oos_mean_ic": 0.0227,
+    "oos_t": 1.1,
+    "retention": 0.194,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 0.4707,
+      "long_net_bps": -5.5293,
+      "short_gross_bps": 0.0596,
+      "short_net_bps": -5.9404,
+      "n_long": 235,
+      "n_short": 235,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 0.8244,
+      "long_net_bps": -5.1756,
+      "short_gross_bps": 0.2268,
+      "short_net_bps": -5.7732,
+      "n_long": 1167,
+      "n_short": 1167,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.404,
+      "long_net_bps": -5.596,
+      "short_gross_bps": 0.3575,
+      "short_net_bps": -5.6425,
+      "n_long": 2331,
+      "n_short": 2331,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "300": {
+    "passed": false,
+    "is_mean_ic": 0.0702,
+    "is_t": 4.76,
+    "oos_mean_ic": 0.025,
+    "oos_t": 0.41,
+    "retention": 0.357,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 0.5086,
+      "long_net_bps": -5.4914,
+      "short_gross_bps": 0.8318,
+      "short_net_bps": -5.1682,
+      "n_long": 227,
+      "n_short": 227,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 0.9548,
+      "long_net_bps": -5.0452,
+      "short_gross_bps": -0.9581,
+      "short_net_bps": -6.9581,
+      "n_long": 1127,
+      "n_short": 1127,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.1152,
+      "long_net_bps": -4.8848,
+      "short_gross_bps": -0.765,
+      "short_net_bps": -6.765,
+      "n_long": 2251,
+      "n_short": 2251,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "900": {
+    "passed": false,
+    "is_mean_ic": 0.0252,
+    "is_t": 2.01,
+    "oos_mean_ic": -0.0075,
+    "oos_t": -0.12,
+    "retention": 0.298,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 1.3897,
+      "long_net_bps": -4.6103,
+      "short_gross_bps": 4.269,
+      "short_net_bps": -1.731,
+      "n_long": 207,
+      "n_short": 207,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 5.7604,
+      "long_net_bps": -0.2396,
+      "short_gross_bps": -2.4535,
+      "short_net_bps": -8.4535,
+      "n_long": 1027,
+      "n_short": 1027,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 5.9081,
+      "long_net_bps": -0.0919,
+      "short_gross_bps": -4.2602,
+      "short_net_bps": -10.2602,
+      "n_long": 2051,
+      "n_short": 2051,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "conc_imb_z_300s",
+  "mechanism": "Placement-style regime: the bid/ask concentration difference (top-5 share of each side's full-book volume) z-scored against its trailing-300s distribution. Persistent extremes mark a sustained strategic posture: a bid side parked at the head while the ask side stays deep is a durable market-making/inventory mode (e.g. creation/redemption programs working the visible queue on one side only), and such structural regimes decay slowly and condition how the next minutes trade -- head-heavy supported structure favors continuation of the favored side at 300-900s. The regime-z form separates persistent posture from the transient migration events measured by the momentum sibling, and keeps the construction in the live delta/z class rather than the dead level class.",
+  "max_abs_corr_vs_panel": 0.5207,
+  "nearest_panel_factor": "wdi",
+  "horizons": {
+   "15": {
+    "passed": false,
+    "is_mean_ic": 0.1878,
+    "is_t": 12.55,
+    "oos_mean_ic": 0.0826,
+    "oos_t": 10.5,
+    "retention": 0.44,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 2.1909,
+      "long_net_bps": -3.8091,
+      "short_gross_bps": 1.265,
+      "short_net_bps": -4.735,
+      "n_long": 235,
+      "n_short": 235,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 1.7091,
+      "long_net_bps": -4.2909,
+      "short_gross_bps": 0.8823,
+      "short_net_bps": -5.1177,
+      "n_long": 1174,
+      "n_short": 1174,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.2518,
+      "long_net_bps": -4.7482,
+      "short_gross_bps": 1.0133,
+      "short_net_bps": -4.9867,
+      "n_long": 2346,
+      "n_short": 2346,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "30": {
+    "passed": false,
+    "is_mean_ic": 0.1829,
+    "is_t": 6.77,
+    "oos_mean_ic": 0.069,
+    "oos_t": 8.01,
+    "retention": 0.377,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 3.8249,
+      "long_net_bps": -2.1751,
+      "short_gross_bps": 0.2781,
+      "short_net_bps": -5.7219,
+      "n_long": 235,
+      "n_short": 235,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 2.2235,
+      "long_net_bps": -3.7765,
+      "short_gross_bps": 0.8763,
+      "short_net_bps": -5.1237,
+      "n_long": 1172,
+      "n_short": 1172,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.4469,
+      "long_net_bps": -4.5531,
+      "short_gross_bps": 1.1774,
+      "short_net_bps": -4.8226,
+      "n_long": 2341,
+      "n_short": 2341,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "60": {
+    "passed": false,
+    "is_mean_ic": 0.1663,
+    "is_t": 4.39,
+    "oos_mean_ic": 0.067,
+    "oos_t": 6.71,
+    "retention": 0.403,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 4.332,
+      "long_net_bps": -1.668,
+      "short_gross_bps": 0.2153,
+      "short_net_bps": -5.7847,
+      "n_long": 235,
+      "n_short": 235,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 2.6452,
+      "long_net_bps": -3.3548,
+      "short_gross_bps": 0.9435,
+      "short_net_bps": -5.0565,
+      "n_long": 1167,
+      "n_short": 1167,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 2.0739,
+      "long_net_bps": -3.9261,
+      "short_gross_bps": 1.3695,
+      "short_net_bps": -4.6305,
+      "n_long": 2331,
+      "n_short": 2331,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "300": {
+    "passed": true,
+    "is_mean_ic": 0.0997,
+    "is_t": 3.82,
+    "oos_mean_ic": 0.0554,
+    "oos_t": 2.3,
+    "retention": 0.556,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 10.1779,
+      "long_net_bps": 4.1779,
+      "short_gross_bps": -0.6425,
+      "short_net_bps": -6.6425,
+      "n_long": 227,
+      "n_short": 227,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 4.4312,
+      "long_net_bps": -1.5688,
+      "short_gross_bps": 0.0992,
+      "short_net_bps": -5.9008,
+      "n_long": 1127,
+      "n_short": 1127,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 3.248,
+      "long_net_bps": -2.752,
+      "short_gross_bps": 1.4559,
+      "short_net_bps": -4.5441,
+      "n_long": 2251,
+      "n_short": 2251,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "900": {
+    "passed": true,
+    "is_mean_ic": 0.0828,
+    "is_t": 4.22,
+    "oos_mean_ic": 0.084,
+    "oos_t": 2.99,
+    "retention": 1.015,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 11.9822,
+      "long_net_bps": 5.9822,
+      "short_gross_bps": 6.9425,
+      "short_net_bps": 0.9425,
+      "n_long": 207,
+      "n_short": 207,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 5.857,
+      "long_net_bps": -0.143,
+      "short_gross_bps": 2.8921,
+      "short_net_bps": -3.1079,
+      "n_long": 1027,
+      "n_short": 1027,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 6.2856,
+      "long_net_bps": 0.2856,
+      "short_gross_bps": 1.5821,
+      "short_net_bps": -4.4179,
+      "n_long": 2051,
+      "n_short": 2051,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "top5_book_div_z_300s",
+  "mechanism": "Structural mismatch regime: the (wdi minus full-book imbalance) gap z-scored against its trailing-300s distribution. A persistently POSITIVE z means displayed touch strength is NOT backed by the deep queue -- thin-backed strength that is fragile: the touch gets consumed without deep refill, hypothesized to drift DOWN over 300-900s (negative contribution). A persistently NEGATIVE z means a deep bid reservoir with modest visible touch -- a supported floor where strength is queued but not yet displayed. When the two imbalances have opposite signs the gap reaches its maximum (|wdi| + |fbi|), so the same statistic also catches sign-level structural conflict. Regime-z form separates sustained mismatch from the transient flickers measured by the momentum sibling.",
+  "max_abs_corr_vs_panel": 0.7782,
+  "nearest_panel_factor": "microprice_dev",
+  "horizons": {
+   "15": {
+    "passed": true,
+    "is_mean_ic": 0.3109,
+    "is_t": 21.94,
+    "oos_mean_ic": 0.214,
+    "oos_t": 14.2,
+    "retention": 0.688,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 3.8453,
+      "long_net_bps": -2.1547,
+      "short_gross_bps": 3.7075,
+      "short_net_bps": -2.2925,
+      "n_long": 235,
+      "n_short": 235,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 2.5796,
+      "long_net_bps": -3.4204,
+      "short_gross_bps": 2.8811,
+      "short_net_bps": -3.1189,
+      "n_long": 1174,
+      "n_short": 1174,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 2.2914,
+      "long_net_bps": -3.7086,
+      "short_gross_bps": 2.3493,
+      "short_net_bps": -3.6507,
+      "n_long": 2346,
+      "n_short": 2346,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "30": {
+    "passed": true,
+    "is_mean_ic": 0.291,
+    "is_t": 9.91,
+    "oos_mean_ic": 0.1633,
+    "oos_t": 10.66,
+    "retention": 0.561,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 4.2773,
+      "long_net_bps": -1.7227,
+      "short_gross_bps": 2.6119,
+      "short_net_bps": -3.3881,
+      "n_long": 235,
+      "n_short": 235,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 3.0378,
+      "long_net_bps": -2.9622,
+      "short_gross_bps": 2.7333,
+      "short_net_bps": -3.2667,
+      "n_long": 1172,
+      "n_short": 1172,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 2.7028,
+      "long_net_bps": -3.2972,
+      "short_gross_bps": 2.181,
+      "short_net_bps": -3.819,
+      "n_long": 2341,
+      "n_short": 2341,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "60": {
+    "passed": true,
+    "is_mean_ic": 0.254,
+    "is_t": 5.8,
+    "oos_mean_ic": 0.1298,
+    "oos_t": 10.57,
+    "retention": 0.511,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 5.0557,
+      "long_net_bps": -0.9443,
+      "short_gross_bps": 3.6985,
+      "short_net_bps": -2.3015,
+      "n_long": 235,
+      "n_short": 235,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 3.5627,
+      "long_net_bps": -2.4373,
+      "short_gross_bps": 3.3942,
+      "short_net_bps": -2.6058,
+      "n_long": 1167,
+      "n_short": 1167,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 3.0871,
+      "long_net_bps": -2.9129,
+      "short_gross_bps": 2.7651,
+      "short_net_bps": -3.2349,
+      "n_long": 2331,
+      "n_short": 2331,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "300": {
+    "passed": false,
+    "is_mean_ic": 0.1488,
+    "is_t": 4.81,
+    "oos_mean_ic": 0.0593,
+    "oos_t": 2.95,
+    "retention": 0.399,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 8.4767,
+      "long_net_bps": 2.4767,
+      "short_gross_bps": -0.0304,
+      "short_net_bps": -6.0304,
+      "n_long": 227,
+      "n_short": 227,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 5.8292,
+      "long_net_bps": -0.1708,
+      "short_gross_bps": 1.7261,
+      "short_net_bps": -4.2739,
+      "n_long": 1127,
+      "n_short": 1127,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 4.4706,
+      "long_net_bps": -1.5294,
+      "short_gross_bps": 1.0598,
+      "short_net_bps": -4.9402,
+      "n_long": 2251,
+      "n_short": 2251,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "900": {
+    "passed": true,
+    "is_mean_ic": 0.098,
+    "is_t": 4.79,
+    "oos_mean_ic": 0.056,
+    "oos_t": 2.79,
+    "retention": 0.571,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 6.1301,
+      "long_net_bps": 0.1301,
+      "short_gross_bps": -2.5467,
+      "short_net_bps": -8.5467,
+      "n_long": 207,
+      "n_short": 207,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 7.0051,
+      "long_net_bps": 1.0051,
+      "short_gross_bps": -0.5407,
+      "short_net_bps": -6.5407,
+      "n_long": 1027,
+      "n_short": 1027,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 6.601,
+      "long_net_bps": 0.601,
+      "short_gross_bps": -1.4966,
+      "short_net_bps": -7.4966,
+      "n_long": 2051,
+      "n_short": 2051,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "iopv_vel_z_300s",
+  "mechanism": "IOPV is the arbitrage anchor of an ETF: when the NAV benchmark itself starts moving unusually fast versus its own trailing-300s behavior, a fundamental re-pricing of the underlying basket is underway. The ETF mid follows IOPV with a lag because arbitrage execution (creation/redemption, basket hedging) takes seconds to minutes, so a velocity spike marks the ONSET of a fair-value move the ETF price has not yet fully tracked: the current velocity, when unusually large, predicts continuation of the ETF mid in the velocity direction at 60-900s as arb flow closes the tracking gap. This is NOT a premium-level factor (all 8 unconditional premium/IOPV forms died of regime break): the input is the rate of change of the anchor (batch-2 column iopv_velocity), and the transform is regime-relative (z vs trailing 300s), so it measures fresh arbitrage-pressure ACCELERATION rather than the dead level/momentum of the premium gap.",
+  "max_abs_corr_vs_panel": 0.847,
+  "nearest_panel_factor": "iopv_velocity",
+  "horizons": {
+   "15": {
+    "passed": true,
+    "is_mean_ic": 0.064,
+    "is_t": 5.91,
+    "oos_mean_ic": 0.0411,
+    "oos_t": 2.67,
+    "retention": 0.642,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 1.7172,
+      "long_net_bps": -4.2828,
+      "short_gross_bps": -1.4497,
+      "short_net_bps": -7.4497,
+      "n_long": 230,
+      "n_short": 230,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 0.9693,
+      "long_net_bps": -5.0307,
+      "short_gross_bps": -0.0959,
+      "short_net_bps": -6.0959,
+      "n_long": 1144,
+      "n_short": 1144,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.8462,
+      "long_net_bps": -5.1538,
+      "short_gross_bps": 0.1133,
+      "short_net_bps": -5.8867,
+      "n_long": 2286,
+      "n_short": 2286,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "30": {
+    "passed": false,
+    "is_mean_ic": 0.0616,
+    "is_t": 4.68,
+    "oos_mean_ic": 0.0206,
+    "oos_t": 0.86,
+    "retention": 0.335,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 2.6303,
+      "long_net_bps": -3.3697,
+      "short_gross_bps": -3.8309,
+      "short_net_bps": -9.8309,
+      "n_long": 230,
+      "n_short": 230,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 1.4734,
+      "long_net_bps": -4.5266,
+      "short_gross_bps": -0.7815,
+      "short_net_bps": -6.7815,
+      "n_long": 1142,
+      "n_short": 1142,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.1766,
+      "long_net_bps": -4.8234,
+      "short_gross_bps": -0.0944,
+      "short_net_bps": -6.0944,
+      "n_long": 2281,
+      "n_short": 2281,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "60": {
+    "passed": false,
+    "is_mean_ic": 0.0533,
+    "is_t": 4.77,
+    "oos_mean_ic": 0.0011,
+    "oos_t": 0.03,
+    "retention": 0.02,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": 1.4188,
+      "long_net_bps": -4.5812,
+      "short_gross_bps": -4.3982,
+      "short_net_bps": -10.3982,
+      "n_long": 230,
+      "n_short": 230,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 1.5259,
+      "long_net_bps": -4.4741,
+      "short_gross_bps": -0.9046,
+      "short_net_bps": -6.9046,
+      "n_long": 1137,
+      "n_short": 1137,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 0.918,
+      "long_net_bps": -5.082,
+      "short_gross_bps": -0.4762,
+      "short_net_bps": -6.4762,
+      "n_long": 2271,
+      "n_short": 2271,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "300": {
+    "passed": false,
+    "is_mean_ic": 0.0319,
+    "is_t": 4.54,
+    "oos_mean_ic": 0.0089,
+    "oos_t": 0.53,
+    "retention": 0.28,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -1.7714,
+      "long_net_bps": -7.7714,
+      "short_gross_bps": -9.7677,
+      "short_net_bps": -15.7677,
+      "n_long": 220,
+      "n_short": 220,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 1.6275,
+      "long_net_bps": -4.3725,
+      "short_gross_bps": -1.3587,
+      "short_net_bps": -7.3587,
+      "n_long": 1097,
+      "n_short": 1097,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 1.5088,
+      "long_net_bps": -4.4912,
+      "short_gross_bps": -0.7365,
+      "short_net_bps": -6.7365,
+      "n_long": 2191,
+      "n_short": 2191,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "900": {
+    "passed": false,
+    "is_mean_ic": 0.0247,
+    "is_t": 4.11,
+    "oos_mean_ic": 0.0027,
+    "oos_t": 0.1,
+    "retention": 0.109,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -1.6978,
+      "long_net_bps": -7.6978,
+      "short_gross_bps": -9.3016,
+      "short_net_bps": -15.3016,
+      "n_long": 200,
+      "n_short": 200,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": 4.9626,
+      "long_net_bps": -1.0374,
+      "short_gross_bps": -3.7023,
+      "short_net_bps": -9.7023,
+      "n_long": 997,
+      "n_short": 997,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": 5.1522,
+      "long_net_bps": -0.8478,
+      "short_gross_bps": -5.0503,
+      "short_net_bps": -11.0503,
+      "n_long": 1991,
+      "n_short": 1991,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "iopv_vel_drift_300s",
+  "mechanism": "Averaging the 60s IOPV change rate over five minutes yields the SUSTAINED drift of the arbitrage anchor: whether NAV has been persistently rising or falling, not just flickering. One-off velocity spikes can be index recomputation noise or single-stock shocks that fade; a 300s-persistent velocity is a genuine fundamental trend regime in the underlying basket. Under such a regime, arbitrage flow works the ETF toward the moving anchor over many minutes, so a positive sustained drift predicts continued ETF appreciation at the 300-900s horizons (and mirror). This is the direction-PERSISTENCE companion of iopv_vel_z_300s: the z asks 'is velocity unusual now', the drift asks 'has the anchor been trending'; the two decorrelate during decaying episodes (z normalizes, drift stays signed). Both avoid the dead premium-level lane: the input is NAV velocity, a batch-2 column.",
+  "max_abs_corr_vs_panel": 0.3714,
+  "nearest_panel_factor": "trade_imbalance_60s",
+  "horizons": {
+   "15": {
+    "passed": false,
+    "is_mean_ic": 0.0206,
+    "is_t": 5.79,
+    "oos_mean_ic": -0.0012,
+    "oos_t": -0.1,
+    "retention": 0.056,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -0.7484,
+      "long_net_bps": -6.7484,
+      "short_gross_bps": -0.3867,
+      "short_net_bps": -6.3867,
+      "n_long": 230,
+      "n_short": 230,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": -0.5144,
+      "long_net_bps": -6.5144,
+      "short_gross_bps": -0.3808,
+      "short_net_bps": -6.3808,
+      "n_long": 1144,
+      "n_short": 1144,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": -0.3045,
+      "long_net_bps": -6.3045,
+      "short_gross_bps": -0.3249,
+      "short_net_bps": -6.3249,
+      "n_long": 2286,
+      "n_short": 2286,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "30": {
+    "passed": false,
+    "is_mean_ic": 0.0213,
+    "is_t": 4.19,
+    "oos_mean_ic": -0.0011,
+    "oos_t": -0.06,
+    "retention": 0.053,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -2.723,
+      "long_net_bps": -8.723,
+      "short_gross_bps": -1.5747,
+      "short_net_bps": -7.5747,
+      "n_long": 230,
+      "n_short": 230,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": -1.3608,
+      "long_net_bps": -7.3608,
+      "short_gross_bps": -1.178,
+      "short_net_bps": -7.178,
+      "n_long": 1142,
+      "n_short": 1142,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": -0.7635,
+      "long_net_bps": -6.7635,
+      "short_gross_bps": -0.4732,
+      "short_net_bps": -6.4732,
+      "n_long": 2281,
+      "n_short": 2281,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "60": {
+    "passed": false,
+    "is_mean_ic": 0.0192,
+    "is_t": 2.08,
+    "oos_mean_ic": -0.0149,
+    "oos_t": -0.44,
+    "retention": 0.779,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -3.2305,
+      "long_net_bps": -9.2305,
+      "short_gross_bps": -4.8667,
+      "short_net_bps": -10.8667,
+      "n_long": 230,
+      "n_short": 230,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": -2.7058,
+      "long_net_bps": -8.7058,
+      "short_gross_bps": -1.5528,
+      "short_net_bps": -7.5528,
+      "n_long": 1137,
+      "n_short": 1137,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": -1.4315,
+      "long_net_bps": -7.4315,
+      "short_gross_bps": -1.0461,
+      "short_net_bps": -7.0461,
+      "n_long": 2271,
+      "n_short": 2271,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "300": {
+    "passed": false,
+    "is_mean_ic": -0.0047,
+    "is_t": -0.28,
+    "oos_mean_ic": -0.0616,
+    "oos_t": -1.39,
+    "retention": 13.014,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -8.5173,
+      "long_net_bps": -14.5173,
+      "short_gross_bps": -29.3931,
+      "short_net_bps": -35.3931,
+      "n_long": 220,
+      "n_short": 220,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": -6.5798,
+      "long_net_bps": -12.5798,
+      "short_gross_bps": -5.5338,
+      "short_net_bps": -11.5338,
+      "n_long": 1099,
+      "n_short": 1097,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": -4.1957,
+      "long_net_bps": -10.1957,
+      "short_gross_bps": -4.7199,
+      "short_net_bps": -10.7199,
+      "n_long": 2191,
+      "n_short": 2191,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   },
+   "900": {
+    "passed": true,
+    "is_mean_ic": -0.0726,
+    "is_t": -4.08,
+    "oos_mean_ic": -0.1786,
+    "oos_t": -2.9,
+    "retention": 2.461,
+    "head_stats": [
+     {
+      "tau": 0.01,
+      "long_gross_bps": -9.2593,
+      "long_net_bps": -15.2593,
+      "short_gross_bps": -56.9455,
+      "short_net_bps": -62.9455,
+      "n_long": 200,
+      "n_short": 200,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.05,
+      "long_gross_bps": -2.7208,
+      "long_net_bps": -8.7208,
+      "short_gross_bps": -18.5071,
+      "short_net_bps": -24.5071,
+      "n_long": 998,
+      "n_short": 997,
+      "n_days_long": 5,
+      "n_days_short": 5
+     },
+     {
+      "tau": 0.1,
+      "long_gross_bps": -3.4446,
+      "long_net_bps": -9.4446,
+      "short_gross_bps": -14.1209,
+      "short_net_bps": -20.1209,
+      "n_long": 1992,
+      "n_short": 1991,
+      "n_days_long": 5,
+      "n_days_short": 5
+     }
+    ]
+   }
+  }
+ }
+]
