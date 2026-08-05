@@ -9008,5 +9008,2495 @@
       "deathmap": "scratch-iter003/round2_deathmap.json",
       "chinese_report": "scratch-iter003/iter003_round2_report.md (server copy: /data/factor_lzt/iterations/)"
     }
+  },
+  "iter003_round3": {
+    "trigger": "iter-003 third batch on the 59-col panel (#146): 57 candidates in 4 families (R3-A day-anchor deviation dynamics, R3-B deep-book divergence decomposition, R3-C cross-scale flow structure, R3-D state interactions between surviving signals); registered + run + eval-v2 screen + pooled Spearman dedup vs the 35-factor library",
+    "generated_at": "2026-08-06",
+    "batch": {
+      "specs_dir": "explore-specs-iter003",
+      "n_specs": 57,
+      "families": {
+        "R3A_anchor_dynamics": 14,
+        "R3B_deepbook_divergence": 14,
+        "R3C_cross_scale_flow": 15,
+        "R3D_state_interactions": 14
+      }
+    },
+    "gate": {
+      "version": "eval_v2",
+      "is_t_min": 2.0,
+      "oos_t_min": 2.0,
+      "retention_min": 0.5,
+      "retention_sign_rule": "IS/OOS IC must have same sign; flip fails",
+      "dedup_max_abs_corr_vs_panel": 0.85,
+      "dedup_library": "35 admitted library factors (16 round-1 + 6 eval-v2 rescreen + 13 round-2); pooled Spearman over 314,053 rows",
+      "embargo_days": 1,
+      "n_test_days": 5,
+      "cost_bps_per_side": 3.0,
+      "head_taus": [
+        0.01,
+        0.05,
+        0.1
+      ],
+      "head_stats_role": "descriptive only, not a gate"
+    },
+    "split": {
+      "train": "20250701-20250922 (60d)",
+      "test": "20250924-20250930 (5d)",
+      "embargo": "20250923",
+      "panel_rows": 314053,
+      "panel_days": 66
+    },
+    "pipeline_run": {
+      "registry": "196 prototypes in prod registry (139 prior + 57 new)",
+      "run": "57 ok / 0 failed, causality-gated (~4 min wall)",
+      "screen": "19 pass / 38 fail (~4 min wall)"
+    },
+    "summary": {
+      "screen_pass": 19,
+      "screen_fail": 38,
+      "dedup_killed": 9,
+      "admitted_new": 10,
+      "library_total": 45
+    },
+    "dedup": {
+      "method": "pooled Spearman over 314,053 rows x 66 days among the 19 screen-pass protos + 35 library factors (manual rank-based rho; polars 1.43 has no Series.corr)",
+      "threshold": 0.85,
+      "killed": [
+        {
+          "name": "dev_open_z_300s",
+          "screen_passed_horizons": [
+            900
+          ],
+          "max_abs_corr_vs_panel": 0.6331808008767251,
+          "killed_reason": "rho=0.901 vs mid_roll_range_pos_300s (library, round 2) -- open-anchor deviation z collapses to the rolling-range-position already admitted"
+        },
+        {
+          "name": "open_side_hold_bars",
+          "screen_passed_horizons": [
+            15,
+            30,
+            60,
+            300,
+            900
+          ],
+          "max_abs_corr_vs_panel": 0.3021811304830167,
+          "killed_reason": "rho=0.879 vs dev_from_open_bps (library, round 2); also rho=-0.919 vs batch-sibling open_pos_roll_range_300s -- holding-duration is just monotone open-deviation"
+        },
+        {
+          "name": "open_pos_roll_range_300s",
+          "screen_passed_horizons": [
+            15,
+            30,
+            60,
+            300,
+            900
+          ],
+          "max_abs_corr_vs_panel": 0.24610949279532468,
+          "killed_reason": "rho=-0.921 vs dev_from_open_bps (library, round 2) -- position within rolling open-anchored range is the negative of open deviation"
+        },
+        {
+          "name": "stretch_per_day_range",
+          "screen_passed_horizons": [
+            15,
+            30,
+            60,
+            300,
+            900
+          ],
+          "max_abs_corr_vs_panel": 0.2850955154762026,
+          "killed_reason": "rho=0.923 vs dev_from_open_bps (library, round 2); also 0.824 vs mid_day_range_pos -- stretch from open is open-deviation rescaled"
+        },
+        {
+          "name": "book_div_z_120s",
+          "screen_passed_horizons": [
+            15,
+            30,
+            60,
+            900
+          ],
+          "max_abs_corr_vs_panel": 0.7334964911513479,
+          "killed_reason": "rho=0.872 vs top5_book_div_z_300s (library, round 2) -- same top5-vs-full divergence, shorter window (keep the admitted 300s version)"
+        },
+        {
+          "name": "ofi_per_vol_z_300s",
+          "screen_passed_horizons": [
+            15
+          ],
+          "max_abs_corr_vs_panel": 0.7400242336036748,
+          "killed_reason": "rho=0.958 vs ofi_per_depth_z_300s (library, round 2) -- normalizing OFI by volume instead of depth yields the same series"
+        },
+        {
+          "name": "ofi_flip_fade_300s",
+          "screen_passed_horizons": [
+            15,
+            30,
+            300
+          ],
+          "max_abs_corr_vs_panel": 0.7500714307813006,
+          "killed_reason": "rho=-0.952 vs ofi_per_depth_z_300s (library, round 2) -- sign-flipped clone of the admitted per-depth OFI z"
+        },
+        {
+          "name": "top5div_x_extremes",
+          "screen_passed_horizons": [
+            15,
+            30,
+            60,
+            900
+          ],
+          "max_abs_corr_vs_panel": 0.7207651194561507,
+          "killed_reason": "rho=0.930 vs top5_book_div_z_300s (library, round 2) -- extremeness-gating does not hide the base divergence factor"
+        },
+        {
+          "name": "top5div_x_spread_z",
+          "screen_passed_horizons": [
+            15,
+            30,
+            60,
+            300,
+            900
+          ],
+          "max_abs_corr_vs_panel": 0.41960258730303274,
+          "killed_reason": "rho=1.000 vs batch-sibling div_z_x_spread_z -- two agents independently wrote the IDENTICAL formula z(wdi - fullbook_imb, 300s) x z(spread, 300s); keep div_z_x_spread_z (R3-B lineage, filed first)"
+        }
+      ],
+      "watchlist_subthreshold": [
+        "hidden_bid_support_z_300s x conc_imb_z_300s (library) rho=-0.792 (bid-side hidden support vs concentration imbalance: opposite sides of the same book-shape coin, different questions, both kept)",
+        "div_pos_frac_300s x hidden_imb_pos_frac_300s (both new) rho=-0.733 (siblings within the divergence family: signed pos-frac variants, kept as pair)",
+        "dev_open_x_spread_z x range_pos_x_spread_z (library) rho=+0.728 (both spread-z gated position factors with different anchors: open vs high-low range)",
+        "ofi_sign_persist_60s x ofi_concord_15_60 (library) rho=+0.723 (sign-persistence vs cross-scale concordance, kept)"
+      ]
+    },
+    "admitted": [
+      {
+        "name": "div_z_x_spread_z",
+        "mechanism": "Stress-gated structural mismatch: a touch-vs-full-book divergence under WIDE, stressed spreads is a different animal than the same divergence under comfortable quoting. Wide spreads mark fearful market-making and adverse-selection risk, so a book that still builds a one-sided touch bias against the deep queue in that state is likely informed positioning rather than routine queue churn -> stronger continuation of the divergence's implied direction at 15-60s. The identical structure under unusually tight spreads may be benign noise. Multiplying the divergence z by the spread-state z gates the mismatch by the quoting regime; the product is sign-symmetric and near-orthogonal to either parent, and is distinct from flow_divergence_x_spread_z (which conditions the FLOW divergence, not the book-structure divergence).",
+        "max_abs_corr_vs_panel": 0.4196,
+        "nearest_panel_factor": "oir",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": -0.1163,
+            "is_t": -11.53,
+            "oos_mean_ic": -0.1701,
+            "oos_t": -12.72,
+            "retention": 1.462,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.1561,
+                "long_net_bps": -6.1561,
+                "short_gross_bps": 0.8554,
+                "short_net_bps": -5.1446,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.8458,
+                "long_net_bps": -7.8458,
+                "short_gross_bps": -1.7968,
+                "short_net_bps": -7.7968,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.8478,
+                "long_net_bps": -7.8478,
+                "short_gross_bps": -1.8995,
+                "short_net_bps": -7.8995,
+                "n_long": 2346,
+                "n_short": 2346,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": -0.096,
+            "is_t": -15.18,
+            "oos_mean_ic": -0.1225,
+            "oos_t": -8.64,
+            "retention": 1.275,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.9781,
+                "long_net_bps": -5.0219,
+                "short_gross_bps": 0.8114,
+                "short_net_bps": -5.1886,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.3208,
+                "long_net_bps": -7.3208,
+                "short_gross_bps": -1.8599,
+                "short_net_bps": -7.8599,
+                "n_long": 1172,
+                "n_short": 1172,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.5229,
+                "long_net_bps": -7.5229,
+                "short_gross_bps": -2.006,
+                "short_net_bps": -8.006,
+                "n_long": 2341,
+                "n_short": 2341,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": -0.0735,
+            "is_t": -11.95,
+            "oos_mean_ic": -0.1047,
+            "oos_t": -8.19,
+            "retention": 1.424,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.3756,
+                "long_net_bps": -4.6244,
+                "short_gross_bps": -0.7511,
+                "short_net_bps": -6.7511,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.4476,
+                "long_net_bps": -7.4476,
+                "short_gross_bps": -2.63,
+                "short_net_bps": -8.63,
+                "n_long": 1167,
+                "n_short": 1167,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.6129,
+                "long_net_bps": -7.6129,
+                "short_gross_bps": -2.6578,
+                "short_net_bps": -8.6578,
+                "n_long": 2331,
+                "n_short": 2331,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": -0.0366,
+            "is_t": -5.69,
+            "oos_mean_ic": -0.0485,
+            "oos_t": -2.62,
+            "retention": 1.327,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 4.8233,
+                "long_net_bps": -1.1767,
+                "short_gross_bps": -3.6334,
+                "short_net_bps": -9.6334,
+                "n_long": 227,
+                "n_short": 227,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.4798,
+                "long_net_bps": -5.5202,
+                "short_gross_bps": -4.4148,
+                "short_net_bps": -10.4148,
+                "n_long": 1127,
+                "n_short": 1127,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.4509,
+                "long_net_bps": -5.5491,
+                "short_gross_bps": -4.667,
+                "short_net_bps": -10.667,
+                "n_long": 2251,
+                "n_short": 2251,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": -0.0191,
+            "is_t": -2.34,
+            "oos_mean_ic": -0.0484,
+            "oos_t": -3.68,
+            "retention": 2.533,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.5907,
+                "long_net_bps": -5.4093,
+                "short_gross_bps": -1.3427,
+                "short_net_bps": -7.3427,
+                "n_long": 207,
+                "n_short": 207,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -2.8449,
+                "long_net_bps": -8.8449,
+                "short_gross_bps": 1.5048,
+                "short_net_bps": -4.4952,
+                "n_long": 1027,
+                "n_short": 1027,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -2.396,
+                "long_net_bps": -8.396,
+                "short_gross_bps": -2.5777,
+                "short_net_bps": -8.5777,
+                "n_long": 2051,
+                "n_short": 2051,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "div_pos_frac_300s",
+        "mechanism": "Regime DURATION, not magnitude: the share of the trailing 300s during which the executable 5-level imbalance (wdi) sits ABOVE the full-book imbalance. top5_book_div_z_300s measures how LARGE the touch-vs-queue gap is right now; this occupancy measures how LONG the touch has persistently led the deep queue. A persistently positive divergence is a durable structural posture -- displayed liquidity consistently out front of hidden liquidity -- which decays slowly and conditions the next minutes differently from a transient spike of identical magnitude. Duration is a different economic question than intensity: a small-but-persistent mismatch and a large-but-fleeting one hit the same z-extreme yet imply different commitment. Occupancy statistics are near-orthogonal to z-scores and to any imbalance momentum, sitting in the slow regime class that paid off at 300-900s in the eval-v2 re-screen.",
+        "max_abs_corr_vs_panel": 0.4712,
+        "nearest_panel_factor": "wdi",
+        "horizons": {
+          "15": {
+            "passed": false,
+            "is_mean_ic": 0.0251,
+            "is_t": 4.39,
+            "oos_mean_ic": 0.0187,
+            "oos_t": 1.96,
+            "retention": 0.745,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.6197,
+                "long_net_bps": -5.3803,
+                "short_gross_bps": 1.2148,
+                "short_net_bps": -4.7852,
+                "n_long": 344,
+                "n_short": 454,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.3166,
+                "long_net_bps": -5.6834,
+                "short_gross_bps": 0.7743,
+                "short_net_bps": -5.2257,
+                "n_long": 1371,
+                "n_short": 1276,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.0685,
+                "long_net_bps": -5.9315,
+                "short_gross_bps": 0.5119,
+                "short_net_bps": -5.4881,
+                "n_long": 2434,
+                "n_short": 2544,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": 0.0314,
+            "is_t": 4.11,
+            "oos_mean_ic": 0.0206,
+            "oos_t": 1.51,
+            "retention": 0.656,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.6399,
+                "long_net_bps": -4.3601,
+                "short_gross_bps": 2.8373,
+                "short_net_bps": -3.1627,
+                "n_long": 339,
+                "n_short": 445,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.525,
+                "long_net_bps": -5.475,
+                "short_gross_bps": 1.6093,
+                "short_net_bps": -4.3907,
+                "n_long": 1366,
+                "n_short": 1261,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.0271,
+                "long_net_bps": -5.9729,
+                "short_gross_bps": 1.0015,
+                "short_net_bps": -4.9985,
+                "n_long": 2484,
+                "n_short": 2527,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.0401,
+            "is_t": 3.86,
+            "oos_mean_ic": 0.0322,
+            "oos_t": 1.69,
+            "retention": 0.802,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.7944,
+                "long_net_bps": -2.2056,
+                "short_gross_bps": 4.4228,
+                "short_net_bps": -1.5772,
+                "n_long": 329,
+                "n_short": 425,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.3574,
+                "long_net_bps": -5.6426,
+                "short_gross_bps": 2.8692,
+                "short_net_bps": -3.1308,
+                "n_long": 1356,
+                "n_short": 1294,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.1182,
+                "long_net_bps": -5.8818,
+                "short_gross_bps": 1.21,
+                "short_net_bps": -4.79,
+                "n_long": 2474,
+                "n_short": 2588,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": 0.084,
+            "is_t": 4.28,
+            "oos_mean_ic": 0.1004,
+            "oos_t": 2.7,
+            "retention": 1.196,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 14.4295,
+                "long_net_bps": 8.4295,
+                "short_gross_bps": 9.4354,
+                "short_net_bps": 3.4354,
+                "n_long": 351,
+                "n_short": 368,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 7.3316,
+                "long_net_bps": 1.3316,
+                "short_gross_bps": 2.4317,
+                "short_net_bps": -3.5683,
+                "n_long": 1273,
+                "n_short": 1367,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 6.4248,
+                "long_net_bps": 0.4248,
+                "short_gross_bps": 2.9772,
+                "short_net_bps": -3.0228,
+                "n_long": 2360,
+                "n_short": 2360,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": 0.1534,
+            "is_t": 5.1,
+            "oos_mean_ic": 0.1654,
+            "oos_t": 2.11,
+            "retention": 1.078,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 22.1858,
+                "long_net_bps": 16.1858,
+                "short_gross_bps": 40.6947,
+                "short_net_bps": 34.6947,
+                "n_long": 319,
+                "n_short": 273,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 18.0674,
+                "long_net_bps": 12.0674,
+                "short_gross_bps": 16.9404,
+                "short_net_bps": 10.9404,
+                "n_long": 1136,
+                "n_short": 1185,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 12.4498,
+                "long_net_bps": 6.4498,
+                "short_gross_bps": 12.0904,
+                "short_net_bps": 6.0904,
+                "n_long": 2174,
+                "n_short": 2151,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "hidden_bid_support_z_300s",
+        "mechanism": "Hidden bid support regime: the fraction of the ENTIRE bid side that rests beyond the executable top-5 levels, z-scored against its own trailing-300s distribution. Side decomposition of the book that the imbalance lens cannot see: a bid side whose size is parked deep (high hidden share) is patient demand STACKED BELOW the touch -- buyers willing to queue far from execution rather than chase, which forms a durable reservoir that keeps refilling the visible bid and supports continued upward drift / a firm floor. A bid side concentrated at the executable tip with little behind it is exposed demand, fragile to consumption. This is a one-sided LEVEL of hidden placement, not a bid-vs-ask asymmetry (conc_imb_z) nor a full-book imbalance, so it is a distinct economic quantity; z-scoring keeps it in the live regime class rather than the dead raw-level class.",
+        "max_abs_corr_vs_panel": 0.4339,
+        "nearest_panel_factor": "wdi",
+        "horizons": {
+          "15": {
+            "passed": false,
+            "is_mean_ic": -0.1586,
+            "is_t": -10.35,
+            "oos_mean_ic": -0.075,
+            "oos_t": -10.18,
+            "retention": 0.473,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -1.5535,
+                "long_net_bps": -7.5535,
+                "short_gross_bps": -1.9851,
+                "short_net_bps": -7.9851,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.726,
+                "long_net_bps": -6.726,
+                "short_gross_bps": -1.3862,
+                "short_net_bps": -7.3862,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.8563,
+                "long_net_bps": -6.8563,
+                "short_gross_bps": -1.0683,
+                "short_net_bps": -7.0683,
+                "n_long": 2346,
+                "n_short": 2346,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": -0.1518,
+            "is_t": -5.75,
+            "oos_mean_ic": -0.061,
+            "oos_t": -6.22,
+            "retention": 0.402,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.7311,
+                "long_net_bps": -6.7311,
+                "short_gross_bps": -2.4423,
+                "short_net_bps": -8.4423,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.532,
+                "long_net_bps": -6.532,
+                "short_gross_bps": -1.5056,
+                "short_net_bps": -7.5056,
+                "n_long": 1172,
+                "n_short": 1172,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.752,
+                "long_net_bps": -6.752,
+                "short_gross_bps": -1.2465,
+                "short_net_bps": -7.2465,
+                "n_long": 2341,
+                "n_short": 2341,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": -0.1334,
+            "is_t": -3.63,
+            "oos_mean_ic": -0.0418,
+            "oos_t": -2.22,
+            "retention": 0.313,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.1487,
+                "long_net_bps": -5.8513,
+                "short_gross_bps": -2.5594,
+                "short_net_bps": -8.5594,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.5967,
+                "long_net_bps": -6.5967,
+                "short_gross_bps": -1.9969,
+                "short_net_bps": -7.9969,
+                "n_long": 1167,
+                "n_short": 1167,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.5163,
+                "long_net_bps": -6.5163,
+                "short_gross_bps": -1.2311,
+                "short_net_bps": -7.2311,
+                "n_long": 2331,
+                "n_short": 2331,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": -0.07,
+            "is_t": -2.49,
+            "oos_mean_ic": -0.0249,
+            "oos_t": -0.81,
+            "retention": 0.356,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 6.5541,
+                "long_net_bps": 0.5541,
+                "short_gross_bps": -1.2025,
+                "short_net_bps": -7.2025,
+                "n_long": 227,
+                "n_short": 227,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.5673,
+                "long_net_bps": -5.4327,
+                "short_gross_bps": -0.263,
+                "short_net_bps": -6.263,
+                "n_long": 1127,
+                "n_short": 1127,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.6465,
+                "long_net_bps": -5.3535,
+                "short_gross_bps": -0.2694,
+                "short_net_bps": -6.2694,
+                "n_long": 2251,
+                "n_short": 2251,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": -0.0625,
+            "is_t": -2.74,
+            "oos_mean_ic": -0.0763,
+            "oos_t": -4.34,
+            "retention": 1.221,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.9291,
+                "long_net_bps": -4.0709,
+                "short_gross_bps": -8.7926,
+                "short_net_bps": -14.7926,
+                "n_long": 207,
+                "n_short": 207,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.0052,
+                "long_net_bps": -6.0052,
+                "short_gross_bps": -8.9647,
+                "short_net_bps": -14.9647,
+                "n_long": 1027,
+                "n_short": 1027,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.2137,
+                "long_net_bps": -3.7863,
+                "short_gross_bps": -9.0711,
+                "short_net_bps": -15.0711,
+                "n_long": 2051,
+                "n_short": 2051,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "hidden_ask_supply_z_300s",
+        "mechanism": "Hidden ask supply regime: the fraction of the ENTIRE ask side that rests beyond the executable top-5 levels, z-scored against its own trailing-300s distribution. The supply-side twin of hidden bid support: an ask side whose size is parked deep is patient SELLING interest stacked above the touch -- distribution queued out of sight that keeps refilling the visible offer and caps rallies / forms a ceiling. An ask side thin behind the executable tip offers little latent supply, so consumption of the visible offer is more likely to walk price up. Decomposing the book by SIDE exposes where hidden liquidity sits that a net imbalance washes out; z-scoring keeps the measure in the live regime class rather than the dead raw-level class. Distinct from conc_imb_z (bid-vs-ask concentration asymmetry) because this is a one-sided absolute of hidden placement.",
+        "max_abs_corr_vs_panel": 0.4064,
+        "nearest_panel_factor": "wdi",
+        "horizons": {
+          "15": {
+            "passed": false,
+            "is_mean_ic": 0.174,
+            "is_t": 18.86,
+            "oos_mean_ic": 0.0639,
+            "oos_t": 8.02,
+            "retention": 0.367,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.4589,
+                "long_net_bps": -4.5411,
+                "short_gross_bps": 0.3397,
+                "short_net_bps": -5.6603,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.127,
+                "long_net_bps": -4.873,
+                "short_gross_bps": 1.0007,
+                "short_net_bps": -4.9993,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.0221,
+                "long_net_bps": -4.9779,
+                "short_gross_bps": 0.9473,
+                "short_net_bps": -5.0527,
+                "n_long": 2346,
+                "n_short": 2346,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": 0.1739,
+            "is_t": 9.59,
+            "oos_mean_ic": 0.0609,
+            "oos_t": 4.86,
+            "retention": 0.35,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.0286,
+                "long_net_bps": -2.9714,
+                "short_gross_bps": -0.1227,
+                "short_net_bps": -6.1227,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.1695,
+                "long_net_bps": -4.8305,
+                "short_gross_bps": 1.2991,
+                "short_net_bps": -4.7009,
+                "n_long": 1172,
+                "n_short": 1172,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.3857,
+                "long_net_bps": -4.6143,
+                "short_gross_bps": 1.3301,
+                "short_net_bps": -4.6699,
+                "n_long": 2341,
+                "n_short": 2341,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.1603,
+            "is_t": 6.06,
+            "oos_mean_ic": 0.0609,
+            "oos_t": 3.97,
+            "retention": 0.38,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 4.3827,
+                "long_net_bps": -1.6173,
+                "short_gross_bps": -1.5733,
+                "short_net_bps": -7.5733,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.0618,
+                "long_net_bps": -3.9382,
+                "short_gross_bps": 1.2107,
+                "short_net_bps": -4.7893,
+                "n_long": 1167,
+                "n_short": 1167,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.4317,
+                "long_net_bps": -3.5683,
+                "short_gross_bps": 1.4895,
+                "short_net_bps": -4.5105,
+                "n_long": 2331,
+                "n_short": 2331,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": 0.1008,
+            "is_t": 5.42,
+            "oos_mean_ic": 0.0658,
+            "oos_t": 3.06,
+            "retention": 0.653,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 10.3796,
+                "long_net_bps": 4.3796,
+                "short_gross_bps": 3.9662,
+                "short_net_bps": -2.0338,
+                "n_long": 227,
+                "n_short": 227,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 3.9376,
+                "long_net_bps": -2.0624,
+                "short_gross_bps": 3.1584,
+                "short_net_bps": -2.8416,
+                "n_long": 1127,
+                "n_short": 1127,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 3.1834,
+                "long_net_bps": -2.8166,
+                "short_gross_bps": 1.1873,
+                "short_net_bps": -4.8127,
+                "n_long": 2251,
+                "n_short": 2251,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": 0.0851,
+            "is_t": 5.77,
+            "oos_mean_ic": 0.047,
+            "oos_t": 2.37,
+            "retention": 0.552,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 8.939,
+                "long_net_bps": 2.939,
+                "short_gross_bps": 4.2989,
+                "short_net_bps": -1.7011,
+                "n_long": 207,
+                "n_short": 207,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.5582,
+                "long_net_bps": -6.5582,
+                "short_gross_bps": 0.0065,
+                "short_net_bps": -5.9935,
+                "n_long": 1027,
+                "n_short": 1027,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.3308,
+                "long_net_bps": -5.6692,
+                "short_gross_bps": -1.2434,
+                "short_net_bps": -7.2434,
+                "n_long": 2051,
+                "n_short": 2051,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "hidden_imb_pos_frac_300s",
+        "mechanism": "Hidden-regime duration: the share of the trailing 300s during which the hidden layer (depth beyond the top-5) is net BID-skewed. hidden_imb_z_300s measures how strongly hidden depth leans one way right now; this occupancy measures how CONSISTENTLY it has leaned that way. A persistently hidden-bid-skewed queue is durable patient accumulation -- demand that has stayed parked below the touch across many snapshots, not a transient flicker -- and such entrenched positioning decays slowly, conditioning the next minutes toward upward drift / a firm floor at 300-900s. Duration and intensity are different economic questions: a weak-but-constant hidden skew and a strong-but-oscillating one can share a z-extreme yet imply very different commitment. Occupancy is near-orthogonal to the z-score and to every momentum factor, in the slow regime class that paid off at long horizons.",
+        "max_abs_corr_vs_panel": 0.285,
+        "nearest_panel_factor": "total_ask_vol",
+        "horizons": {
+          "15": {
+            "passed": false,
+            "is_mean_ic": -0.0144,
+            "is_t": -2.5,
+            "oos_mean_ic": -0.0004,
+            "oos_t": -0.06,
+            "retention": 0.03,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.097,
+                "long_net_bps": -5.903,
+                "short_gross_bps": -0.0677,
+                "short_net_bps": -6.0677,
+                "n_long": 9831,
+                "n_short": 7587,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.0791,
+                "long_net_bps": -5.9209,
+                "short_gross_bps": -0.0677,
+                "short_net_bps": -6.0677,
+                "n_long": 10015,
+                "n_short": 7587,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.0671,
+                "long_net_bps": -5.9329,
+                "short_gross_bps": -0.0361,
+                "short_net_bps": -6.0361,
+                "n_long": 10247,
+                "n_short": 7660,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": -0.0204,
+            "is_t": -2.76,
+            "oos_mean_ic": 0.0025,
+            "oos_t": 0.21,
+            "retention": 0.123,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.17,
+                "long_net_bps": -5.83,
+                "short_gross_bps": -0.1254,
+                "short_net_bps": -6.1254,
+                "n_long": 9811,
+                "n_short": 7567,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.126,
+                "long_net_bps": -5.874,
+                "short_gross_bps": -0.1254,
+                "short_net_bps": -6.1254,
+                "n_long": 9995,
+                "n_short": 7567,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.1162,
+                "long_net_bps": -5.8838,
+                "short_gross_bps": -0.0639,
+                "short_net_bps": -6.0639,
+                "n_long": 10237,
+                "n_short": 7640,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": -0.0287,
+            "is_t": -2.84,
+            "oos_mean_ic": 0.0003,
+            "oos_t": 0.02,
+            "retention": 0.01,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.3977,
+                "long_net_bps": -5.6023,
+                "short_gross_bps": -0.2706,
+                "short_net_bps": -6.2706,
+                "n_long": 9771,
+                "n_short": 7527,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.2996,
+                "long_net_bps": -5.7004,
+                "short_gross_bps": -0.2706,
+                "short_net_bps": -6.2706,
+                "n_long": 9955,
+                "n_short": 7527,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.347,
+                "long_net_bps": -5.653,
+                "short_gross_bps": -0.1894,
+                "short_net_bps": -6.1894,
+                "n_long": 10188,
+                "n_short": 7600,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": -0.083,
+            "is_t": -4.24,
+            "oos_mean_ic": -0.0293,
+            "oos_t": -0.51,
+            "retention": 0.353,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.3706,
+                "long_net_bps": -3.6294,
+                "short_gross_bps": -2.9695,
+                "short_net_bps": -8.9695,
+                "n_long": 9447,
+                "n_short": 7232,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.3598,
+                "long_net_bps": -3.6402,
+                "short_gross_bps": -2.9695,
+                "short_net_bps": -8.9695,
+                "n_long": 9618,
+                "n_short": 7232,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.4461,
+                "long_net_bps": -3.5539,
+                "short_gross_bps": -2.9695,
+                "short_net_bps": -8.9695,
+                "n_long": 9873,
+                "n_short": 7232,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": -0.1474,
+            "is_t": -5.19,
+            "oos_mean_ic": -0.2051,
+            "oos_t": -2.98,
+            "retention": 1.392,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.5828,
+                "long_net_bps": -2.4172,
+                "short_gross_bps": -9.5217,
+                "short_net_bps": -15.5217,
+                "n_long": 8435,
+                "n_short": 6632,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.8745,
+                "long_net_bps": -3.1255,
+                "short_gross_bps": -9.5217,
+                "short_net_bps": -15.5217,
+                "n_long": 8599,
+                "n_short": 6632,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.726,
+                "long_net_bps": -3.274,
+                "short_gross_bps": -9.8678,
+                "short_net_bps": -15.8678,
+                "n_long": 8805,
+                "n_short": 6754,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "div_x_vis_share",
+        "mechanism": "Concentration-unexplained mismatch: algebraically the divergence wdi - fbi equals hidden_share x (visible imbalance - hidden imbalance), so its magnitude is MECHANICALLY damped when depth concentrates at the touch (hidden_share low). A divergence that is nonetheless large WHILE the book is concentrated at the executable levels therefore implies an outsized visible-vs-hidden dislocation that hidden reserves cannot explain -- an acute, urgent structural conflict sitting right where trades execute, hypothesized to resolve directionally at 15-60s. Conversely, the same divergence in a deep, hidden-heavy book is buffered and benign. Multiplying the divergence z by the concentration z surfaces precisely the joint regime where the mismatch is large relative to the hidden depth available to produce it; product of two near-orthogonal z parents (one signed mismatch, one sign-blind shape).",
+        "max_abs_corr_vs_panel": 0.074,
+        "nearest_panel_factor": "wdi",
+        "horizons": {
+          "15": {
+            "passed": false,
+            "is_mean_ic": 0.008,
+            "is_t": 1.41,
+            "oos_mean_ic": 0.0233,
+            "oos_t": 1.86,
+            "retention": 2.923,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.0029,
+                "long_net_bps": -6.0029,
+                "short_gross_bps": -0.2828,
+                "short_net_bps": -6.2828,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.0789,
+                "long_net_bps": -5.9211,
+                "short_gross_bps": -0.1081,
+                "short_net_bps": -6.1081,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.183,
+                "long_net_bps": -5.817,
+                "short_gross_bps": 0.2795,
+                "short_net_bps": -5.7205,
+                "n_long": 2346,
+                "n_short": 2346,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.0168,
+            "is_t": 3.15,
+            "oos_mean_ic": 0.027,
+            "oos_t": 2.93,
+            "retention": 1.613,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.6056,
+                "long_net_bps": -5.3944,
+                "short_gross_bps": -1.6666,
+                "short_net_bps": -7.6666,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.4125,
+                "long_net_bps": -5.5875,
+                "short_gross_bps": -0.3182,
+                "short_net_bps": -6.3182,
+                "n_long": 1172,
+                "n_short": 1172,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.3968,
+                "long_net_bps": -5.6032,
+                "short_gross_bps": 0.3935,
+                "short_net_bps": -5.6065,
+                "n_long": 2341,
+                "n_short": 2341,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": 0.0248,
+            "is_t": 4.32,
+            "oos_mean_ic": 0.0319,
+            "oos_t": 5.18,
+            "retention": 1.287,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.4593,
+                "long_net_bps": -4.5407,
+                "short_gross_bps": -1.652,
+                "short_net_bps": -7.652,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.6516,
+                "long_net_bps": -5.3484,
+                "short_gross_bps": -0.4346,
+                "short_net_bps": -6.4346,
+                "n_long": 1167,
+                "n_short": 1167,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.4571,
+                "long_net_bps": -5.5429,
+                "short_gross_bps": 0.2492,
+                "short_net_bps": -5.7508,
+                "n_long": 2331,
+                "n_short": 2331,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": 0.0319,
+            "is_t": 3.9,
+            "oos_mean_ic": 0.0492,
+            "oos_t": 3.17,
+            "retention": 1.544,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 4.8345,
+                "long_net_bps": -1.1655,
+                "short_gross_bps": -3.5593,
+                "short_net_bps": -9.5593,
+                "n_long": 227,
+                "n_short": 227,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.3579,
+                "long_net_bps": -4.6421,
+                "short_gross_bps": 0.537,
+                "short_net_bps": -5.463,
+                "n_long": 1127,
+                "n_short": 1127,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.1533,
+                "long_net_bps": -3.8467,
+                "short_gross_bps": 1.3568,
+                "short_net_bps": -4.6432,
+                "n_long": 2251,
+                "n_short": 2251,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.036,
+            "is_t": 3.09,
+            "oos_mean_ic": 0.0756,
+            "oos_t": 1.51,
+            "retention": 2.1,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 8.7417,
+                "long_net_bps": 2.7417,
+                "short_gross_bps": 10.1507,
+                "short_net_bps": 4.1507,
+                "n_long": 207,
+                "n_short": 207,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 7.0353,
+                "long_net_bps": 1.0353,
+                "short_gross_bps": 5.5319,
+                "short_net_bps": -0.4681,
+                "n_long": 1027,
+                "n_short": 1027,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 8.2536,
+                "long_net_bps": 2.2536,
+                "short_gross_bps": 2.7604,
+                "short_net_bps": -3.2396,
+                "n_long": 2051,
+                "n_short": 2051,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "ofi_sign_persist_60s",
+        "mechanism": "Book-flow commitment at the fastest resolved scale: ofi_15s whose sign flips every snapshot is market-maker churn -- two-sided queue replacement with no directional information -- while runs of same-sign 15s book flow mark genuine queue investment that persistently leans one side of the book. Cont-Kukanov-Stoikov (2014) show OFI's price power is monotone in its persistence, so the fraction of consecutive-snapshot pairs keeping the same sign over the trailing 60s, signed by the CURRENT direction, scores how committed the passive side is right now: high positive = sustained buy-side building -> 15-60s continuation up; near zero = coin-flip chop with no regime. This is a second-order run-structure statistic: it ignores flow magnitude entirely, so it is not another ofi_60s/ofi_15s level or z-surprise, and it is not the dead pos_frac_300s family either (those measured the fraction of POSITIVE rows of the 60s columns over 300s; this measures transition-to-transition sign retention of the 15s column over 60s -- a tape can have the same positive fraction but alternating signs, which reads as committed here and positive-fraction-identical there).",
+        "max_abs_corr_vs_panel": 0.7817,
+        "nearest_panel_factor": "ofi_15s",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.1277,
+            "is_t": 13.92,
+            "oos_mean_ic": 0.0713,
+            "oos_t": 3.63,
+            "retention": 0.559,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.7792,
+                "long_net_bps": -5.2208,
+                "short_gross_bps": -0.6737,
+                "short_net_bps": -6.6737,
+                "n_long": 531,
+                "n_short": 566,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.818,
+                "long_net_bps": -5.182,
+                "short_gross_bps": 0.3265,
+                "short_net_bps": -5.6735,
+                "n_long": 1951,
+                "n_short": 1673,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.8339,
+                "long_net_bps": -5.1661,
+                "short_gross_bps": 0.2783,
+                "short_net_bps": -5.7217,
+                "n_long": 4766,
+                "n_short": 4060,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.1178,
+            "is_t": 10.62,
+            "oos_mean_ic": 0.0628,
+            "oos_t": 3.3,
+            "retention": 0.533,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.7847,
+                "long_net_bps": -5.2153,
+                "short_gross_bps": -0.7774,
+                "short_net_bps": -6.7774,
+                "n_long": 531,
+                "n_short": 566,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.1802,
+                "long_net_bps": -4.8198,
+                "short_gross_bps": 0.4599,
+                "short_net_bps": -5.5401,
+                "n_long": 1948,
+                "n_short": 1672,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.149,
+                "long_net_bps": -4.851,
+                "short_gross_bps": 0.2527,
+                "short_net_bps": -5.7473,
+                "n_long": 4750,
+                "n_short": 3422,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.1038,
+            "is_t": 9.26,
+            "oos_mean_ic": 0.03,
+            "oos_t": 2.37,
+            "retention": 0.289,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.53,
+                "long_net_bps": -6.53,
+                "short_gross_bps": -1.3129,
+                "short_net_bps": -7.3129,
+                "n_long": 531,
+                "n_short": 566,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.3007,
+                "long_net_bps": -4.6993,
+                "short_gross_bps": 0.0349,
+                "short_net_bps": -5.9651,
+                "n_long": 1944,
+                "n_short": 1670,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.1231,
+                "long_net_bps": -4.8769,
+                "short_gross_bps": -0.3032,
+                "short_net_bps": -6.3032,
+                "n_long": 4735,
+                "n_short": 3412,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.0503,
+            "is_t": 3.73,
+            "oos_mean_ic": -0.0092,
+            "oos_t": -0.48,
+            "retention": 0.182,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -2.0423,
+                "long_net_bps": -8.0423,
+                "short_gross_bps": -1.0692,
+                "short_net_bps": -7.0692,
+                "n_long": 522,
+                "n_short": 360,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.7328,
+                "long_net_bps": -5.2672,
+                "short_gross_bps": -1.3112,
+                "short_net_bps": -7.3112,
+                "n_long": 1882,
+                "n_short": 1643,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.9335,
+                "long_net_bps": -4.0665,
+                "short_gross_bps": -3.6739,
+                "short_net_bps": -9.6739,
+                "n_long": 4525,
+                "n_short": 3345,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.01,
+            "is_t": 1.08,
+            "oos_mean_ic": -0.0289,
+            "oos_t": -1.09,
+            "retention": 2.878,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 11.9804,
+                "long_net_bps": 5.9804,
+                "short_gross_bps": -15.3643,
+                "short_net_bps": -21.3643,
+                "n_long": 472,
+                "n_short": 660,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 7.106,
+                "long_net_bps": 1.106,
+                "short_gross_bps": -6.6764,
+                "short_net_bps": -12.6764,
+                "n_long": 1697,
+                "n_short": 1394,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 5.0296,
+                "long_net_bps": -0.9704,
+                "short_gross_bps": -6.4552,
+                "short_net_bps": -12.4552,
+                "n_long": 4095,
+                "n_short": 3519,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "ofi_z_cross_vel_15s",
+        "mechanism": "The moment a book-flow regime turns: when the trailing-300s z of ofi_60s crosses zero within the last 15s, the book's five-minute flow regime has just changed sign -- an unusually information-dense event, because a regime that was one-sided for minutes reversed in seconds. The VELOCITY of the crossing (z now minus z 15s ago, signed by the new direction) measures how decisive the flip is: a fast, forceful cross marks a sharp reallocation of limit interest (informed direction change, queue pull-and-rebuild) whose new direction continues at 15-60s; a slow drift across zero scores weak. The factor is event-sparse -- exactly 0 except in the rows immediately after a crossing -- so it is a different object from the dead ofi_mom_60s, which is z-momentum ACTIVE EVERY ROW (always-on momentum of z-ofi at a 60s lag): here momentum is measured only at sign-crossing events over a 15s span. The crossing test is causal by construction: current z vs lagged z, no lookahead.",
+        "max_abs_corr_vs_panel": 0.3269,
+        "nearest_panel_factor": "ofi_15s",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.052,
+            "is_t": 13.23,
+            "oos_mean_ic": 0.0368,
+            "oos_t": 3.93,
+            "retention": 0.709,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.3311,
+                "long_net_bps": -4.6689,
+                "short_gross_bps": 1.7078,
+                "short_net_bps": -4.2922,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.8094,
+                "long_net_bps": -5.1906,
+                "short_gross_bps": 0.8948,
+                "short_net_bps": -5.1052,
+                "n_long": 1169,
+                "n_short": 1169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.1345,
+                "long_net_bps": -5.8655,
+                "short_gross_bps": 0.4049,
+                "short_net_bps": -5.5951,
+                "n_long": 6104,
+                "n_short": 6099,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.0458,
+            "is_t": 11.42,
+            "oos_mean_ic": 0.0369,
+            "oos_t": 2.34,
+            "retention": 0.806,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.0308,
+                "long_net_bps": -3.9692,
+                "short_gross_bps": 2.6139,
+                "short_net_bps": -3.3861,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.1248,
+                "long_net_bps": -4.8752,
+                "short_gross_bps": 1.4463,
+                "short_net_bps": -4.5537,
+                "n_long": 1164,
+                "n_short": 1164,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.0073,
+                "long_net_bps": -5.9927,
+                "short_gross_bps": 0.6813,
+                "short_net_bps": -5.3187,
+                "n_long": 6093,
+                "n_short": 6088,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.0395,
+            "is_t": 12.52,
+            "oos_mean_ic": 0.018,
+            "oos_t": 1.26,
+            "retention": 0.456,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 4.0524,
+                "long_net_bps": -1.9476,
+                "short_gross_bps": 2.039,
+                "short_net_bps": -3.961,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.535,
+                "long_net_bps": -4.465,
+                "short_gross_bps": 0.6592,
+                "short_net_bps": -5.3408,
+                "n_long": 1159,
+                "n_short": 1159,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.2447,
+                "long_net_bps": -6.2447,
+                "short_gross_bps": 0.8002,
+                "short_net_bps": -5.1998,
+                "n_long": 6068,
+                "n_short": 6062,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": 0.0207,
+            "is_t": 11.88,
+            "oos_mean_ic": 0.0111,
+            "oos_t": 2.64,
+            "retention": 0.539,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.1496,
+                "long_net_bps": -2.8504,
+                "short_gross_bps": -2.025,
+                "short_net_bps": -8.025,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 3.7284,
+                "long_net_bps": -2.2716,
+                "short_gross_bps": -0.3462,
+                "short_net_bps": -6.3462,
+                "n_long": 1119,
+                "n_short": 1119,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.028,
+                "long_net_bps": -7.028,
+                "short_gross_bps": 1.3471,
+                "short_net_bps": -4.6529,
+                "n_long": 9438,
+                "n_short": 9432,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": 0.0138,
+            "is_t": 10.73,
+            "oos_mean_ic": 0.009,
+            "oos_t": 3.17,
+            "retention": 0.649,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -2.4247,
+                "long_net_bps": -8.4247,
+                "short_gross_bps": -0.2197,
+                "short_net_bps": -6.2197,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 3.6645,
+                "long_net_bps": -2.3355,
+                "short_gross_bps": -1.2131,
+                "short_net_bps": -7.2131,
+                "n_long": 1019,
+                "n_short": 1019,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -5.0387,
+                "long_net_bps": -11.0387,
+                "short_gross_bps": 5.6562,
+                "short_net_bps": -0.3438,
+                "n_long": 5330,
+                "n_short": 5320,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "dev_open_x_spread_z",
+        "mechanism": "Quoting-stress gate on the open anchor. A spread unusually wide for its trailing-300s self WHILE price sits stretched from the open means liquidity providers are retreating from quoting the stretched level -- adverse-selection and inventory fear exactly where the reversion pressure lives. Reversion needs someone to quote against the stretch; withdrawal removes the cushion, so the eventual snap-back is faster and sharper. The product dev x z(spread) carries NEGATIVE IC: stressed-wide quoting amplifies the reversion of the stretch; tight quoting at a stretched price is confident absorption and the deviation decays slowly. Round 1 established spread has no bare directional content (spread_z_60s/120s IS-dead) yet works as a condition (ofi_z_x_spread_z, flow_divergence_x_spread_z passed). Distinct from the admitted range_pos_x_spread_z: different anchor (open price vs envelope position; the anchors correlate ~0.77 but the HYPOTHESIS direction differs -- reversion amplification here vs boundary-resolution there), so the ranking change is not a rescaling of the admitted interaction.",
+        "max_abs_corr_vs_panel": 0.2161,
+        "nearest_panel_factor": "high_px",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.0156,
+            "is_t": 3.41,
+            "oos_mean_ic": 0.0324,
+            "oos_t": 2.25,
+            "retention": 2.077,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -1.1376,
+                "long_net_bps": -7.1376,
+                "short_gross_bps": 3.4077,
+                "short_net_bps": -2.5923,
+                "n_long": 236,
+                "n_short": 256,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.1932,
+                "long_net_bps": -6.1932,
+                "short_gross_bps": 0.8996,
+                "short_net_bps": -5.1004,
+                "n_long": 3483,
+                "n_short": 1206,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.1193,
+                "long_net_bps": -6.1193,
+                "short_gross_bps": 0.5501,
+                "short_net_bps": -5.4499,
+                "n_long": 3952,
+                "n_short": 2375,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.0228,
+            "is_t": 3.97,
+            "oos_mean_ic": 0.0473,
+            "oos_t": 2.82,
+            "retention": 2.08,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -1.7909,
+                "long_net_bps": -7.7909,
+                "short_gross_bps": 4.2389,
+                "short_net_bps": -1.7611,
+                "n_long": 236,
+                "n_short": 256,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.2023,
+                "long_net_bps": -6.2023,
+                "short_gross_bps": 2.0539,
+                "short_net_bps": -3.9461,
+                "n_long": 3463,
+                "n_short": 1206,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.0812,
+                "long_net_bps": -6.0812,
+                "short_gross_bps": 0.9037,
+                "short_net_bps": -5.0963,
+                "n_long": 3932,
+                "n_short": 2375,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": 0.0324,
+            "is_t": 4.61,
+            "oos_mean_ic": 0.0742,
+            "oos_t": 3.28,
+            "retention": 2.29,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.6564,
+                "long_net_bps": -6.6564,
+                "short_gross_bps": 6.0436,
+                "short_net_bps": 0.0436,
+                "n_long": 235,
+                "n_short": 256,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.0018,
+                "long_net_bps": -6.0018,
+                "short_gross_bps": 3.8426,
+                "short_net_bps": -2.1574,
+                "n_long": 3426,
+                "n_short": 1206,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.131,
+                "long_net_bps": -5.869,
+                "short_gross_bps": 1.892,
+                "short_net_bps": -4.108,
+                "n_long": 3888,
+                "n_short": 2372,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": 0.0705,
+            "is_t": 5.59,
+            "oos_mean_ic": 0.1914,
+            "oos_t": 3.51,
+            "retention": 2.716,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -4.9734,
+                "long_net_bps": -10.9734,
+                "short_gross_bps": 24.3118,
+                "short_net_bps": 18.3118,
+                "n_long": 230,
+                "n_short": 248,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 3.2838,
+                "long_net_bps": -2.7162,
+                "short_gross_bps": 11.785,
+                "short_net_bps": 5.785,
+                "n_long": 3171,
+                "n_short": 1146,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 3.4919,
+                "long_net_bps": -2.5081,
+                "short_gross_bps": 7.9642,
+                "short_net_bps": 1.9642,
+                "n_long": 3612,
+                "n_short": 2276,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": 0.0844,
+            "is_t": 3.57,
+            "oos_mean_ic": 0.3045,
+            "oos_t": 7.24,
+            "retention": 3.61,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -21.731,
+                "long_net_bps": -27.731,
+                "short_gross_bps": 37.8719,
+                "short_net_bps": 31.8719,
+                "n_long": 207,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 8.2332,
+                "long_net_bps": 2.2332,
+                "short_gross_bps": 31.0937,
+                "short_net_bps": 25.0937,
+                "n_long": 2691,
+                "n_short": 1049,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 10.4588,
+                "long_net_bps": 4.4588,
+                "short_gross_bps": 23.0532,
+                "short_net_bps": 17.0532,
+                "n_long": 3084,
+                "n_short": 2063,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "conc_imb_x_spread_z",
+        "mechanism": "Quoting-stress gate on the placement-style regime. Under TIGHT normal quoting, one side parking orders at the head is routine market-making posture with weak directional content. Under an unusually WIDE spread, passive quoting is dangerous -- whoever still stacks one side's orders at the touch is competing for queue priority despite adverse selection, i.e. urgent informed positioning that expects the spread to resolve in its favor. Hypothesis: stressed quoting AMPLIFIES the concentration signal: product conc_z x spread_z carries POSITIVE IC at slow horizons (300-900s, the parent's admitted horizons), concentrated in stressed episodes. Falsifiable: IC at or below the parent's rejects the amplification claim. Distinct from the rv-gate sibling conc_imb_x_rv_z (exogenous turbulence vs endogenous quoting stress -- different conditioning states, different economics) and from the parent conc_imb_z_300s (which averages over the quoting regime).",
+        "max_abs_corr_vs_panel": 0.2655,
+        "nearest_panel_factor": "wdi",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": -0.0615,
+            "is_t": -9.81,
+            "oos_mean_ic": -0.0622,
+            "oos_t": -8.75,
+            "retention": 1.012,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.1773,
+                "long_net_bps": -6.1773,
+                "short_gross_bps": 0.6132,
+                "short_net_bps": -5.3868,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.8729,
+                "long_net_bps": -6.8729,
+                "short_gross_bps": -1.4242,
+                "short_net_bps": -7.4242,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.7299,
+                "long_net_bps": -6.7299,
+                "short_gross_bps": -1.1292,
+                "short_net_bps": -7.1292,
+                "n_long": 2346,
+                "n_short": 2346,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": -0.0525,
+            "is_t": -7.02,
+            "oos_mean_ic": -0.0485,
+            "oos_t": -11.01,
+            "retention": 0.924,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.1007,
+                "long_net_bps": -5.8993,
+                "short_gross_bps": -0.178,
+                "short_net_bps": -6.178,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.7203,
+                "long_net_bps": -6.7203,
+                "short_gross_bps": -2.4662,
+                "short_net_bps": -8.4662,
+                "n_long": 1172,
+                "n_short": 1172,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.6322,
+                "long_net_bps": -6.6322,
+                "short_gross_bps": -1.5214,
+                "short_net_bps": -7.5214,
+                "n_long": 2341,
+                "n_short": 2341,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": -0.0432,
+            "is_t": -5.02,
+            "oos_mean_ic": -0.0539,
+            "oos_t": -11.01,
+            "retention": 1.247,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.6854,
+                "long_net_bps": -4.3146,
+                "short_gross_bps": -0.8985,
+                "short_net_bps": -6.8985,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.5664,
+                "long_net_bps": -6.5664,
+                "short_gross_bps": -3.7138,
+                "short_net_bps": -9.7138,
+                "n_long": 1167,
+                "n_short": 1167,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.7517,
+                "long_net_bps": -6.7517,
+                "short_gross_bps": -2.5142,
+                "short_net_bps": -8.5142,
+                "n_long": 2331,
+                "n_short": 2331,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": -0.0168,
+            "is_t": -2.04,
+            "oos_mean_ic": -0.0604,
+            "oos_t": -2.69,
+            "retention": 3.588,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.2534,
+                "long_net_bps": -2.7466,
+                "short_gross_bps": -2.3462,
+                "short_net_bps": -8.3462,
+                "n_long": 227,
+                "n_short": 227,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.9211,
+                "long_net_bps": -5.0789,
+                "short_gross_bps": -4.3377,
+                "short_net_bps": -10.3377,
+                "n_long": 1127,
+                "n_short": 1127,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.6296,
+                "long_net_bps": -6.6296,
+                "short_gross_bps": -2.6894,
+                "short_net_bps": -8.6894,
+                "n_long": 2251,
+                "n_short": 2251,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": -0.0007,
+            "is_t": -0.07,
+            "oos_mean_ic": -0.0784,
+            "oos_t": -2.84,
+            "retention": 111.461,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.9181,
+                "long_net_bps": -3.0819,
+                "short_gross_bps": 4.9633,
+                "short_net_bps": -1.0367,
+                "n_long": 207,
+                "n_short": 207,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -4.0533,
+                "long_net_bps": -10.0533,
+                "short_gross_bps": 5.0694,
+                "short_net_bps": -0.9306,
+                "n_long": 1027,
+                "n_short": 1027,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -3.6153,
+                "long_net_bps": -9.6153,
+                "short_gross_bps": 1.0263,
+                "short_net_bps": -4.9737,
+                "n_long": 2051,
+                "n_short": 2051,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "death_map": {
+      "by_family_dominant_mode": {
+        "R3A_anchor_dynamics/dedup_killed": [
+          "dev_open_z_300s",
+          "open_pos_roll_range_300s",
+          "open_side_hold_bars",
+          "stretch_per_day_range"
+        ],
+        "R3A_anchor_dynamics/is_dead": [
+          "abs_open_dev_delta_300s",
+          "bars_since_open_cross",
+          "gap_fill_ratio",
+          "ofi_z_x_gap_fill_dir",
+          "open_dev_extremeness",
+          "open_dev_sign_x_wdi",
+          "open_dev_x_gapdir",
+          "open_dev_z_accel",
+          "open_dev_z_x_ofi_z",
+          "open_dev_z_x_ti_60s"
+        ],
+        "R3B_deepbook_divergence/dedup_killed": [
+          "book_div_z_120s"
+        ],
+        "R3B_deepbook_divergence/is_dead": [
+          "div_x_ofi_align",
+          "div_x_ti_align",
+          "visible_share_z_300s"
+        ],
+        "R3B_deepbook_divergence/oos_collapse": [
+          "bid_absorb_x_sell",
+          "hidden_imb_x_ti",
+          "hidden_imb_z_300s",
+          "vis_share_x_ti"
+        ],
+        "R3C_cross_scale_flow/dedup_killed": [
+          "ofi_flip_fade_300s",
+          "ofi_per_vol_z_300s"
+        ],
+        "R3C_cross_scale_flow/is_dead": [
+          "ti15_sign_x_ofi_z"
+        ],
+        "R3C_cross_scale_flow/oos_collapse": [
+          "book_leads_trade_120s",
+          "buysell_regime_gap_300s",
+          "ltns_confirms_ofi_z",
+          "ltns_confirms_ti15_z",
+          "ofi_flow_tstat_300s",
+          "ofi_regime_mature_60s",
+          "ofi_sign_run_300s",
+          "ti_sign_streak_30s"
+        ],
+        "R3C_cross_scale_flow/panel_duplicate": [
+          "ti15_per_vol_regime",
+          "trade_book_conflict_60s"
+        ],
+        "R3D_state_interactions/dedup_killed": [
+          "top5div_x_extremes",
+          "top5div_x_spread_z"
+        ],
+        "R3D_state_interactions/is_dead": [
+          "conc_imb_x_rv_z",
+          "dev_open_x_ofi_z",
+          "dev_open_x_ti15",
+          "iopv_drift_x_fbi",
+          "iopv_vel_x_wdi",
+          "rollrpos_x_spread_z",
+          "top5div_x_ofi_z"
+        ],
+        "R3D_state_interactions/oos_collapse": [
+          "fbi_z_x_rv_z"
+        ],
+        "R3D_state_interactions/panel_duplicate": [
+          "dayedge_x_ti60",
+          "rollrpos_x_ti15"
+        ]
+      },
+      "notes": [
+        "R3-A anchor-dynamics is a TOTAL dedup wipeout: all 4 screen-passers (dev_open_z_300s, open_side_hold_bars, open_pos_roll_range_300s, stretch_per_day_range) are rho 0.88-0.92 clones of library dev_from_open_bps / mid_roll_range_pos_300s. Every 'where is price vs the day anchor' transform is already mined out.",
+        "4 screen-level panel duplicates, all cross-scale recombinations of admitted bases: trade_book_conflict_60s (0.886), ti15_per_vol_regime (0.949), rollrpos_x_ti15 (0.929), dayedge_x_ti60 (0.927).",
+        "ofi_per_vol_z_300s (0.958) and ofi_flip_fade_300s (-0.952) both collapse to library ofi_per_depth_z_300s: normalizing flow by volume instead of depth, or flipping sign-persistence, does not create new information.",
+        "top5div_x_extremes (0.930 vs top5_book_div_z_300s): extremeness-gating a strong base factor leaves the base fully visible; only the spread-z gate produced a genuinely new series (div_z_x_spread_z)."
+      ]
+    },
+    "lessons": [
+      "Hidden-depth SIDE decomposition is the productive new angle: hidden_bid_support_z_300s, hidden_ask_supply_z_300s, hidden_imb_pos_frac_300s, div_pos_frac_300s, div_x_vis_share all pass -- one-sided hidden depth in ratio/pos-frac form works (round 2: raw hidden qty levels died). R3-B is 7/14 screen pass, the best family hit-rate so far.",
+      "div_z_x_spread_z passes ALL 5 horizons (15s OOS IC -0.1701, t -12.72) -- divergence-under-spread-stress is the strongest short-horizon IC since top5_book_div_z_300s (0.21). The spread-z gate turns the round-2 divergence cluster into a genuinely new series (panel corr 0.420).",
+      "Spread-z remains the only productive interaction dimension: div_z_x_spread_z, dev_open_x_spread_z, conc_imb_x_spread_z all pass; rv-z and amplitude/extremes gates on the same bases all died. Quote-conditions > volatility-conditions.",
+      "Day-anchor dynamics family is SATURATED: 0/14 admitted; the 4 survivors were all 0.88-0.92 clones of dev_from_open_bps/mid_roll_range_pos_300s. Do not propose further anchor-position/duration/velocity variants.",
+      "Cross-scale recombinations of admitted factors are dedup traps: combining/adapting an admitted base (ofi_per_depth_z, top5_book_div_z, dev_from_open_bps) with a new window/normalizer/gate usually reproduces it (5 of 9 kills). New constructions must change the ECONOMIC INPUT, not just the transform.",
+      "ofi_z_cross_vel_15s and ofi_sign_persist_60s show cross-scale flow STRUCTURE (sign runs, z-vs-velocity disagreement) still has unmined signal at 15-60s."
+    ],
+    "artifacts": {
+      "screen_reports": "scratch-iter003/reports_round3/ (19 PASS JSONs; full 57 fetched to scratch-tmp/r3_all during archiving)",
+      "screen_log": "/data/factor_lzt/logs/iter003_round3.log",
+      "corr": "scratch-iter003/iter003_round3_corr.json + .txt (server copies: /data/factor_lzt/iterations/)",
+      "admitted_detail": "scratch-iter003/round3_admitted_detail.json",
+      "deathmap": "scratch-iter003/round3_deathmap.json",
+      "chinese_report": "scratch-iter003/iter003_round3_report.md (server copy: /data/factor_lzt/iterations/)"
+    }
   }
 }

@@ -1,0 +1,614 @@
+{
+ "abs_open_dev_delta_300s": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.1826265466935655
+ },
+ "bars_since_open_cross": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.5589961138909866
+ },
+ "bid_absorb_x_sell": {
+  "family": "R3B_deepbook_divergence",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 5
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "oos_collapse",
+   "900": "oos_collapse"
+  },
+  "max_abs_corr_vs_panel": 0.10786179385655281
+ },
+ "book_div_z_120s": {
+  "family": "R3B_deepbook_divergence",
+  "dominant": "dedup_killed",
+  "detail": "rho=0.872 vs top5_book_div_z_300s (library, round 2) -- same top5-vs-full divergence, shorter window (keep the admitted 300s version)",
+  "horizons": {}
+ },
+ "book_leads_trade_120s": {
+  "family": "R3C_cross_scale_flow",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 3,
+   "retention_or_sign": 1,
+   "is_dead": 1
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "retention_or_sign",
+   "300": "oos_collapse",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.3257905823998879
+ },
+ "buysell_regime_gap_300s": {
+  "family": "R3C_cross_scale_flow",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 5
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "oos_collapse",
+   "900": "oos_collapse"
+  },
+  "max_abs_corr_vs_panel": 0.6890459536829748
+ },
+ "conc_imb_x_rv_z": {
+  "family": "R3D_state_interactions",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.15867967026309476
+ },
+ "dayedge_x_ti60": {
+  "family": "R3D_state_interactions",
+  "dominant": "panel_duplicate",
+  "detail": "max|corr|=0.927 vs trade_imbalance_60s",
+  "horizons": {},
+  "max_abs_corr_vs_panel": 0.926701374463695
+ },
+ "dev_open_x_ofi_z": {
+  "family": "R3D_state_interactions",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.28425821989528766
+ },
+ "dev_open_x_ti15": {
+  "family": "R3D_state_interactions",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.2784812723337504
+ },
+ "dev_open_z_300s": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "dedup_killed",
+  "detail": "rho=0.901 vs mid_roll_range_pos_300s (library, round 2) -- open-anchor deviation z collapses to the rolling-range-position already admitted",
+  "horizons": {}
+ },
+ "div_x_ofi_align": {
+  "family": "R3B_deepbook_divergence",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.19270661438377581
+ },
+ "div_x_ti_align": {
+  "family": "R3B_deepbook_divergence",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 2,
+   "oos_collapse": 2,
+   "retention_or_sign": 1
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "retention_or_sign",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.14749266265647973
+ },
+ "fbi_z_x_rv_z": {
+  "family": "R3D_state_interactions",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 4,
+   "retention_or_sign": 1
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "retention_or_sign",
+   "300": "oos_collapse",
+   "900": "oos_collapse"
+  },
+  "max_abs_corr_vs_panel": 0.16651991711959246
+ },
+ "gap_fill_ratio": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.15454297713513596
+ },
+ "hidden_imb_x_ti": {
+  "family": "R3B_deepbook_divergence",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 3,
+   "is_dead": 2
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.5752239127397033
+ },
+ "hidden_imb_z_300s": {
+  "family": "R3B_deepbook_divergence",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 3,
+   "is_dead": 2
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "oos_collapse",
+   "900": "oos_collapse"
+  },
+  "max_abs_corr_vs_panel": 0.5759589294326193
+ },
+ "iopv_drift_x_fbi": {
+  "family": "R3D_state_interactions",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 3,
+   "oos_collapse": 2
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "oos_collapse",
+   "900": "oos_collapse"
+  },
+  "max_abs_corr_vs_panel": 0.19330631991623584
+ },
+ "iopv_vel_x_wdi": {
+  "family": "R3D_state_interactions",
+  "dominant": "is_dead",
+  "counts": {
+   "oos_collapse": 2,
+   "is_dead": 3
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.19713105650378313
+ },
+ "ltns_confirms_ofi_z": {
+  "family": "R3C_cross_scale_flow",
+  "dominant": "oos_collapse",
+  "counts": {
+   "retention_or_sign": 1,
+   "oos_collapse": 4
+  },
+  "horizons": {
+   "15": "retention_or_sign",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "oos_collapse",
+   "900": "oos_collapse"
+  },
+  "max_abs_corr_vs_panel": 0.7345053674349382
+ },
+ "ltns_confirms_ti15_z": {
+  "family": "R3C_cross_scale_flow",
+  "dominant": "oos_collapse",
+  "counts": {
+   "retention_or_sign": 1,
+   "oos_collapse": 4
+  },
+  "horizons": {
+   "15": "retention_or_sign",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "oos_collapse",
+   "900": "oos_collapse"
+  },
+  "max_abs_corr_vs_panel": 0.8085248240786612
+ },
+ "ofi_flip_fade_300s": {
+  "family": "R3C_cross_scale_flow",
+  "dominant": "dedup_killed",
+  "detail": "rho=-0.952 vs ofi_per_depth_z_300s (library, round 2) -- sign-flipped clone of the admitted per-depth OFI z",
+  "horizons": {}
+ },
+ "ofi_flow_tstat_300s": {
+  "family": "R3C_cross_scale_flow",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 4,
+   "is_dead": 1
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "is_dead",
+   "900": "oos_collapse"
+  },
+  "max_abs_corr_vs_panel": 0.4705671457679347
+ },
+ "ofi_per_vol_z_300s": {
+  "family": "R3C_cross_scale_flow",
+  "dominant": "dedup_killed",
+  "detail": "rho=0.958 vs ofi_per_depth_z_300s (library, round 2) -- normalizing OFI by volume instead of depth yields the same series",
+  "horizons": {}
+ },
+ "ofi_regime_mature_60s": {
+  "family": "R3C_cross_scale_flow",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 4,
+   "is_dead": 1
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "oos_collapse",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.4998662602551106
+ },
+ "ofi_sign_run_300s": {
+  "family": "R3C_cross_scale_flow",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 3,
+   "is_dead": 2
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "oos_collapse"
+  },
+  "max_abs_corr_vs_panel": 0.4486440865180362
+ },
+ "ofi_z_x_gap_fill_dir": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.21748988447354123
+ },
+ "open_dev_extremeness": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.20404093294023573
+ },
+ "open_dev_sign_x_wdi": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.17482029439409547
+ },
+ "open_dev_x_gapdir": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.1601323349462503
+ },
+ "open_dev_z_accel": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "oos_collapse": 1,
+   "is_dead": 4
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.5703737248969322
+ },
+ "open_dev_z_x_ofi_z": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.19201436767052613
+ },
+ "open_dev_z_x_ti_60s": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 3,
+   "oos_collapse": 2
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "oos_collapse",
+   "900": "oos_collapse"
+  },
+  "max_abs_corr_vs_panel": 0.2993080368140381
+ },
+ "open_pos_roll_range_300s": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "dedup_killed",
+  "detail": "rho=-0.921 vs dev_from_open_bps (library, round 2) -- position within rolling open-anchored range is the negative of open deviation",
+  "horizons": {}
+ },
+ "open_side_hold_bars": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "dedup_killed",
+  "detail": "rho=0.879 vs dev_from_open_bps (library, round 2); also rho=-0.919 vs batch-sibling open_pos_roll_range_300s -- holding-duration is just monotone open-deviation",
+  "horizons": {}
+ },
+ "rollrpos_x_spread_z": {
+  "family": "R3D_state_interactions",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 4,
+   "oos_collapse": 1
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "oos_collapse",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.3370381631260759
+ },
+ "rollrpos_x_ti15": {
+  "family": "R3D_state_interactions",
+  "dominant": "panel_duplicate",
+  "detail": "max|corr|=0.929 vs trade_imbalance_15s",
+  "horizons": {},
+  "max_abs_corr_vs_panel": 0.9293701145816083
+ },
+ "stretch_per_day_range": {
+  "family": "R3A_anchor_dynamics",
+  "dominant": "dedup_killed",
+  "detail": "rho=0.923 vs dev_from_open_bps (library, round 2); also 0.824 vs mid_day_range_pos -- stretch from open is open-deviation rescaled",
+  "horizons": {}
+ },
+ "ti15_per_vol_regime": {
+  "family": "R3C_cross_scale_flow",
+  "dominant": "panel_duplicate",
+  "detail": "max|corr|=0.949 vs trade_imbalance_15s",
+  "horizons": {},
+  "max_abs_corr_vs_panel": 0.9494089075715048
+ },
+ "ti15_sign_x_ofi_z": {
+  "family": "R3C_cross_scale_flow",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.1033364413593876
+ },
+ "ti_sign_streak_30s": {
+  "family": "R3C_cross_scale_flow",
+  "dominant": "oos_collapse",
+  "counts": {
+   "retention_or_sign": 1,
+   "oos_collapse": 3,
+   "is_dead": 1
+  },
+  "horizons": {
+   "15": "retention_or_sign",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "oos_collapse",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.643576417014651
+ },
+ "top5div_x_extremes": {
+  "family": "R3D_state_interactions",
+  "dominant": "dedup_killed",
+  "detail": "rho=0.930 vs top5_book_div_z_300s (library, round 2) -- extremeness-gating does not hide the base divergence factor",
+  "horizons": {}
+ },
+ "top5div_x_ofi_z": {
+  "family": "R3D_state_interactions",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.19270661438377581
+ },
+ "top5div_x_spread_z": {
+  "family": "R3D_state_interactions",
+  "dominant": "dedup_killed",
+  "detail": "rho=1.000 vs batch-sibling div_z_x_spread_z -- two agents independently wrote the IDENTICAL formula z(wdi - fullbook_imb, 300s) x z(spread, 300s); keep div_z_x_spread_z (R3-B lineage, filed first)",
+  "horizons": {}
+ },
+ "trade_book_conflict_60s": {
+  "family": "R3C_cross_scale_flow",
+  "dominant": "panel_duplicate",
+  "detail": "max|corr|=0.886 vs trade_imbalance_15s",
+  "horizons": {},
+  "max_abs_corr_vs_panel": 0.8862423269238185
+ },
+ "vis_share_x_ti": {
+  "family": "R3B_deepbook_divergence",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 4,
+   "is_dead": 1
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "oos_collapse",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.09784976466044576
+ },
+ "visible_share_z_300s": {
+  "family": "R3B_deepbook_divergence",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.17615882367771232
+ }
+}
