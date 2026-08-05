@@ -2595,5 +2595,357 @@
       },
       "max_corr_library": 0.320
     }
-  ]
+  ],
+  "eval_v2_rescreen_2026_08_05": {
+    "generated_at": "2026-08-05",
+    "trigger": "Two infrastructure changes invalidated all pre-2026-08-05 screen numbers: (1) #141 fixed a purged_day_splits last-fold residual-chunk bug (old OOS fold composition was wrong); (2) eval-v2 directive replaced the Harvey-Liu hurdle gate with an IC-primary gate. All 18 registered prototypes re-screened from scratch under v2; this block is the authoritative baseline for future iterations.",
+    "gate": {
+      "min_is_t": 2.0,
+      "min_oos_t": 2.0,
+      "min_retention": 0.5,
+      "retention_sign_rule": "retention = |OOS IC|/|IS IC| AND requires same IS/OOS sign; sign flip fails retention regardless of ratio",
+      "max_abs_corr": 0.85,
+      "embargo_days": 1,
+      "cost_bps_per_side": 3.0,
+      "horizons_s": [15, 30, 60, 300, 900],
+      "split": {
+        "mode": "anchored walk-forward, last fold",
+        "train_dates": "20250701-20250922 (60 trading days)",
+        "test_dates": "20250924-20250930 (5 trading days)",
+        "panel_rows_pooled": 314053
+      }
+    },
+    "head_stats_semantics": "Computed on OOS block only (5 days). Per-date quantiles of factor value: long head = rows >= q(1-tau), short head = rows <= q(tau). long_gross_bps = mean(fwd_mid_ret of top)*1e4; short_gross_bps = -mean(fwd_mid_ret of bottom)*1e4 (SIGN-FLIPPED bottom leg: compare long_gross against -short_gross = raw bottom mean to check consistency with IC sign). net = gross - 6bp round trip. No IC-sign adjustment. Same-sign legs = OOS-week drift or time-of-day concentration, not an anomaly. tau=1% legs are ~40 rows/day, noise-dominated at 300/900s (e.g. wdi_mom_90s positive IC yet tau1%/tau5% legs look inverted; only tau10% agrees). DESCRIPTIVE ONLY, never gates admission.",
+    "summary": {
+      "n_prototypes": 18,
+      "n_passed": 6,
+      "passed_prototypes": {
+        "flow_divergence_300s": [15, 30, 60],
+        "depth5_delta_60s": [900],
+        "wdi_mom_90s": [900],
+        "dd_flow_300s": [900],
+        "rv_asym_300s": [900],
+        "session_clock": [60]
+      },
+      "observation": "4 of 6 passes are at 900s; only flow_divergence_300s holds 15-60s. Retention, not OOS significance, is the dominant short-horizon killer: depth5_delta_60s / wdi_mom_90s / queue_refill_asym_300s all show OOS |t| 3-11 at 15-60s yet fail retention 0.08-0.47."
+    },
+    "dedup_within_batch": {
+      "method": "pooled Spearman on 314053 rows, 66 dates",
+      "pass6_max_abs_rho": 0.503,
+      "pass6_max_pair": "dd_flow_300s x rv_asym_300s",
+      "all_pass6_below_085_bar": true,
+      "cluster_caveat": "dd_flow_300s x ti_accum_300s rho 0.894 and x ti_ewm_state_300s rho 0.859 (FAIL members of the same flow-accumulator cluster); rv_asym_300s x ofi_accum_300s rho 0.750. Keep at most one representative per cluster in future batches.",
+      "session_clock_note": "max rho 0.252 (vs trade_arrival_burst), else <= 0.05: orthogonal time-of-day dimension."
+    },
+    "verdicts": [
+      {
+        "name": "flow_divergence_300s",
+        "old_verdict": "admitted@15 (iter-001)",
+        "new_verdict": "PASS@15/30/60",
+        "passed_horizons": [15, 30, 60],
+        "stats": {
+          "15": {"is_ic": 0.0268, "is_t": 3.80, "oos_ic": 0.0528, "oos_t": 6.30, "retention": 1.971, "passed": true},
+          "30": {"is_ic": 0.0231, "is_t": 3.31, "oos_ic": 0.0552, "oos_t": 4.78, "retention": 2.385, "passed": true},
+          "60": {"is_ic": 0.0171, "is_t": 2.16, "oos_ic": 0.0581, "oos_t": 2.49, "retention": 3.394, "passed": true},
+          "300": {"is_ic": 0.0025, "is_t": 0.29, "oos_ic": 0.0459, "oos_t": 1.33, "retention": 18.654, "passed": false},
+          "900": {"is_ic": 0.0061, "is_t": 1.09, "oos_ic": 0.0083, "oos_t": 0.28, "retention": 1.358, "passed": false}
+        },
+        "head_stats_passed_bps": {
+          "15": {"tau01_long": -0.3, "tau01_short": 0.2, "tau05_long": 0.2, "tau05_short": 0.3, "tau10_long": 0.5, "tau10_short": 0.5},
+          "30": {"tau01_long": -0.1, "tau01_short": -0.1, "tau05_long": 0.6, "tau05_short": 0.4, "tau10_long": 1.1, "tau10_short": 0.6},
+          "60": {"tau01_long": 0.3, "tau01_short": -0.9, "tau05_long": 0.5, "tau05_short": 0.4, "tau10_long": 1.5, "tau10_short": 0.6}
+        },
+        "note": "Library champion; OOS IC stronger than IS at all three short horizons. Gross head edges <=1.5bp at 15-60s are below the 6bp round-trip cost: value is rank/conditioning, not raw head capture."
+      },
+      {
+        "name": "depth5_delta_60s",
+        "old_verdict": "admitted@15 (iter-001)",
+        "new_verdict": "PASS@900 only; 15s admission REVOKED (retention 0.470 < 0.5, near-miss)",
+        "passed_horizons": [900],
+        "stats": {
+          "15": {"is_ic": 0.2010, "is_t": 15.80, "oos_ic": 0.0945, "oos_t": 10.55, "retention": 0.470, "passed": false},
+          "30": {"is_ic": 0.1924, "is_t": 7.92, "oos_ic": 0.0767, "oos_t": 8.36, "retention": 0.399, "passed": false},
+          "60": {"is_ic": 0.1723, "is_t": 5.06, "oos_ic": 0.0556, "oos_t": 3.92, "retention": 0.323, "passed": false},
+          "300": {"is_ic": 0.0981, "is_t": 4.25, "oos_ic": 0.0355, "oos_t": 2.72, "retention": 0.361, "passed": false},
+          "900": {"is_ic": 0.0657, "is_t": 4.33, "oos_ic": 0.0386, "oos_t": 2.79, "retention": 0.588, "passed": true}
+        },
+        "head_stats_passed_bps": {
+          "900": {"tau01_long": -10.9, "tau01_short": 8.7, "tau05_long": -5.7, "tau05_short": 3.9, "tau10_long": 0.7, "tau10_short": 1.0}
+        },
+        "note": "Genuinely strong signal that decays too fast for the retention bar at 15-300s (OOS t 10.55 at 15s yet retention 0.470). 900s head legs noise-dominated at tau1%/5%; tau10% consistent with positive IC. Monitor as regime-dependent short-h candidate."
+      },
+      {
+        "name": "wdi_mom_90s",
+        "old_verdict": "rejected (iter-002)",
+        "new_verdict": "PASS@900",
+        "passed_horizons": [900],
+        "stats": {
+          "15": {"is_ic": 0.1229, "is_t": 8.21, "oos_ic": 0.0464, "oos_t": 8.51, "retention": 0.377, "passed": false},
+          "30": {"is_ic": 0.1259, "is_t": 5.18, "oos_ic": 0.0522, "oos_t": 7.20, "retention": 0.414, "passed": false},
+          "60": {"is_ic": 0.1207, "is_t": 3.97, "oos_ic": 0.0560, "oos_t": 8.49, "retention": 0.464, "passed": false},
+          "300": {"is_ic": 0.0750, "is_t": 3.48, "oos_ic": 0.0216, "oos_t": 1.79, "retention": 0.288, "passed": false},
+          "900": {"is_ic": 0.0466, "is_t": 3.37, "oos_ic": 0.0369, "oos_t": 2.46, "retention": 0.793, "passed": true}
+        },
+        "head_stats_passed_bps": {
+          "900": {"tau01_long": -17.1, "tau01_short": -3.8, "tau05_long": -5.7, "tau05_short": 2.5, "tau10_long": 0.4, "tau10_short": 1.3}
+        },
+        "note": "Textbook retention pattern: huge OOS t at 15-60s, retention 0.38-0.46, passes only at 900s. tau1%/tau5% head legs look inverted vs the positive IC sign = sampling noise (40 rows/day); only tau10% agrees."
+      },
+      {
+        "name": "dd_flow_300s",
+        "old_verdict": "rejected (iter-002)",
+        "new_verdict": "PASS@900",
+        "passed_horizons": [900],
+        "stats": {
+          "15": {"is_ic": 0.0156, "is_t": 3.65, "oos_ic": 0.0041, "oos_t": 0.40, "retention": 0.265, "passed": false},
+          "30": {"is_ic": 0.0165, "is_t": 2.47, "oos_ic": 0.0100, "oos_t": 0.67, "retention": 0.605, "passed": false},
+          "60": {"is_ic": 0.0146, "is_t": 1.46, "oos_ic": -0.0020, "oos_t": -0.09, "retention": 0.140, "passed": false},
+          "300": {"is_ic": -0.0167, "is_t": -0.87, "oos_ic": -0.0507, "oos_t": -1.79, "retention": 3.025, "passed": false},
+          "900": {"is_ic": -0.0488, "is_t": -2.27, "oos_ic": -0.1074, "oos_t": -2.74, "retention": 2.203, "passed": true}
+        },
+        "head_stats_passed_bps": {
+          "900": {"tau01_long": 21.6, "tau01_short": -31.4, "tau05_long": 22.1, "tau05_short": -17.8, "tau10_long": 14.8, "tau10_short": -10.3}
+        },
+        "note": "Negative-IC continuation factor at 900s; head spread consistent with IC sign (both legs positive = OOS-week drift; bottom raw mean > top raw mean). Member of ti/dd flow-accumulator cluster (rho 0.89 with ti_accum_300s)."
+      },
+      {
+        "name": "rv_asym_300s",
+        "old_verdict": "rejected_sign_gated (iter-002)",
+        "new_verdict": "PASS@900 (restored: v2 gate is sign-agnostic)",
+        "passed_horizons": [900],
+        "stats": {
+          "15": {"is_ic": -0.0222, "is_t": -1.73, "oos_ic": -0.0002, "oos_t": -0.02, "retention": 0.009, "passed": false},
+          "30": {"is_ic": -0.0272, "is_t": -1.60, "oos_ic": -0.0034, "oos_t": -0.16, "retention": 0.123, "passed": false},
+          "60": {"is_ic": -0.0291, "is_t": -1.65, "oos_ic": -0.0103, "oos_t": -0.37, "retention": 0.356, "passed": false},
+          "300": {"is_ic": -0.0310, "is_t": -1.95, "oos_ic": -0.0426, "oos_t": -0.79, "retention": 1.376, "passed": false},
+          "900": {"is_ic": -0.0740, "is_t": -4.11, "oos_ic": -0.1283, "oos_t": -2.17, "retention": 1.734, "passed": true}
+        },
+        "head_stats_passed_bps": {
+          "900": {"tau01_long": -11.6, "tau01_short": -6.6, "tau05_long": -6.2, "tau05_short": -13.0, "tau10_long": -3.1, "tau10_short": -10.1}
+        },
+        "note": "All 900s head legs negative (drift week); top < bottom consistent with negative IC. Correlated with ofi_accum_300s (rho 0.750) - one representative of the pair."
+      },
+      {
+        "name": "session_clock",
+        "old_verdict": "rejected (iter-002)",
+        "new_verdict": "PASS@60 (borderline; monitor-only)",
+        "passed_horizons": [60],
+        "stats": {
+          "15": {"is_ic": -0.0117, "is_t": -2.23, "oos_ic": -0.0280, "oos_t": -1.96, "retention": 2.382, "passed": false},
+          "30": {"is_ic": -0.0163, "is_t": -2.31, "oos_ic": -0.0417, "oos_t": -1.98, "retention": 2.561, "passed": false},
+          "60": {"is_ic": -0.0221, "is_t": -2.39, "oos_ic": -0.0545, "oos_t": -2.01, "retention": 2.472, "passed": true},
+          "300": {"is_ic": -0.0338, "is_t": -1.89, "oos_ic": -0.0628, "oos_t": -1.04, "retention": 1.858, "passed": false},
+          "900": {"is_ic": -0.0628, "is_t": -2.01, "oos_ic": -0.0662, "oos_t": -0.93, "retention": 1.055, "passed": false}
+        },
+        "head_stats_passed_bps": {
+          "60": {"tau01_long": 0.8, "tau01_short": -16.6, "tau05_long": 0.1, "tau05_short": -9.1, "tau10_long": 0.5, "tau10_short": -1.5}
+        },
+        "note": "Time-of-day factor; 15/30s miss OOS t by 0.02-0.04. Bottom leg dominated by session-open rows. Not standalone tradable - use as conditioning/detrending; dedup rho 0.767 vs cum_trade_vol (below 0.85 bar)."
+      },
+      {
+        "name": "depth_resiliency",
+        "old_verdict": "rejected (iter-002)",
+        "new_verdict": "FAIL all horizons",
+        "passed_horizons": [],
+        "stats": {
+          "15": {"is_ic": 0.0111, "is_t": 1.60, "oos_ic": 0.0243, "oos_t": 3.31, "retention": 2.199, "passed": false},
+          "30": {"is_ic": 0.0066, "is_t": 1.06, "oos_ic": 0.0183, "oos_t": 1.25, "retention": 2.767, "passed": false},
+          "60": {"is_ic": -0.0001, "is_t": -0.01, "oos_ic": 0.0056, "oos_t": 0.24, "retention": 72.026, "passed": false},
+          "300": {"is_ic": -0.0078, "is_t": -1.18, "oos_ic": -0.0424, "oos_t": -1.79, "retention": 5.408, "passed": false},
+          "900": {"is_ic": -0.0030, "is_t": -0.52, "oos_ic": -0.0034, "oos_t": -0.32, "retention": 1.138, "passed": false}
+        },
+        "note": "IS |t| < 2 at every horizon; the OOS 15s t 3.31 is unusable because the IS gate fails first."
+      },
+      {
+        "name": "iopv_premium_mom",
+        "old_verdict": "rejected_sign_gated (iter-001)",
+        "new_verdict": "FAIL all horizons (regime break, not a sign-gate artifact)",
+        "passed_horizons": [],
+        "stats": {
+          "15": {"is_ic": -0.0421, "is_t": -6.41, "oos_ic": -0.0015, "oos_t": -0.10, "retention": 0.035, "passed": false},
+          "30": {"is_ic": -0.0435, "is_t": -5.18, "oos_ic": 0.0070, "oos_t": 0.41, "retention": 0.160, "passed": false},
+          "60": {"is_ic": -0.0399, "is_t": -4.35, "oos_ic": -0.0027, "oos_t": -0.15, "retention": 0.067, "passed": false},
+          "300": {"is_ic": -0.0220, "is_t": -5.47, "oos_ic": 0.0033, "oos_t": 0.47, "retention": 0.152, "passed": false},
+          "900": {"is_ic": -0.0157, "is_t": -7.01, "oos_ic": 0.0002, "oos_t": 0.02, "retention": 0.012, "passed": false}
+        },
+        "note": "Strong IS negative IC (t -4.4 to -7.0) collapses to ~0 OOS: premium-momentum regime ended before the OOS week. Premium factors need regime conditioning before re-submission (iter-003 family D)."
+      },
+      {
+        "name": "large_trade_share_level",
+        "old_verdict": "rejected (iter-002; registered as identity prototype of engine column large_trade_share_60s)",
+        "new_verdict": "FAIL all horizons",
+        "passed_horizons": [],
+        "stats": {
+          "15": {"is_ic": -0.0008, "is_t": -0.18, "oos_ic": 0.0133, "oos_t": 1.31, "retention": 17.560, "passed": false},
+          "30": {"is_ic": -0.0011, "is_t": -0.20, "oos_ic": 0.0079, "oos_t": 0.50, "retention": 7.178, "passed": false},
+          "60": {"is_ic": -0.0017, "is_t": -0.24, "oos_ic": -0.0137, "oos_t": -0.66, "retention": 8.202, "passed": false},
+          "300": {"is_ic": -0.0167, "is_t": -1.65, "oos_ic": 0.0116, "oos_t": 0.73, "retention": 0.693, "passed": false},
+          "900": {"is_ic": -0.0249, "is_t": -1.90, "oos_ic": 0.0046, "oos_t": 0.13, "retention": 0.183, "passed": false}
+        },
+        "note": "rejected_duplicate status is structural (corr 1.0 with its own source column in PANEL_FACTORS) and uninformative; the IC evidence kills it: |t| <= 1.90 everywhere. Level of large-trade share has no rank information; may still work as conditioning (iter-003 family B/D interactions)."
+      },
+      {
+        "name": "ofi_accum_300s",
+        "old_verdict": "rejected_sign_gated (iter-002)",
+        "new_verdict": "FAIL all horizons (900s near-miss)",
+        "passed_horizons": [],
+        "stats": {
+          "15": {"is_ic": 0.0186, "is_t": 5.11, "oos_ic": -0.0065, "oos_t": -0.44, "retention": 0.350, "passed": false},
+          "30": {"is_ic": 0.0193, "is_t": 3.19, "oos_ic": -0.0099, "oos_t": -0.46, "retention": 0.514, "passed": false},
+          "60": {"is_ic": 0.0175, "is_t": 1.78, "oos_ic": -0.0314, "oos_t": -0.91, "retention": 1.793, "passed": false},
+          "300": {"is_ic": -0.0027, "is_t": -0.17, "oos_ic": -0.1000, "oos_t": -1.73, "retention": 37.318, "passed": false},
+          "900": {"is_ic": -0.0639, "is_t": -3.33, "oos_ic": -0.1439, "oos_t": -1.53, "retention": 2.252, "passed": false}
+        },
+        "note": "Sign flip at 15/30s; 900s misses OOS t by 0.47. Redundant with rv_asym_300s (rho 0.750) which passed - do not re-submit without differentiation."
+      },
+      {
+        "name": "prem_x_ofi",
+        "old_verdict": "rejected (iter-001)",
+        "new_verdict": "FAIL all horizons",
+        "passed_horizons": [],
+        "stats": {
+          "15": {"is_ic": -0.0003, "is_t": -0.07, "oos_ic": 0.0091, "oos_t": 0.82, "retention": 34.857, "passed": false},
+          "30": {"is_ic": -0.0018, "is_t": -0.50, "oos_ic": 0.0166, "oos_t": 1.49, "retention": 9.508, "passed": false},
+          "60": {"is_ic": -0.0018, "is_t": -0.44, "oos_ic": 0.0295, "oos_t": 2.61, "retention": 16.731, "passed": false},
+          "300": {"is_ic": -0.0066, "is_t": -1.23, "oos_ic": -0.0038, "oos_t": -0.25, "retention": 0.576, "passed": false},
+          "900": {"is_ic": -0.0107, "is_t": -2.06, "oos_ic": -0.0001, "oos_t": -0.01, "retention": 0.011, "passed": false}
+        },
+        "note": "IS dead at all horizons; OOS 60s t 2.61 is unusable without IS support. AP arbitrage reacts to premium level, not to order-flow-gated reversion timing."
+      },
+      {
+        "name": "prem_x_wdi",
+        "old_verdict": "rejected (iter-001)",
+        "new_verdict": "FAIL all horizons",
+        "passed_horizons": [],
+        "stats": {
+          "15": {"is_ic": -0.0034, "is_t": -0.57, "oos_ic": -0.0104, "oos_t": -2.71, "retention": 3.069, "passed": false},
+          "30": {"is_ic": -0.0030, "is_t": -0.42, "oos_ic": -0.0150, "oos_t": -2.43, "retention": 4.999, "passed": false},
+          "60": {"is_ic": 0.0002, "is_t": 0.03, "oos_ic": -0.0110, "oos_t": -1.61, "retention": 54.474, "passed": false},
+          "300": {"is_ic": 0.0028, "is_t": 0.58, "oos_ic": -0.0139, "oos_t": -0.65, "retention": 4.942, "passed": false},
+          "900": {"is_ic": 0.0022, "is_t": 0.43, "oos_ic": -0.0024, "oos_t": -0.10, "retention": 1.081, "passed": false}
+        },
+        "note": "IS |t| <= 0.58 everywhere; OOS 15/30s negative t exists but cannot be admitted without IS evidence."
+      },
+      {
+        "name": "queue_refill_asym_300s",
+        "old_verdict": "rejected (iter-001)",
+        "new_verdict": "FAIL all horizons (retention collapse)",
+        "passed_horizons": [],
+        "stats": {
+          "15": {"is_ic": 0.1071, "is_t": 6.38, "oos_ic": 0.0212, "oos_t": 1.33, "retention": 0.198, "passed": false},
+          "30": {"is_ic": 0.1090, "is_t": 4.06, "oos_ic": 0.0146, "oos_t": 0.56, "retention": 0.134, "passed": false},
+          "60": {"is_ic": 0.1025, "is_t": 2.72, "oos_ic": 0.0085, "oos_t": 0.26, "retention": 0.083, "passed": false},
+          "300": {"is_ic": 0.0857, "is_t": 2.70, "oos_ic": -0.0364, "oos_t": -0.73, "retention": 0.424, "passed": false},
+          "900": {"is_ic": 0.0556, "is_t": 2.54, "oos_ic": -0.0070, "oos_t": -0.08, "retention": 0.125, "passed": false}
+        },
+        "note": "Large IS effect (IC ~0.10 at 15s) decays to nothing OOS: retention 0.08-0.20. Regime-dependent queue dynamics; do not re-submit raw clones."
+      },
+      {
+        "name": "ti_accum_300s",
+        "old_verdict": "rejected (iter-002)",
+        "new_verdict": "FAIL all horizons",
+        "passed_horizons": [],
+        "stats": {
+          "15": {"is_ic": 0.0103, "is_t": 2.33, "oos_ic": 0.0051, "oos_t": 0.51, "retention": 0.500, "passed": false},
+          "30": {"is_ic": 0.0108, "is_t": 1.74, "oos_ic": 0.0075, "oos_t": 0.57, "retention": 0.700, "passed": false},
+          "60": {"is_ic": 0.0098, "is_t": 1.07, "oos_ic": -0.0033, "oos_t": -0.15, "retention": 0.336, "passed": false},
+          "300": {"is_ic": -0.0147, "is_t": -0.73, "oos_ic": -0.0280, "oos_t": -0.56, "retention": 1.902, "passed": false},
+          "900": {"is_ic": -0.0468, "is_t": -2.19, "oos_ic": -0.0865, "oos_t": -1.13, "retention": 1.850, "passed": false}
+        },
+        "note": "Near-misses only: 15s retention 0.4997 (hair under 0.5) with OOS t 0.51; 900s OOS t -1.13. Clone cluster with dd_flow_300s (rho 0.894) which passed - cluster representative already chosen."
+      },
+      {
+        "name": "ti_ewm_accel_120s",
+        "old_verdict": "rejected (iter-001)",
+        "new_verdict": "FAIL all horizons",
+        "passed_horizons": [],
+        "stats": {
+          "15": {"is_ic": 0.0380, "is_t": 4.54, "oos_ic": -0.0050, "oos_t": -0.28, "retention": 0.131, "passed": false},
+          "30": {"is_ic": 0.0413, "is_t": 3.89, "oos_ic": -0.0242, "oos_t": -1.01, "retention": 0.585, "passed": false},
+          "60": {"is_ic": 0.0446, "is_t": 5.17, "oos_ic": -0.0419, "oos_t": -1.39, "retention": 0.941, "passed": false},
+          "300": {"is_ic": 0.0357, "is_t": 3.82, "oos_ic": -0.0122, "oos_t": -0.86, "retention": 0.343, "passed": false},
+          "900": {"is_ic": 0.0161, "is_t": 2.89, "oos_ic": -0.0025, "oos_t": -0.31, "retention": 0.154, "passed": false}
+        },
+        "note": "Strong IS at all horizons, OOS flips sign at every horizon: flow-MACD on windowed input overfits the IS regime. Lesson stands: do not retry flow-MACD on windowed inputs."
+      },
+      {
+        "name": "ti_ewm_state_300s",
+        "old_verdict": "rejected (iter-001)",
+        "new_verdict": "FAIL all horizons",
+        "passed_horizons": [],
+        "stats": {
+          "15": {"is_ic": 0.0138, "is_t": 3.11, "oos_ic": -0.0011, "oos_t": -0.18, "retention": 0.083, "passed": false},
+          "30": {"is_ic": 0.0140, "is_t": 2.24, "oos_ic": -0.0012, "oos_t": -0.15, "retention": 0.086, "passed": false},
+          "60": {"is_ic": 0.0115, "is_t": 1.25, "oos_ic": -0.0137, "oos_t": -0.97, "retention": 1.186, "passed": false},
+          "300": {"is_ic": -0.0172, "is_t": -0.86, "oos_ic": -0.0427, "oos_t": -0.87, "retention": 2.491, "passed": false},
+          "900": {"is_ic": -0.0536, "is_t": -2.29, "oos_ic": -0.1142, "oos_t": -1.39, "retention": 2.129, "passed": false}
+        },
+        "note": "900s misses OOS t by 0.61. Cluster member (rho 0.86-0.89 with dd_flow/ti_accum). NOTE: built with polars ewm_mean on a column with leading warm-up nulls - latent state-poisoning hazard (see lessons); monitor if it ever resurfaces."
+      },
+      {
+        "name": "trade_arrival_burst",
+        "old_verdict": "rejected (iter-002)",
+        "new_verdict": "FAIL all horizons",
+        "passed_horizons": [],
+        "stats": {
+          "15": {"is_ic": 0.0037, "is_t": 0.77, "oos_ic": -0.0046, "oos_t": -0.33, "retention": 1.251, "passed": false},
+          "30": {"is_ic": 0.0027, "is_t": 0.40, "oos_ic": -0.0045, "oos_t": -0.25, "retention": 1.652, "passed": false},
+          "60": {"is_ic": 0.0032, "is_t": 0.32, "oos_ic": -0.0120, "oos_t": -0.47, "retention": 3.736, "passed": false},
+          "300": {"is_ic": 0.0024, "is_t": 0.11, "oos_ic": 0.0043, "oos_t": 0.11, "retention": 1.794, "passed": false},
+          "900": {"is_ic": -0.0011, "is_t": -0.04, "oos_ic": -0.0926, "oos_t": -1.18, "retention": 80.824, "passed": false}
+        },
+        "note": "Direction-free arrival intensity carries no rank information. Signed/conditional arrival variants remain untested (iter-003 family B signed_arrival_z)."
+      },
+      {
+        "name": "vol_adj_slope",
+        "old_verdict": "rejected (iter-002)",
+        "new_verdict": "FAIL all horizons",
+        "passed_horizons": [],
+        "stats": {
+          "15": {"is_ic": -0.0109, "is_t": -2.06, "oos_ic": -0.0029, "oos_t": -0.29, "retention": 0.267, "passed": false},
+          "30": {"is_ic": -0.0157, "is_t": -2.33, "oos_ic": 0.0016, "oos_t": 0.13, "retention": 0.103, "passed": false},
+          "60": {"is_ic": -0.0158, "is_t": -1.80, "oos_ic": 0.0132, "oos_t": 0.69, "retention": 0.836, "passed": false},
+          "300": {"is_ic": -0.0137, "is_t": -1.12, "oos_ic": 0.0415, "oos_t": 1.13, "retention": 3.021, "passed": false},
+          "900": {"is_ic": -0.0313, "is_t": -2.05, "oos_ic": 0.0236, "oos_t": 0.87, "retention": 0.755, "passed": false}
+        },
+        "note": "Weak negative IS, ~0 or sign-flipped OOS. iter-003 family C probes momentum variants (vol_adj_mom_60s) instead of slope."
+      }
+    ],
+    "reconciliation_vs_prior_verdicts": {
+      "note": "All pre-2026-08-05 verdicts used pre-#141 splits and/or the Harvey-Liu hurdle gate; their numbers are not comparable to v2 numbers. Mapping below is verdict-level only.",
+      "confirmed_fail": ["queue_refill_asym_300s", "ti_ewm_state_300s", "ti_ewm_accel_120s", "prem_x_ofi", "prem_x_wdi", "vol_adj_slope", "depth_resiliency", "ti_accum_300s", "large_trade_share_60s", "trade_arrival_burst"],
+      "confirmed_with_root_cause": {
+        "iopv_premium_mom": "rejected_sign_gated under old gate; v2 shows the real cause is a regime break (strong IS negative IC -> ~0 OOS), not the sign gate."
+      },
+      "restored_to_pass": {
+        "rv_asym_300s": "rejected_sign_gated -> PASS@900 (v2 gate is sign-agnostic)",
+        "dd_flow_300s": "rejected -> PASS@900",
+        "wdi_mom_90s": "rejected -> PASS@900",
+        "session_clock": "rejected -> PASS@60 (borderline, monitor-only, conditioning use)"
+      },
+      "still_fail_under_v2": {
+        "ofi_accum_300s": "rejected_sign_gated -> still FAIL, 900s near-miss (OOS t -1.53); redundant with passing rv_asym_300s (rho 0.750)"
+      },
+      "admitted_reexamined": {
+        "flow_divergence_300s": "admitted@15 -> CONFIRMED and extended to 15/30/60; library champion",
+        "depth5_delta_60s": "admitted@15 -> REVOKED at 15/30/60/300 (retention 0.470/0.399/0.323/0.361 < 0.5 despite OOS t 10.55/8.36/3.92/2.72); PASSES at 900 only"
+      }
+    },
+    "lessons": [
+      "Verdicts are only valid relative to the eval-code version that produced them: the #141 split bug silently changed OOS composition for every historical screen. Any infrastructure fix touching splits/IC computation must trigger a full re-screen before new batches.",
+      "Retention >= 0.5 is the dominant killer of strong short-horizon signals: depth5_delta_60s, wdi_mom_90s, queue_refill_asym_300s show OOS |t| 3-11 at 15-60s yet fail retention 0.08-0.47 -> regime-dependent at short horizons, not noise. depth5_delta and wdi_mom pass at 900s instead. Do not re-propose raw clones at other windows; change normalization/window and expect horizon migration.",
+      "900s is currently the richest horizon (4 of 6 passes); 15-60s is carried by flow_divergence_300s alone. Never pre-exclude any horizon.",
+      "Head long/short reading convention: short_gross_bps = -mean(bottom); compare long_gross vs -short_gross; same-sign legs = OOS-week drift or time-of-day concentration; tau=1% legs are ~40 rows/day and noise-dominated at long horizons. Descriptive only, never gates.",
+      "Flow-accumulator redundancy: dd_flow_300s / ti_accum_300s / ti_ewm_state_300s form a rho 0.86-0.89 cluster; rv_asym_300s x ofi_accum_300s rho 0.750. Budget at most one representative per cluster per batch.",
+      "session_clock (time-of-day) is orthogonal to all market factors (max rho 0.252) and passes @60; it is a conditioning/detrending tool, not a standalone tradable factor.",
+      "polars 1.43 hazard: ewm_mean permanently contaminates state to NaN when input has leading nulls (engine warm-up), in both ignore_nulls modes. Use rolling_mean for warm-up-prone columns (enforced in iter-003 family B specs).",
+      "iopv premium momentum is regime-bound: strong IS, zero OOS. Premium-based factors need regime conditioning before re-submission (iter-003 family D)."
+    ],
+    "artifacts": {
+      "raw_reports_json": "scratch-iter003/rescreen_reports.json",
+      "summary_txt": "scratch-iter003/rescreen_summary.txt",
+      "spearman_matrix_txt": "scratch-iter003/rescreen_corr_out.txt",
+      "chinese_report": "scratch-iter003/eval_v2_rescreen_existing18.md (copy on server: /data/factor_lzt/iterations/)"
+    }
+  }
 }

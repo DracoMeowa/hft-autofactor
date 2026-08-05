@@ -1,0 +1,109 @@
+reports dumped: 18
+names: ['dd_flow_300s', 'depth5_delta_60s', 'depth_resiliency', 'flow_divergence_300s', 'iopv_premium_mom', 'large_trade_share_level', 'ofi_accum_300s', 'prem_x_ofi', 'prem_x_wdi', 'queue_refill_asym_300s', 'rv_asym_300s', 'session_clock', 'ti_accum_300s', 'ti_ewm_accel_120s', 'ti_ewm_state_300s', 'trade_arrival_burst', 'vol_adj_slope', 'wdi_mom_90s']
+proto dirs missing: []
+probe schema: ['date', 'exchange', 'instrument', 'ts_ms', 'snap_seq', 'flags', 'mid_px', 'last_px', 'bid1_px', 'ask1_px', 'bid1_qty', 'ask1_qty', 'depth_bid5', 'depth_ask5', 'channel', 'fwd_mid_ret_15s', 'fwd_mid_ret_30s', 'fwd_mid_ret_60s', 'fwd_mid_ret_300s', 'fwd_mid_ret_900s', 'fwd_last_ret_15s', 'fwd_last_ret_30s', 'fwd_last_ret_60s', 'fwd_last_ret_300s', 'fwd_last_ret_900s', 'quoted_spread_ticks', 'microprice_dev', 'oir', 'wdi', 'book_slope', 'iopv_premium', 'rv_60s', 'rv_300s', 'ofi_60s', 'trade_imbalance_60s', 'order_arrival_60s', 'cancel_ratio_60s', 'avg_trade_size_60s', 'n_trades_60s', 'large_trade_share_60s', 'trade_gap_ms', 'cum_trade_vol', 'depth5_delta_60s']
+wide rows: 314053 dates: 66
+=== pooled Spearman: PASS6 vs all computed protos ===
+dd_flow_300s           x depth5_delta_60s         n= 305987 rho=-0.042
+dd_flow_300s           x flow_divergence_300s     n= 305787 rho=-0.019
+dd_flow_300s           x queue_refill_asym_300s   n= 305987 rho=-0.047
+dd_flow_300s           x ti_ewm_state_300s        n= 305987 rho=+0.859  <<< HIGH
+dd_flow_300s           x ti_ewm_accel_120s        n= 305987 rho=-0.085
+dd_flow_300s           x iopv_premium_mom         n= 305987 rho=+0.001
+dd_flow_300s           x prem_x_ofi               n= 305787 rho=-0.030
+dd_flow_300s           x prem_x_wdi               n= 305987 rho=+0.001
+dd_flow_300s           x vol_adj_slope            n= 280754 rho=-0.001
+dd_flow_300s           x depth_resiliency         n= 305987 rho=-0.011
+dd_flow_300s           x session_clock            n= 305987 rho=-0.028
+dd_flow_300s           x ti_accum_300s            n= 305987 rho=+0.894  <<< HIGH
+dd_flow_300s           x ofi_accum_300s           n= 305787 rho=+0.575
+dd_flow_300s           x rv_asym_300s             n= 305987 rho=+0.503
+dd_flow_300s           x wdi_mom_90s              n= 305987 rho=-0.045
+dd_flow_300s           x large_trade_share_level  n= 305987 rho=-0.044
+dd_flow_300s           x trade_arrival_burst      n= 265255 rho=-0.090
+depth5_delta_60s       x flow_divergence_300s     n= 305787 rho=+0.108
+depth5_delta_60s       x queue_refill_asym_300s   n= 307123 rho=+0.074
+depth5_delta_60s       x ti_ewm_state_300s        n= 306185 rho=-0.073
+depth5_delta_60s       x ti_ewm_accel_120s        n= 308825 rho=-0.157
+depth5_delta_60s       x iopv_premium_mom         n= 312733 rho=-0.039
+depth5_delta_60s       x prem_x_ofi               n= 305896 rho=+0.004
+depth5_delta_60s       x prem_x_wdi               n= 307519 rho=+0.002
+depth5_delta_60s       x vol_adj_slope            n= 280754 rho=-0.005
+depth5_delta_60s       x depth_resiliency         n= 307519 rho=+0.062
+depth5_delta_60s       x session_clock            n= 312733 rho=-0.005
+depth5_delta_60s       x ti_accum_300s            n= 305987 rho=-0.051
+depth5_delta_60s       x ofi_accum_300s           n= 305896 rho=-0.096
+depth5_delta_60s       x rv_asym_300s             n= 307453 rho=-0.154
+depth5_delta_60s       x dd_flow_300s             n= 305987 rho=-0.042
+depth5_delta_60s       x wdi_mom_90s              n= 311479 rho=+0.369
+depth5_delta_60s       x large_trade_share_level  n= 312715 rho=+0.017
+depth5_delta_60s       x trade_arrival_burst      n= 265255 rho=+0.008
+flow_divergence_300s   x depth5_delta_60s         n= 305787 rho=+0.108
+flow_divergence_300s   x queue_refill_asym_300s   n= 305787 rho=-0.040
+flow_divergence_300s   x ti_ewm_state_300s        n= 305787 rho=-0.063
+flow_divergence_300s   x ti_ewm_accel_120s        n= 305787 rho=-0.436
+flow_divergence_300s   x iopv_premium_mom         n= 305787 rho=-0.008
+flow_divergence_300s   x prem_x_ofi               n= 305787 rho=-0.004
+flow_divergence_300s   x prem_x_wdi               n= 305787 rho=+0.002
+flow_divergence_300s   x vol_adj_slope            n= 280754 rho=-0.015
+flow_divergence_300s   x depth_resiliency         n= 305787 rho=+0.074
+flow_divergence_300s   x session_clock            n= 305787 rho=-0.012
+flow_divergence_300s   x ti_accum_300s            n= 305787 rho=-0.010
+flow_divergence_300s   x ofi_accum_300s           n= 305787 rho=-0.162
+flow_divergence_300s   x rv_asym_300s             n= 305787 rho=-0.084
+flow_divergence_300s   x dd_flow_300s             n= 305787 rho=-0.019
+flow_divergence_300s   x wdi_mom_90s              n= 305787 rho=-0.027
+flow_divergence_300s   x large_trade_share_level  n= 305787 rho=-0.016
+flow_divergence_300s   x trade_arrival_burst      n= 265055 rho=-0.007
+rv_asym_300s           x depth5_delta_60s         n= 307453 rho=-0.154
+rv_asym_300s           x flow_divergence_300s     n= 305787 rho=-0.084
+rv_asym_300s           x queue_refill_asym_300s   n= 307123 rho=-0.091
+rv_asym_300s           x ti_ewm_state_300s        n= 306185 rho=+0.542
+rv_asym_300s           x ti_ewm_accel_120s        n= 307451 rho=+0.111
+rv_asym_300s           x iopv_premium_mom         n= 307453 rho=+0.035
+rv_asym_300s           x prem_x_ofi               n= 305896 rho=-0.020
+rv_asym_300s           x prem_x_wdi               n= 307453 rho=-0.000
+rv_asym_300s           x vol_adj_slope            n= 280754 rho=-0.019
+rv_asym_300s           x depth_resiliency         n= 307453 rho=+0.001
+rv_asym_300s           x session_clock            n= 307453 rho=-0.009
+rv_asym_300s           x ti_accum_300s            n= 305987 rho=+0.570
+rv_asym_300s           x ofi_accum_300s           n= 305896 rho=+0.750  <<< HIGH
+rv_asym_300s           x dd_flow_300s             n= 305987 rho=+0.503
+rv_asym_300s           x wdi_mom_90s              n= 307453 rho=-0.146
+rv_asym_300s           x large_trade_share_level  n= 307451 rho=+0.013
+rv_asym_300s           x trade_arrival_burst      n= 265255 rho=-0.000
+session_clock          x depth5_delta_60s         n= 312733 rho=-0.005
+session_clock          x flow_divergence_300s     n= 305787 rho=-0.012
+session_clock          x queue_refill_asym_300s   n= 307123 rho=+0.012
+session_clock          x ti_ewm_state_300s        n= 306185 rho=-0.039
+session_clock          x ti_ewm_accel_120s        n= 308825 rho=+0.012
+session_clock          x iopv_premium_mom         n= 313393 rho=+0.002
+session_clock          x prem_x_ofi               n= 305896 rho=+0.009
+session_clock          x prem_x_wdi               n= 307519 rho=-0.015
+session_clock          x vol_adj_slope            n= 280754 rho=-0.046
+session_clock          x depth_resiliency         n= 307519 rho=-0.049
+session_clock          x ti_accum_300s            n= 305987 rho=-0.034
+session_clock          x ofi_accum_300s           n= 305896 rho=-0.028
+session_clock          x rv_asym_300s             n= 307453 rho=-0.009
+session_clock          x dd_flow_300s             n= 305987 rho=-0.028
+session_clock          x wdi_mom_90s              n= 311479 rho=-0.002
+session_clock          x large_trade_share_level  n= 312719 rho=+0.002
+session_clock          x trade_arrival_burst      n= 265255 rho=+0.252
+wdi_mom_90s            x depth5_delta_60s         n= 311479 rho=+0.369
+wdi_mom_90s            x flow_divergence_300s     n= 305787 rho=-0.027
+wdi_mom_90s            x queue_refill_asym_300s   n= 307123 rho=+0.159
+wdi_mom_90s            x ti_ewm_state_300s        n= 306185 rho=-0.081
+wdi_mom_90s            x ti_ewm_accel_120s        n= 308825 rho=+0.012
+wdi_mom_90s            x iopv_premium_mom         n= 311479 rho=-0.017
+wdi_mom_90s            x prem_x_ofi               n= 305896 rho=+0.004
+wdi_mom_90s            x prem_x_wdi               n= 307519 rho=-0.004
+wdi_mom_90s            x vol_adj_slope            n= 280754 rho=+0.005
+wdi_mom_90s            x depth_resiliency         n= 307519 rho=+0.038
+wdi_mom_90s            x session_clock            n= 311479 rho=-0.002
+wdi_mom_90s            x ti_accum_300s            n= 305987 rho=-0.058
+wdi_mom_90s            x ofi_accum_300s           n= 305896 rho=-0.079
+wdi_mom_90s            x rv_asym_300s             n= 307453 rho=-0.146
+wdi_mom_90s            x dd_flow_300s             n= 305987 rho=-0.045
+wdi_mom_90s            x large_trade_share_level  n= 311477 rho=+0.004
+wdi_mom_90s            x trade_arrival_burst      n= 265255 rho=+0.009
+done
