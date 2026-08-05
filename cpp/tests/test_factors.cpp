@@ -383,6 +383,213 @@ static void test_trade_gap_skew_clamp() {
   CHECK_NEAR(v, 2700.0, 1e-9);                  // 3200 - 500
 }
 
+// iter-003 wide-table expansion (#144): snapshot pass-through columns.
+static void test_snapshot_passthrough() {
+  const Symbol inst = make_symbol("510300", 6);
+  const Session sess = session_for("sse");
+  FactorContext ctx{"20250603", "sse", sess};
+
+  auto reg = make_registry({"total_bid_vol", "total_ask_vol", "bid_orders5",
+                            "ask_orders5", "open_px", "high_px", "low_px",
+                            "pre_close_px"}, false);
+  CHECK_EQ((int)reg.size(), 8);
+  for (auto& f : reg) {
+    f->on_day_start(ctx);
+    f->on_instrument_day_start(inst);
+  }
+
+  BookState book;
+  double v;
+
+  // make_snap leaves totals/OHLC unset (0) => NaN; order counts still valid.
+  Snapshot s0 = make_snap(inst, t(9, 30, 0));
+  book.apply_snapshot(s0);
+  for (auto& f : reg) f->on_snapshot(s0, book);
+  CHECK(!find(reg, "total_bid_vol")->value(inst, v));
+  CHECK(!find(reg, "total_ask_vol")->value(inst, v));
+  CHECK(!find(reg, "open_px")->value(inst, v));
+  CHECK(!find(reg, "high_px")->value(inst, v));
+  CHECK(!find(reg, "low_px")->value(inst, v));
+  CHECK(!find(reg, "pre_close_px")->value(inst, v));
+  CHECK(find(reg, "bid_orders5")->value(inst, v));
+  CHECK_NEAR(v, 7.0, 1e-12);                 // make_snap: 3 + 4x1
+  CHECK(find(reg, "ask_orders5")->value(inst, v));
+  CHECK_NEAR(v, 6.0, 1e-12);                 // 2 + 4x1
+
+  // Full fields populated: raw totals in fund units, prices in CNY.
+  Snapshot s1 = make_snap(inst, t(9, 30, 3));
+  s1.total_bid_vol = 12345;
+  s1.total_ask_vol = 23456;
+  s1.open_px = 3995000;
+  s1.high = 4010000;
+  s1.low = 3990000;
+  s1.pre_close = 3990000;
+  book.apply_snapshot(s1);
+  for (auto& f : reg) f->on_snapshot(s1, book);
+  CHECK(find(reg, "total_bid_vol")->value(inst, v));
+  CHECK_NEAR(v, 12345.0, 1e-12);
+  CHECK(find(reg, "total_ask_vol")->value(inst, v));
+  CHECK_NEAR(v, 23456.0, 1e-12);
+  CHECK(find(reg, "open_px")->value(inst, v));
+  CHECK_NEAR(v, 3995.0, 1e-12);
+  CHECK(find(reg, "high_px")->value(inst, v));
+  CHECK_NEAR(v, 4010.0, 1e-12);
+  CHECK(find(reg, "low_px")->value(inst, v));
+  CHECK_NEAR(v, 3990.0, 1e-12);
+  CHECK(find(reg, "pre_close_px")->value(inst, v));
+  CHECK_NEAR(v, 3990.0, 1e-12);
+}
+
+// iopv_velocity: trailing-60s IOPV change rate (bps/s), span >= 30s guard.
+static void test_iopv_velocity() {
+  const Symbol inst = make_symbol("510300", 6);
+  const Session sess = session_for("sse");
+  FactorContext ctx{"20250603", "sse", sess};
+
+  auto reg = make_registry({"iopv_velocity"}, false);
+  CHECK_EQ((int)reg.size(), 1);
+  IFactor* vel = reg[0].get();
+  vel->on_day_start(ctx);
+  vel->on_instrument_day_start(inst);
+
+  BookState book;
+  const TsMs t0 = t(9, 30, 0);
+  double v;
+
+  // IOPV climbs 1 CNY (1000 milli) every 3s from 4000.000.
+  for (int k = 0; k <= 20; ++k) {
+    Snapshot s = make_snap(inst, t0 + 3000LL * k);
+    s.iopv = 4000000 + 1000LL * k;
+    s.iopv_valid = true;
+    book.apply_snapshot(s);
+    vel->on_snapshot(s, book);
+    if (k < 10) CHECK(!vel->value(inst, v));  // < 2 points or span < 30s
+  }
+  // k=20: window holds k=0..20 (span 60s): rel = 20000/4000000 = 50bps / 60s.
+  CHECK(vel->value(inst, v));
+  CHECK_NEAR(v, 50.0 / 60.0, 1e-9);
+
+  // An invalid-IOPV snapshot emits NaN (and adds no point).
+  Snapshot bad = make_snap(inst, t0 + 63000);
+  bad.iopv = 0;
+  bad.iopv_valid = false;
+  book.apply_snapshot(bad);
+  vel->on_snapshot(bad, book);
+  CHECK(!vel->value(inst, v));
+}
+
+// Short-window OFI/imbalance + signed-flow columns: warm-up boundaries,
+// exact values, '-' exclusion, empty-window zero-vs-NaN semantics.
+static void test_short_window_flow_factors() {
+  const Symbol inst = make_symbol("510300", 6);
+  const Session sess = session_for("sse");
+  FactorContext ctx{"20250603", "sse", sess};
+
+  auto reg = make_registry({"ofi_15s", "ofi_30s", "ofi_60s",
+                            "trade_imbalance_15s", "buy_vol_60s", "sell_vol_60s",
+                            "large_trade_net_share_60s",
+                            "book_event_intensity_60s"}, false);
+  CHECK_EQ((int)reg.size(), 8);
+  for (auto& f : reg) {
+    f->on_day_start(ctx);
+    f->on_instrument_day_start(inst);
+  }
+  IFactor* ofi15 = find(reg, "ofi_15s");
+  IFactor* ofi30 = find(reg, "ofi_30s");
+  IFactor* ofi60 = find(reg, "ofi_60s");
+  IFactor* ti15 = find(reg, "trade_imbalance_15s");
+  IFactor* bvol = find(reg, "buy_vol_60s");
+  IFactor* svol = find(reg, "sell_vol_60s");
+  IFactor* lns = find(reg, "large_trade_net_share_60s");
+  IFactor* bei = find(reg, "book_event_intensity_60s");
+  CHECK(ofi15 && ofi30 && ofi60 && ti15 && bvol && svol && lns && bei);
+
+  BookState book;
+  const TsMs t0 = t(9, 30, 0);
+  double v;
+
+  // Snapshot before any event: everything warming up.
+  Snapshot s0 = make_snap(inst, t0);
+  book.apply_snapshot(s0);
+  for (auto& f : reg) f->on_snapshot(s0, book);
+  for (auto& f : reg) CHECK(!f->value(inst, v));
+
+  // Deep order (no quote change => OFI contrib 0) + one buy and one sell print.
+  TickEvent e1 = order(t0 + 1000, inst, Side::Buy, 3988, 100);
+  TickEvent e2 = trade(t0 + 2000, inst, 300, 'B');
+  TickEvent e3 = trade(t0 + 4000, inst, 100, 'S');
+  TickEvent evs1[] = {e1, e2, e3};
+  for (auto& e : evs1) {
+    if (e.is_trade) book.apply_trade(e); else book.apply_order(e);
+    for (auto& f : reg) f->on_tick(e, book);
+  }
+
+  // t0+15s: 14s since first tick => ofi_15s still warming; same for the rest.
+  Snapshot s1 = make_snap(inst, t0 + 15000);
+  book.apply_snapshot(s1);
+  for (auto& f : reg) f->on_snapshot(s1, book);
+  for (auto& f : reg) CHECK(!f->value(inst, v));
+
+  // t0+17s: ofi_15s warm (16s >= 15s) and exactly zero (no quote changes);
+  // trade_imbalance_15s warm (15s >= 15s): (300-100)/(300+100) = 0.5.
+  // Longer windows and the 60s family still warming.
+  Snapshot s2 = make_snap(inst, t0 + 17000);
+  book.apply_snapshot(s2);
+  for (auto& f : reg) f->on_snapshot(s2, book);
+  CHECK(ofi15->value(inst, v));
+  CHECK_NEAR(v, 0.0, 1e-12);
+  CHECK(!ofi30->value(inst, v));
+  CHECK(!ofi60->value(inst, v));
+  CHECK(ti15->value(inst, v));
+  CHECK_NEAR(v, 0.5, 1e-12);
+  CHECK(!bvol->value(inst, v));
+  CHECK(!lns->value(inst, v));
+  CHECK(!bei->value(inst, v));
+
+  // Later events: deep ask order, whale buy print, one '-' print.
+  TickEvent e4 = order(t0 + 61000, inst, Side::Sell, 4012, 100);
+  TickEvent e5 = trade(t0 + 64000, inst, 1000, 'B');
+  TickEvent e6 = trade(t0 + 64500, inst, 500, '-');   // excluded from signed family
+  TickEvent evs2[] = {e4, e5, e6};
+  for (auto& e : evs2) {
+    if (e.is_trade) book.apply_trade(e); else book.apply_order(e);
+    for (auto& f : reg) f->on_tick(e, book);
+  }
+
+  // t0+63s: 60s family warm (62s >= 60s). The early prints are pruned out of
+  // the 60s window (ts < 3s), so buy/sell volumes are a legitimate 0.0 while
+  // the ratio-style columns go NaN (no attributable flow left).
+  Snapshot s3 = make_snap(inst, t0 + 63000);
+  book.apply_snapshot(s3);
+  for (auto& f : reg) f->on_snapshot(s3, book);
+  CHECK(bvol->value(inst, v));
+  CHECK_NEAR(v, 0.0, 1e-12);
+  CHECK(svol->value(inst, v));
+  CHECK_NEAR(v, 0.0, 1e-12);
+  CHECK(!ti15->value(inst, v));                       // window has no signed trade
+  CHECK(!lns->value(inst, v));
+  CHECK(bei->value(inst, v));
+  CHECK_NEAR(v, 2.0 / 60.0, 1e-12);                   // e3 (4s) + e4 (61s)
+
+  // t0+65s: whale buy in the window; '-' print never counts for signed stats
+  // but does count for event intensity.
+  Snapshot s4 = make_snap(inst, t0 + 65000);
+  book.apply_snapshot(s4);
+  for (auto& f : reg) f->on_snapshot(s4, book);
+  CHECK(bvol->value(inst, v));
+  CHECK_NEAR(v, 1000.0, 1e-12);
+  CHECK(svol->value(inst, v));
+  CHECK_NEAR(v, 0.0, 1e-12);
+  CHECK(ti15->value(inst, v));
+  CHECK_NEAR(v, 1.0, 1e-12);                          // whale alone in 15s window
+  CHECK(lns->value(inst, v));
+  CHECK_NEAR(v, 1.0, 1e-12);                          // n=1: top-1 = the whale
+  CHECK(bei->value(inst, v));
+  CHECK_NEAR(v, 3.0 / 60.0, 1e-12);                   // e4 + e5 + e6
+  CHECK(ofi60->value(inst, v));
+  CHECK_NEAR(v, 0.0, 1e-12);                          // deep events: zero contrib
+}
+
 static void test_registry() {
   auto def = make_default_registry();
   CHECK_EQ((int)def.size(), (int)kDefaultFactorNames.size());
@@ -439,6 +646,12 @@ static void test_registry() {
   static const char* kWishlist[] = {
       "avg_trade_size_60s", "n_trades_60s", "large_trade_share_60s",
       "trade_gap_ms", "cum_trade_vol",
+      // iter-003 wide-table expansion (#144)
+      "total_bid_vol", "total_ask_vol", "bid_orders5", "ask_orders5",
+      "open_px", "high_px", "low_px", "pre_close_px", "iopv_velocity",
+      "ofi_15s", "ofi_30s", "trade_imbalance_15s", "trade_imbalance_30s",
+      "buy_vol_60s", "sell_vol_60s", "large_trade_net_share_60s",
+      "book_event_intensity_60s",
   };
   for (const char* n : kWishlist) {
     auto f = make_snapshot_factor(n);
@@ -454,6 +667,9 @@ int main() {
   test_sse_cancel_gating();
   test_trade_window_factors();
   test_trade_gap_skew_clamp();
+  test_snapshot_passthrough();
+  test_iopv_velocity();
+  test_short_window_flow_factors();
   test_registry();
   return hftaft::finish("test_factors");
 }

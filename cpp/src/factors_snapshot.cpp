@@ -260,6 +260,123 @@ class RealizedVol final : public SnapshotFactorBase {
   std::unordered_map<Symbol, TsMs, SymbolHash> first_ts_;
 };
 
+// ---------------------------------------------------------------------------
+// iter-003 wide-table expansion (#140/#144): raw snapshot pass-throughs and
+// IOPV velocity. All opt-in via --factors (NOT in kDefaultFactorNames). The
+// pass-throughs emit raw state so the explore lane derives windowed deltas /
+// z-scores; NaN marks a missing/invalid source field.
+// ---------------------------------------------------------------------------
+
+// total_bid_vol / total_ask_vol = snapshot TotalBidVolume / TotalAskVolume
+// pass-through (fund units): full-book liquidity lens, wider than the
+// 5-level depth columns. NaN when the feed omits the field (<= 0).
+class TotalBookVol final : public SnapshotFactorBase {
+ public:
+  explicit TotalBookVol(bool is_bid) : is_bid_(is_bid) {
+    name_ = is_bid ? "total_bid_vol" : "total_ask_vol";
+  }
+  const std::string& name() const override { return name_; }
+  void on_snapshot(const Snapshot& s, const BookState&) override {
+    const QtyI q = is_bid_ ? s.total_bid_vol : s.total_ask_vol;
+    if (q <= 0) return store(s.instrument, kNan);
+    store(s.instrument, static_cast<double>(q));
+  }
+
+ private:
+  bool is_bid_;
+  std::string name_;
+};
+
+// bid_orders5 / ask_orders5 = sum of NumOrders over levels 0..4 where the
+// level is present (price > 0); NaN when the side has no valid level.
+// Raw input for average-order-size (depth/orders) and order-count imbalance.
+class Orders5 final : public SnapshotFactorBase {
+ public:
+  explicit Orders5(bool is_bid) : is_bid_(is_bid) {
+    name_ = is_bid ? "bid_orders5" : "ask_orders5";
+  }
+  const std::string& name() const override { return name_; }
+  void on_snapshot(const Snapshot& s, const BookState&) override {
+    std::int64_t sum = 0;
+    bool any = false;
+    for (int k = 0; k < 5; ++k) {
+      const BookLevel& lv = is_bid_ ? s.bids[k] : s.asks[k];
+      if (lv.price <= 0) continue;
+      sum += lv.num_orders;
+      any = true;
+    }
+    if (!any) return store(s.instrument, kNan);
+    store(s.instrument, static_cast<double>(sum));
+  }
+
+ private:
+  bool is_bid_;
+  std::string name_;
+};
+
+// open_px / high_px / low_px / pre_close_px = intraday reference prices in
+// CNY (milli/1000, matching the Row price scale). NaN when unset (<= 0).
+// Raw inputs for day-range position, gap context, momentum references.
+class PriceField final : public SnapshotFactorBase {
+ public:
+  enum class Field { Open, High, Low, PreClose };
+  explicit PriceField(Field f) : field_(f) {
+    switch (f) {
+      case Field::Open: name_ = "open_px"; break;
+      case Field::High: name_ = "high_px"; break;
+      case Field::Low: name_ = "low_px"; break;
+      case Field::PreClose: name_ = "pre_close_px"; break;
+    }
+  }
+  const std::string& name() const override { return name_; }
+  void on_snapshot(const Snapshot& s, const BookState&) override {
+    PriceI p = 0;
+    switch (field_) {
+      case Field::Open: p = s.open_px; break;
+      case Field::High: p = s.high; break;
+      case Field::Low: p = s.low; break;
+      case Field::PreClose: p = s.pre_close; break;
+    }
+    if (p <= 0) return store(s.instrument, kNan);
+    store(s.instrument, milli_to_cny(p));
+  }
+
+ private:
+  Field field_;
+  std::string name_;
+};
+
+// iopv_velocity = IOPV rate of change (bps/s) over a trailing 60s window of
+// valid IOPV snapshots: (last - first)/first * 1e4 / span_s. Requires the
+// current snapshot's IOPV valid, >= 2 valid points and span >= 30s (shorter
+// spans are too noisy). Directional companion to the iopv_premium level:
+// which way arbitrage pressure is moving.
+class IopvVelocity final : public SnapshotFactorBase {
+ public:
+  const std::string& name() const override { static const std::string n = "iopv_velocity"; return n; }
+  void on_instrument_day_start(const Symbol& inst) override {
+    SnapshotFactorBase::on_instrument_day_start(inst);
+    pts_.erase(inst);
+  }
+  void on_snapshot(const Snapshot& s, const BookState&) override {
+    auto& dq = pts_[s.instrument];
+    if (!s.iopv_valid || s.iopv <= 0) return store(s.instrument, kNan);
+    dq.push_back(Pt{s.time, static_cast<double>(s.iopv)});
+    while (!dq.empty() && dq.front().t < s.time - kWindowMs) dq.pop_front();
+    if (dq.size() < 2) return store(s.instrument, kNan);
+    const TsMs span = dq.back().t - dq.front().t;
+    if (span < kMinSpanMs) return store(s.instrument, kNan);
+    const double rel = (dq.back().iopv - dq.front().iopv) / dq.front().iopv;
+    store(s.instrument, rel * 1e4 / (static_cast<double>(span) / 1000.0));
+  }
+
+ private:
+  struct Pt { TsMs t; double iopv; };
+  static constexpr TsMs kWindowMs = 60000;
+  static constexpr TsMs kMinSpanMs = 30000;
+  std::unordered_map<Symbol, std::deque<Pt>, SymbolHash> pts_;
+};
+
 }  // namespace
 
 std::unique_ptr<IFactor> make_snapshot_factor(const std::string& name) {
@@ -270,6 +387,15 @@ std::unique_ptr<IFactor> make_snapshot_factor(const std::string& name) {
   if (name == "book_slope") return std::make_unique<BookSlope>();
   if (name == "iopv_premium") return std::make_unique<IopvPremium>();
   if (name == "cum_trade_vol") return std::make_unique<CumTradeVol>();
+  if (name == "total_bid_vol") return std::make_unique<TotalBookVol>(true);
+  if (name == "total_ask_vol") return std::make_unique<TotalBookVol>(false);
+  if (name == "bid_orders5") return std::make_unique<Orders5>(true);
+  if (name == "ask_orders5") return std::make_unique<Orders5>(false);
+  if (name == "open_px") return std::make_unique<PriceField>(PriceField::Field::Open);
+  if (name == "high_px") return std::make_unique<PriceField>(PriceField::Field::High);
+  if (name == "low_px") return std::make_unique<PriceField>(PriceField::Field::Low);
+  if (name == "pre_close_px") return std::make_unique<PriceField>(PriceField::Field::PreClose);
+  if (name == "iopv_velocity") return std::make_unique<IopvVelocity>();
   if (name == "rv_60s") return std::make_unique<RealizedVol>(60);
   if (name == "rv_300s") return std::make_unique<RealizedVol>(300);
   return nullptr;

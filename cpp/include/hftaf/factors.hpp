@@ -65,11 +65,23 @@ class IFactor {
 //  per instrument on demand — see docs/roadmap/panel-columns-wishlist.md):
 //   snapshot family: cum_trade_vol       cumulative-since-open TradeVolume pass-through
 //                                          (NaN on intra-day decrease => feed anomaly)
+//                    total_bid_vol / total_ask_vol  full-book volume totals (raw units)
+//                    bid_orders5 / ask_orders5      sum of NumOrders over levels 0..4
+//                    open_px / high_px / low_px / pre_close_px  intraday reference
+//                                          prices in CNY (milli/1000)
+//                    iopv_velocity        IOPV change rate over trailing 60s (bps/s)
 //   tick family:     avg_trade_size_60s      mean per-trade volume over trailing 60s
 //                    n_trades_60s            trade count over trailing 60s (arrival rate)
 //                    large_trade_share_60s   volume share of the largest ceil(n/10) trades
+//                    large_trade_net_share_60s  signed net share of the largest ceil(n/10)
+//                                          trades, in [-1,1] ('-' prints excluded)
 //                    trade_gap_ms            ms since the most recent trade (no 60s warm-up;
 //                                              clamped at 0 under snapshot-phase skew)
+//                    ofi_15s / ofi_30s       short-window OFI (same formula as ofi_60s)
+//                    trade_imbalance_15s / trade_imbalance_30s  short-window imbalance
+//                    buy_vol_60s / sell_vol_60s  side-attributed trade volume (raw units;
+//                                          '-' prints excluded; zero legitimate once warm)
+//                    book_event_intensity_60s  feed events (orders+trades) per second
 std::vector<std::unique_ptr<IFactor>> make_default_registry();
 std::vector<std::unique_ptr<IFactor>> make_registry(const std::vector<std::string>& names, bool include_canaries = false);
 

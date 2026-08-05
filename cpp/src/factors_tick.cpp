@@ -59,18 +59,24 @@ class TickFactorBase : public IFactor {
 };
 
 // ---------------------------------------------------------------------------
-// ofi_60s — Cont-Kukanov-Stoikov OFI on event-updated best quotes, normalized
-// by mean best depth. Per event:
+// ofi_60s / ofi_30s / ofi_15s — Cont-Kukanov-Stoikov OFI on event-updated
+// best quotes, normalized by mean best depth, over a parameterized trailing
+// window (60s is the v1 default; 30/15s added for the iter-003 wide-table
+// expansion, same formula and warm-up contract). Per event:
 //   eB = 1{bp_n >= bp_{n-1}} bq_n - 1{bp_n <= bp_{n-1}} bq_{n-1}
 //   eA = 1{ap_n <= ap_{n-1}} aq_n - 1{ap_n >= ap_{n-1}} aq_{n-1}
 //   contrib = eB - eA
-// value = sum(contrib over trailing 60s) / mean(bq+aq over those events).
+// value = sum(contrib over trailing window) / mean(bq+aq over those events).
 // Quotes are re-based at every snapshot (authoritative re-anchor); events while
 // the book is unsynced contribute nothing (prev quote invalidated).
 // ---------------------------------------------------------------------------
-class OFI60s final : public TickFactorBase {
+class OFIWindow final : public TickFactorBase {
  public:
-  const std::string& name() const override { static const std::string n = "ofi_60s"; return n; }
+  explicit OFIWindow(int window_s)
+      : window_ms_(static_cast<TsMs>(window_s) * 1000) {
+    name_ = "ofi_" + std::to_string(window_s) + "s";
+  }
+  const std::string& name() const override { return name_; }
 
   void on_instrument_day_start(const Symbol& inst) override {
     TickFactorBase::on_instrument_day_start(inst);
@@ -83,7 +89,7 @@ class OFI60s final : public TickFactorBase {
     if (first_tick_.find(t.instrument) == first_tick_.end()) first_tick_[t.instrument] = t.time;
     auto& dq = events_[t.instrument];
     // Prune by event time to keep the window bounded even between snapshots.
-    while (!dq.empty() && dq.front().ts < t.time - kWindowMs) dq.pop_front();
+    while (!dq.empty() && dq.front().ts < t.time - window_ms_) dq.pop_front();
 
     if (!book.synced()) { prev_[t.instrument].valid = false; return; }
     Quote cur;
@@ -111,10 +117,10 @@ class OFI60s final : public TickFactorBase {
     prev_[s.instrument] = q;
 
     auto& dq = events_[s.instrument];
-    while (!dq.empty() && dq.front().ts < s.time - kWindowMs) dq.pop_front();
+    while (!dq.empty() && dq.front().ts < s.time - window_ms_) dq.pop_front();
 
     auto fit = first_tick_.find(s.instrument);
-    if (fit == first_tick_.end() || s.time - fit->second < kWindowMs || dq.empty())
+    if (fit == first_tick_.end() || s.time - fit->second < window_ms_ || dq.empty())
       return store(s.instrument, kNan);
 
     QtyI sum_contrib = 0, sum_depth = 0;
@@ -132,18 +138,26 @@ class OFI60s final : public TickFactorBase {
  private:
   struct Quote { PriceI bp = 0, ap = 0; QtyI bq = 0, aq = 0; bool valid = false; };
   struct Event { TsMs ts; QtyI contrib; QtyI depth; };
+  TsMs window_ms_;
+  std::string name_;
   std::unordered_map<Symbol, std::deque<Event>, SymbolHash> events_;
   std::unordered_map<Symbol, Quote, SymbolHash> prev_;
   std::unordered_map<Symbol, TsMs, SymbolHash> first_tick_;
 };
 
 // ---------------------------------------------------------------------------
-// trade_imbalance_60s = (Vbuy - Vsell)/(Vbuy + Vsell) via exchange aggressor
-// flags (TrdBSFlag); '-' prints excluded (unattributable).
+// trade_imbalance_60s / _30s / _15s = (Vbuy - Vsell)/(Vbuy + Vsell) via
+// exchange aggressor flags (TrdBSFlag) over a parameterized trailing window;
+// '-' prints excluded (unattributable). 60s is the v1 default; 30/15s added
+// for the iter-003 wide-table expansion with the same formula and warm-up.
 // ---------------------------------------------------------------------------
-class TradeImbalance60s final : public TickFactorBase {
+class TradeImbalanceWindow final : public TickFactorBase {
  public:
-  const std::string& name() const override { static const std::string n = "trade_imbalance_60s"; return n; }
+  explicit TradeImbalanceWindow(int window_s)
+      : window_ms_(static_cast<TsMs>(window_s) * 1000) {
+    name_ = "trade_imbalance_" + std::to_string(window_s) + "s";
+  }
+  const std::string& name() const override { return name_; }
 
   void on_instrument_day_start(const Symbol& inst) override {
     TickFactorBase::on_instrument_day_start(inst);
@@ -161,14 +175,14 @@ class TradeImbalance60s final : public TickFactorBase {
       first_trade_[t.instrument] = t.time;
     auto& dq = events_[t.instrument];
     dq.push_back(Event{t.time, sv});
-    while (!dq.empty() && dq.front().ts < t.time - kWindowMs) dq.pop_front();
+    while (!dq.empty() && dq.front().ts < t.time - window_ms_) dq.pop_front();
   }
 
   void on_snapshot(const Snapshot& s, const BookState&) override {
     auto& dq = events_[s.instrument];
-    while (!dq.empty() && dq.front().ts < s.time - kWindowMs) dq.pop_front();
+    while (!dq.empty() && dq.front().ts < s.time - window_ms_) dq.pop_front();
     auto fit = first_trade_.find(s.instrument);
-    if (fit == first_trade_.end() || s.time - fit->second < kWindowMs)
+    if (fit == first_trade_.end() || s.time - fit->second < window_ms_)
       return store(s.instrument, kNan);
     QtyI vb = 0, vs = 0;
     for (const auto& e : dq) {
@@ -181,6 +195,8 @@ class TradeImbalance60s final : public TickFactorBase {
 
  private:
   struct Event { TsMs ts; QtyI signed_vol; };
+  TsMs window_ms_;
+  std::string name_;
   std::unordered_map<Symbol, std::deque<Event>, SymbolHash> events_;
   std::unordered_map<Symbol, TsMs, SymbolHash> first_trade_;
 };
@@ -423,6 +439,158 @@ class TradeGapMs final : public TickFactorBase {
 };
 
 // ---------------------------------------------------------------------------
+// iter-003 wide-table expansion (#140/#144): short-window OFI/imbalance live
+// in the parameterized classes above; new columns below. All opt-in via
+// --factors (NOT in kDefaultFactorNames).
+// ---------------------------------------------------------------------------
+
+// buy_vol_60s / sell_vol_60s = total aggressor-attributed trade volume on one
+// side over the trailing 60s (fund units). '-' prints (unattributable) count
+// for neither side. Warm-up follows the signed-trade family: emitted only
+// once (t - first signed trade time) >= 60s. Raw level (zero is a legitimate
+// value once warm); the explore lane derives ratios / z-scores.
+class SideVol60s final : public TickFactorBase {
+ public:
+  explicit SideVol60s(Side side) : side_(side) {
+    name_ = (side == Side::Buy) ? "buy_vol_60s" : "sell_vol_60s";
+  }
+  const std::string& name() const override { return name_; }
+
+  void on_instrument_day_start(const Symbol& inst) override {
+    TickFactorBase::on_instrument_day_start(inst);
+    events_.erase(inst);
+    first_trade_.erase(inst);
+  }
+
+  void on_tick(const TickEvent& t, const BookState&) override {
+    if (!t.is_trade || t.trd_bs == '-') return;
+    if (first_trade_.find(t.instrument) == first_trade_.end())
+      first_trade_[t.instrument] = t.time;
+    if ((t.trd_bs == 'B') != (side_ == Side::Buy)) return;
+    auto& dq = events_[t.instrument];
+    dq.push_back(Event{t.time, t.volume});
+    while (!dq.empty() && dq.front().ts < t.time - kWindowMs) dq.pop_front();
+  }
+
+  void on_snapshot(const Snapshot& s, const BookState&) override {
+    auto& dq = events_[s.instrument];
+    while (!dq.empty() && dq.front().ts < s.time - kWindowMs) dq.pop_front();
+    auto fit = first_trade_.find(s.instrument);
+    if (fit == first_trade_.end() || s.time - fit->second < kWindowMs)
+      return store(s.instrument, kNan);
+    QtyI total = 0;
+    for (const auto& e : dq) total += e.volume;
+    store(s.instrument, static_cast<double>(total));
+  }
+
+ private:
+  struct Event { TsMs ts; QtyI volume; };
+  Side side_;
+  std::string name_;
+  std::unordered_map<Symbol, std::deque<Event>, SymbolHash> events_;
+  std::unordered_map<Symbol, TsMs, SymbolHash> first_trade_;
+};
+
+// large_trade_net_share_60s = net signed volume share of the largest trades:
+// among the signed ('B'/'S'; '-' excluded) trades in the trailing 60s, take
+// the largest k = ceil(n/10) (>= 1) by size and emit
+//   sum(their signed volume) / sum(|volume| over all signed trades) in [-1,1].
+// Directional companion to large_trade_share_60s (institutional activity
+// probe). Deterministic under size ties: stable sort keeps arrival order, so
+// equal-size prints cannot flip the signed sum.
+class LargeTradeNetShare60s final : public TickFactorBase {
+ public:
+  const std::string& name() const override { static const std::string n = "large_trade_net_share_60s"; return n; }
+
+  void on_instrument_day_start(const Symbol& inst) override {
+    TickFactorBase::on_instrument_day_start(inst);
+    trades_.erase(inst);
+    first_trade_.erase(inst);
+  }
+
+  void on_tick(const TickEvent& t, const BookState&) override {
+    if (!t.is_trade || t.volume <= 0) return;
+    QtyI sv = 0;
+    if (t.trd_bs == 'B') sv = t.volume;
+    else if (t.trd_bs == 'S') sv = -t.volume;
+    else return;                          // '-' print: excluded
+    if (first_trade_.find(t.instrument) == first_trade_.end())
+      first_trade_[t.instrument] = t.time;
+    auto& dq = trades_[t.instrument];
+    dq.push_back(Trd{t.time, sv});
+    while (!dq.empty() && dq.front().ts < t.time - kWindowMs) dq.pop_front();
+  }
+
+  void on_snapshot(const Snapshot& s, const BookState&) override {
+    auto& dq = trades_[s.instrument];
+    while (!dq.empty() && dq.front().ts < s.time - kWindowMs) dq.pop_front();
+    auto fit = first_trade_.find(s.instrument);
+    if (fit == first_trade_.end() || s.time - fit->second < kWindowMs || dq.empty())
+      return store(s.instrument, kNan);
+    std::vector<Trd> v(dq.begin(), dq.end());
+    std::stable_sort(v.begin(), v.end(), [](const Trd& a, const Trd& b) {
+      const QtyI aa = a.signed_vol >= 0 ? a.signed_vol : -a.signed_vol;
+      const QtyI ab = b.signed_vol >= 0 ? b.signed_vol : -b.signed_vol;
+      return aa > ab;
+    });
+    const std::size_t n = v.size();
+    const std::size_t k_large = std::max<std::size_t>(1, (n + 9) / 10);  // ceil(n/10)
+    QtyI top_signed = 0, total_abs = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+      const QtyI av = v[i].signed_vol >= 0 ? v[i].signed_vol : -v[i].signed_vol;
+      total_abs += av;
+      if (i < k_large) top_signed += v[i].signed_vol;
+    }
+    if (total_abs <= 0) return store(s.instrument, kNan);
+    store(s.instrument, static_cast<double>(top_signed) / static_cast<double>(total_abs));
+  }
+
+ private:
+  struct Trd { TsMs ts; QtyI signed_vol; };
+  std::unordered_map<Symbol, std::deque<Trd>, SymbolHash> trades_;
+  std::unordered_map<Symbol, TsMs, SymbolHash> first_trade_;
+};
+
+// book_event_intensity_60s = count of feed events (orders + trades) touching
+// the instrument over the trailing 60s, per second: information-arrival rate
+// decoupled from the 3s snapshot cadence (Hawkes self-excitation proxy).
+// Every event counts regardless of add/cancel classification: on SSE cancels
+// cannot be decoded reliably, but all events are book-touching by definition.
+// Warm-up: 60s from the first event of the day.
+class BookEventIntensity60s final : public TickFactorBase {
+ public:
+  const std::string& name() const override { static const std::string n = "book_event_intensity_60s"; return n; }
+
+  void on_instrument_day_start(const Symbol& inst) override {
+    TickFactorBase::on_instrument_day_start(inst);
+    events_.erase(inst);
+    first_event_.erase(inst);
+  }
+
+  void on_tick(const TickEvent& t, const BookState&) override {
+    if (first_event_.find(t.instrument) == first_event_.end())
+      first_event_[t.instrument] = t.time;
+    auto& dq = events_[t.instrument];
+    dq.push_back(t.time);
+    while (!dq.empty() && dq.front() < t.time - kWindowMs) dq.pop_front();
+  }
+
+  void on_snapshot(const Snapshot& s, const BookState&) override {
+    auto& dq = events_[s.instrument];
+    while (!dq.empty() && dq.front() < s.time - kWindowMs) dq.pop_front();
+    auto fit = first_event_.find(s.instrument);
+    if (fit == first_event_.end() || s.time - fit->second < kWindowMs)
+      return store(s.instrument, kNan);
+    store(s.instrument, static_cast<double>(dq.size()) /
+                        (static_cast<double>(kWindowMs) / 1000.0));
+  }
+
+ private:
+  std::unordered_map<Symbol, std::deque<TsMs>, SymbolHash> events_;
+  std::unordered_map<Symbol, TsMs, SymbolHash> first_event_;
+};
+
+// ---------------------------------------------------------------------------
 // CANARIES — deliberate look-ahead, shipped only behind --canaries.
 // The engine finalizes canary rows kCanaryHorizonMs late (value_at), so these
 // factors can illegitimately see the future. The mask test MUST fail when
@@ -521,13 +689,21 @@ class FutureTradeSign final : public TickFactorBase {
 }  // namespace
 
 std::unique_ptr<IFactor> make_tick_factor(const std::string& name) {
-  if (name == "ofi_60s") return std::make_unique<OFI60s>();
-  if (name == "trade_imbalance_60s") return std::make_unique<TradeImbalance60s>();
+  if (name == "ofi_60s") return std::make_unique<OFIWindow>(60);
+  if (name == "ofi_30s") return std::make_unique<OFIWindow>(30);
+  if (name == "ofi_15s") return std::make_unique<OFIWindow>(15);
+  if (name == "trade_imbalance_60s") return std::make_unique<TradeImbalanceWindow>(60);
+  if (name == "trade_imbalance_30s") return std::make_unique<TradeImbalanceWindow>(30);
+  if (name == "trade_imbalance_15s") return std::make_unique<TradeImbalanceWindow>(15);
   if (name == "order_arrival_60s") return std::make_unique<OrderArrival60s>();
   if (name == "cancel_ratio_60s") return std::make_unique<CancelRatio60s>();
   if (name == "avg_trade_size_60s") return std::make_unique<AvgTradeSize60s>();
   if (name == "n_trades_60s") return std::make_unique<NTrades60s>();
   if (name == "large_trade_share_60s") return std::make_unique<LargeTradeShare60s>();
+  if (name == "large_trade_net_share_60s") return std::make_unique<LargeTradeNetShare60s>();
+  if (name == "buy_vol_60s") return std::make_unique<SideVol60s>(Side::Buy);
+  if (name == "sell_vol_60s") return std::make_unique<SideVol60s>(Side::Sell);
+  if (name == "book_event_intensity_60s") return std::make_unique<BookEventIntensity60s>();
   if (name == "trade_gap_ms") return std::make_unique<TradeGapMs>();
   if (name == "future_mid_15s") return std::make_unique<FutureMid15s>();
   if (name == "future_trade_sign") return std::make_unique<FutureTradeSign>();
