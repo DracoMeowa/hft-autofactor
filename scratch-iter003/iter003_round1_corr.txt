@@ -1,0 +1,19 @@
+pooled rows=314053 dates=66
+microprice_dev_mom_60s           x oir_mom_60s                      n= 312733 rho=+0.996  <<< HIGH
+signed_rv_60s                    x vol_adj_mom_60s                  n= 215291 rho=+0.974  <<< HIGH
+top_book_delta_30s               x wdi_mom_30s                      n= 313393 rho=+0.878  <<< HIGH
+flow_divergence_120s             x flow_divergence_300s             n= 305787 rho=+0.783
+depth5_delta_30s                 x wdi_mom_30s                      n= 313393 rho=+0.767
+flow_divergence_120s             x flow_divergence_60s              n= 309987 rho=+0.763
+log_mid_ret_120s                 x vol_adj_mom_60s                  n= 213974 rho=+0.712
+log_mid_ret_120s                 x signed_rv_60s                    n= 311413 rho=+0.635
+flow_divergence_60s              x flow_divergence_300s             n= 305787 rho=+0.554
+depth5_delta_120s                x wdi_mom_90s                      n= 311413 rho=+0.549
+log_mid_ret_120s                 x rv_asym_300s                     n= 307453 rho=+0.548
+depth5_delta_30s                 x depth5_delta_60s                 n= 312733 rho=+0.543
+depth5_delta_120s                x depth5_delta_60s                 n= 311413 rho=+0.537
+price_accel_60_180               x rv_asym_300s                     n= 307453 rho=-0.536
+depth5_delta_30s                 x top_book_delta_30s               n= 313393 rho=+0.530
+dd_flow_300s                     x rv_asym_300s                     n= 305987 rho=+0.503
+oir_mom_60s                      x top_book_delta_30s               n= 312733 rho=+0.501
+microprice_dev_mom_60s           x top_book_delta_30s               n= 312733 rho=+0.500

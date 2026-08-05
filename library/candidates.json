@@ -2947,5 +2947,2203 @@
       "spearman_matrix_txt": "scratch-iter003/rescreen_corr_out.txt",
       "chinese_report": "scratch-iter003/eval_v2_rescreen_existing18.md (copy on server: /data/factor_lzt/iterations/)"
     }
+  },
+  "iter003_round1": {
+    "trigger": "iter-003 first batch: 60 wide-table-derived candidates (families A depth/book, B flow interaction, C price/vol, D etf regime) registered + run + eval-v2 screen + within-batch Spearman dedup",
+    "generated_at": "2026-08-05",
+    "batch": {
+      "specs_dir": "explore-specs-iter003",
+      "n_specs": 60,
+      "families": {
+        "A_depth_book": 9,
+        "B_flow_interaction": 16,
+        "C_price_vol": 19,
+        "D_etf_regime": 16
+      }
+    },
+    "gate": {
+      "version": "eval_v2",
+      "is_t_min": 2.0,
+      "oos_t_min": 2.0,
+      "retention_min": 0.5,
+      "retention_sign_rule": "IS/OOS IC must have same sign; flip fails",
+      "dedup_max_abs_corr_vs_panel": 0.85,
+      "dedup_library": "17 wide-table factor columns",
+      "embargo_days": 1,
+      "n_test_days": 5,
+      "cost_bps_per_side": 3.0,
+      "head_taus": [
+        0.01,
+        0.05,
+        0.1
+      ],
+      "head_stats_role": "descriptive only, not a gate"
+    },
+    "split": {
+      "train": "20250701-20250922 (60d)",
+      "test": "20250924-20250930 (5d)",
+      "embargo": "20250923",
+      "panel_rows": 314053,
+      "panel_days": 66
+    },
+    "pipeline_run": {
+      "registry": "81 prototypes in prod registry (18 prior + 3 built-in + 60 new)",
+      "run": "60 ok / 0 failed (~2.5 min)",
+      "screen": "19 pass / 41 fail (~3 min)"
+    },
+    "summary": {
+      "screen_pass": 19,
+      "screen_fail": 41,
+      "dedup_killed_within_batch": 3,
+      "admitted_new": 16,
+      "prior_admitted_still_valid": 6,
+      "library_total": 22
+    },
+    "dedup_within_batch": {
+      "method": "pooled Spearman over 314,053 rows x 66 days among the 19 screen-pass protos + 6 prior admitted (25 columns, 300 pairs); threshold 0.85",
+      "high_pairs": [
+        {
+          "a": "microprice_dev_mom_60s",
+          "b": "oir_mom_60s",
+          "rho": 0.996,
+          "kept": "oir_mom_60s",
+          "reason": "IC identical to 4 decimals; OIR momentum is the more direct mechanism"
+        },
+        {
+          "a": "signed_rv_60s",
+          "b": "vol_adj_mom_60s",
+          "rho": 0.974,
+          "kept": "signed_rv_60s",
+          "reason": "vol_adj_mom_60s sits at 0.849 vs library ofi_60s (near re-skin); signed_rv_60s more independent (0.782)"
+        },
+        {
+          "a": "top_book_delta_30s",
+          "b": "wdi_mom_30s",
+          "rho": 0.878,
+          "kept": "wdi_mom_30s",
+          "reason": "lower panel corr 0.558 vs 0.622, higher OOS IC; top-book family keeps top_book_delta_120s (rho 0.454)"
+        }
+      ],
+      "notable_subthreshold": [
+        {
+          "a": "flow_divergence_120s",
+          "b": "flow_divergence_300s (prior)",
+          "rho": 0.783,
+          "note": "family passes at 60/120/300s windows; saturated, do not extend"
+        },
+        {
+          "a": "flow_divergence_60s",
+          "b": "flow_divergence_120s",
+          "rho": 0.763
+        },
+        {
+          "a": "signed_rv_60s",
+          "b": "ofi_60s (panel)",
+          "rho": 0.782
+        },
+        {
+          "a": "log_mid_ret_120s",
+          "b": "ofi_60s (panel)",
+          "rho": 0.616
+        }
+      ],
+      "artifacts": [
+        "iter003_round1_corr.json",
+        "iter003_round1_corr.txt"
+      ]
+    },
+    "admitted": [
+      {
+        "name": "depth5_delta_120s",
+        "mechanism": "Slow depth momentum: the trailing-120s CHANGE in 5-level depth imbalance, integrating a full accumulation step of the deep book. Deep-book accumulation/distribution unfolds over minutes - meta-order slicing into passive limit orders, ETF creation/redemption inventory positioning - and a 60s delta sees only the first leg of such a build-up. The 120s window should match the 300-900s drift horizon where the parent depth5_delta_60s PASSED, testing whether longer integration improves horizon alignment and OOS stability of depth momentum, while differencing still strips the dead level state.",
+        "max_abs_corr_vs_panel": 0.4021,
+        "nearest_panel_factor": "wdi",
+        "horizons": {
+          "15": {
+            "passed": false,
+            "is_mean_ic": 0.1745,
+            "is_t": 13.14,
+            "oos_mean_ic": 0.0831,
+            "oos_t": 9.24,
+            "retention": 0.477,
+            "head_stats": []
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": 0.1704,
+            "is_t": 7.22,
+            "oos_mean_ic": 0.0778,
+            "oos_t": 13.43,
+            "retention": 0.456,
+            "head_stats": []
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.1561,
+            "is_t": 4.91,
+            "oos_mean_ic": 0.068,
+            "oos_t": 5.65,
+            "retention": 0.435,
+            "head_stats": []
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": 0.0914,
+            "is_t": 3.71,
+            "oos_mean_ic": 0.0486,
+            "oos_t": 2.52,
+            "retention": 0.531,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -4.2,
+                "long_net_bps": -10.2,
+                "short_gross_bps": 5.0668,
+                "short_net_bps": -0.9332,
+                "n_long": 230,
+                "n_short": 230,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.3302,
+                "long_net_bps": -7.3302,
+                "short_gross_bps": 5.4076,
+                "short_net_bps": -0.5924,
+                "n_long": 1140,
+                "n_short": 1140,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.7616,
+                "long_net_bps": -4.2384,
+                "short_gross_bps": 3.5464,
+                "short_net_bps": -2.4536,
+                "n_long": 2279,
+                "n_short": 2279,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": 0.0651,
+            "is_t": 4.11,
+            "oos_mean_ic": 0.0605,
+            "oos_t": 2.93,
+            "retention": 0.93,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -23.7163,
+                "long_net_bps": -29.7163,
+                "short_gross_bps": 4.3899,
+                "short_net_bps": -1.6101,
+                "n_long": 210,
+                "n_short": 210,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -6.7823,
+                "long_net_bps": -12.7823,
+                "short_gross_bps": 5.8316,
+                "short_net_bps": -0.1684,
+                "n_long": 1040,
+                "n_short": 1040,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.0148,
+                "long_net_bps": -7.0148,
+                "short_gross_bps": 5.0911,
+                "short_net_bps": -0.9089,
+                "n_long": 2079,
+                "n_short": 2079,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "depth5_delta_30s",
+        "mechanism": "Fast depth momentum: the trailing-30s CHANGE in 5-level depth imbalance (bid-ask)/(bid+ask), half the window of the eval-v2 PASS factor depth5_delta_60s. A 30s delta isolates the rapid reallocation of bid vs ask depth stock that precedes execution by seconds - informed traders pulling passive depth on the side they are about to trade against and stacking it on the side they favor - before the 60s window averages in older, already-priced flow. The parent showed strong short-horizon OOS t at 15-60s but missed IS-retention; a faster window may retain the short-horizon information that decays inside the 60s integration, at the cost of more event noise.",
+        "max_abs_corr_vs_panel": 0.3574,
+        "nearest_panel_factor": "wdi",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.2155,
+            "is_t": 18.49,
+            "oos_mean_ic": 0.1092,
+            "oos_t": 7.52,
+            "retention": 0.507,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.0691,
+                "long_net_bps": -3.9309,
+                "short_gross_bps": 0.9616,
+                "short_net_bps": -5.0384,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.4492,
+                "long_net_bps": -4.5508,
+                "short_gross_bps": 1.2519,
+                "short_net_bps": -4.7481,
+                "n_long": 1195,
+                "n_short": 1195,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.5137,
+                "long_net_bps": -4.4863,
+                "short_gross_bps": 0.805,
+                "short_net_bps": -5.195,
+                "n_long": 2389,
+                "n_short": 2389,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": 0.2014,
+            "is_t": 10.13,
+            "oos_mean_ic": 0.0891,
+            "oos_t": 5.95,
+            "retention": 0.442,
+            "head_stats": []
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.1745,
+            "is_t": 5.83,
+            "oos_mean_ic": 0.0579,
+            "oos_t": 5.18,
+            "retention": 0.332,
+            "head_stats": []
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.0978,
+            "is_t": 5.08,
+            "oos_mean_ic": 0.0336,
+            "oos_t": 3.5,
+            "retention": 0.344,
+            "head_stats": []
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": 0.0622,
+            "is_t": 5.1,
+            "oos_mean_ic": 0.0318,
+            "oos_t": 5.98,
+            "retention": 0.511,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -3.8981,
+                "long_net_bps": -9.8981,
+                "short_gross_bps": 4.1582,
+                "short_net_bps": -1.8418,
+                "n_long": 210,
+                "n_short": 210,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.4716,
+                "long_net_bps": -4.5284,
+                "short_gross_bps": 0.577,
+                "short_net_bps": -5.423,
+                "n_long": 1049,
+                "n_short": 1049,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 4.5629,
+                "long_net_bps": -1.4371,
+                "short_gross_bps": -1.8341,
+                "short_net_bps": -7.8341,
+                "n_long": 2094,
+                "n_short": 2094,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "flow_divergence_120s",
+        "mechanism": "Medium-horizon absorption divergence: between the fresh 60s variant and the champion's 300s window lies the 120s scale, where a stealth episode that started one or two minutes ago is still active but no longer noise-dominated. z(ofi) minus z(trade imbalance) over 120s measures whether book building over the last two minutes has systematically outrun (positive: passive bid accumulation beyond what trades justify -> up-continuation) or lagged (negative: hidden distribution) executed aggression. The three windowed variants (60/120/300s) triangulate which absorption bandwidth each prediction horizon rewards.",
+        "max_abs_corr_vs_panel": 0.345,
+        "nearest_panel_factor": "trade_imbalance_60s",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.0281,
+            "is_t": 4.68,
+            "oos_mean_ic": 0.0325,
+            "oos_t": 2.79,
+            "retention": 1.156,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.6774,
+                "long_net_bps": -5.3226,
+                "short_gross_bps": -0.0289,
+                "short_net_bps": -6.0289,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.803,
+                "long_net_bps": -5.197,
+                "short_gross_bps": 0.6742,
+                "short_net_bps": -5.3258,
+                "n_long": 1184,
+                "n_short": 1184,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.4762,
+                "long_net_bps": -5.5238,
+                "short_gross_bps": 0.572,
+                "short_net_bps": -5.428,
+                "n_long": 2366,
+                "n_short": 2366,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.0242,
+            "is_t": 4.36,
+            "oos_mean_ic": 0.0358,
+            "oos_t": 2.27,
+            "retention": 1.479,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.8495,
+                "long_net_bps": -4.1505,
+                "short_gross_bps": -0.9645,
+                "short_net_bps": -6.9645,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.0453,
+                "long_net_bps": -4.9547,
+                "short_gross_bps": 0.3368,
+                "short_net_bps": -5.6632,
+                "n_long": 1182,
+                "n_short": 1182,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.6617,
+                "long_net_bps": -5.3383,
+                "short_gross_bps": 0.4651,
+                "short_net_bps": -5.5349,
+                "n_long": 2361,
+                "n_short": 2361,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": 0.0184,
+            "is_t": 3.05,
+            "oos_mean_ic": 0.0374,
+            "oos_t": 2.37,
+            "retention": 2.036,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.3486,
+                "long_net_bps": -3.6514,
+                "short_gross_bps": -3.6122,
+                "short_net_bps": -9.6122,
+                "n_long": 237,
+                "n_short": 237,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.9109,
+                "long_net_bps": -5.0891,
+                "short_gross_bps": -0.0741,
+                "short_net_bps": -6.0741,
+                "n_long": 1177,
+                "n_short": 1177,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.8071,
+                "long_net_bps": -5.1929,
+                "short_gross_bps": 0.2308,
+                "short_net_bps": -5.7692,
+                "n_long": 2351,
+                "n_short": 2351,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.0052,
+            "is_t": 0.98,
+            "oos_mean_ic": 0.0314,
+            "oos_t": 1.41,
+            "retention": 5.989,
+            "head_stats": []
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.0064,
+            "is_t": 1.4,
+            "oos_mean_ic": 0.0219,
+            "oos_t": 1.15,
+            "retention": 3.424,
+            "head_stats": []
+          }
+        }
+      },
+      {
+        "name": "flow_divergence_60s",
+        "mechanism": "Horizon-matched absorption/stealth divergence: the champion flow_divergence_300s compares z(ofi) and z(trade imbalance) over a 300s window -- appropriate for minute-scale absorption but over-smoothed for the 15-30s horizons where it also passes OOS. A 60s z window keeps the divergence FRESH: book building racing ahead of (or lagging) executed aggression within the last minute flags immediate stealth-limit activity whose price consequence is seconds away, not minutes. Same economic signal as the champion, bandwidth tuned to the short horizon.",
+        "max_abs_corr_vs_panel": 0.2455,
+        "nearest_panel_factor": "trade_imbalance_60s",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.0258,
+            "is_t": 3.74,
+            "oos_mean_ic": 0.0325,
+            "oos_t": 2.16,
+            "retention": 1.263,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.1454,
+                "long_net_bps": -4.8546,
+                "short_gross_bps": 0.3611,
+                "short_net_bps": -5.6389,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.0017,
+                "long_net_bps": -4.9983,
+                "short_gross_bps": 0.4447,
+                "short_net_bps": -5.5553,
+                "n_long": 1189,
+                "n_short": 1189,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.6493,
+                "long_net_bps": -5.3507,
+                "short_gross_bps": 0.3943,
+                "short_net_bps": -5.6057,
+                "n_long": 2376,
+                "n_short": 2376,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": 0.0209,
+            "is_t": 2.88,
+            "oos_mean_ic": 0.038,
+            "oos_t": 1.95,
+            "retention": 1.814,
+            "head_stats": []
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": 0.0186,
+            "is_t": 3.52,
+            "oos_mean_ic": 0.0388,
+            "oos_t": 2.89,
+            "retention": 2.091,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.9146,
+                "long_net_bps": -3.0854,
+                "short_gross_bps": -1.4097,
+                "short_net_bps": -7.4097,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.6723,
+                "long_net_bps": -4.3277,
+                "short_gross_bps": -0.0495,
+                "short_net_bps": -6.0495,
+                "n_long": 1182,
+                "n_short": 1182,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.4567,
+                "long_net_bps": -4.5433,
+                "short_gross_bps": -0.0113,
+                "short_net_bps": -6.0113,
+                "n_long": 2361,
+                "n_short": 2361,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.0086,
+            "is_t": 2.32,
+            "oos_mean_ic": 0.0308,
+            "oos_t": 1.87,
+            "retention": 3.587,
+            "head_stats": []
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.0045,
+            "is_t": 1.23,
+            "oos_mean_ic": 0.0278,
+            "oos_t": 3.57,
+            "retention": 6.229,
+            "head_stats": []
+          }
+        }
+      },
+      {
+        "name": "flow_divergence_x_spread_z",
+        "mechanism": "Stress-gated absorption: the flow_divergence signal (book flow minus trade flow) is strongest when it must EXPLAIN itself against stressed quoting. When spreads are wide (makers fearful, adverse selection high), a book that still builds one side beyond what executed aggression justifies is almost certainly informed stealth flow -> strong continuation at 15-60s. The same divergence under unusually tight, comfortable spreads may be routine queue noise. Multiplying by spread z gates the champion signal by the quoting state; the product is sign-symmetric and near-orthogonal to either parent.",
+        "max_abs_corr_vs_panel": 0.1427,
+        "nearest_panel_factor": "trade_imbalance_60s",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": -0.0152,
+            "is_t": -2.95,
+            "oos_mean_ic": -0.0271,
+            "oos_t": -2.21,
+            "retention": 1.78,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.5355,
+                "long_net_bps": -6.5355,
+                "short_gross_bps": 0.6561,
+                "short_net_bps": -5.3439,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.1515,
+                "long_net_bps": -6.1515,
+                "short_gross_bps": -0.3815,
+                "short_net_bps": -6.3815,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.3546,
+                "long_net_bps": -6.3546,
+                "short_gross_bps": -0.3018,
+                "short_net_bps": -6.3018,
+                "n_long": 2346,
+                "n_short": 2346,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": -0.0118,
+            "is_t": -1.85,
+            "oos_mean_ic": -0.0257,
+            "oos_t": -1.65,
+            "retention": 2.187,
+            "head_stats": []
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": -0.0083,
+            "is_t": -1.47,
+            "oos_mean_ic": -0.0281,
+            "oos_t": -1.38,
+            "retention": 3.376,
+            "head_stats": []
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": -0.0007,
+            "is_t": -0.15,
+            "oos_mean_ic": -0.0209,
+            "oos_t": -0.96,
+            "retention": 28.506,
+            "head_stats": []
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.0047,
+            "is_t": 0.9,
+            "oos_mean_ic": -0.0072,
+            "oos_t": -0.82,
+            "retention": 1.537,
+            "head_stats": []
+          }
+        }
+      },
+      {
+        "name": "last_mid_gap_ticks",
+        "mechanism": "Instantaneous aggressor side: the mid is the quote midpoint, so where the last trade landed relative to it reveals who crossed. last > mid means the last print lifted the ask (a buyer was the aggressor, paying up); last < mid means it hit the bid (seller aggression); last == mid is a mid cross. The magnitude in ticks also scales with the half-spread, so wide-quote aggression reads larger. The aggressor side is the fastest directional microstructure signal on the panel -- it is determined by the very trade that moves price -- and a fresh aggressor imbalance predicts immediate (15-60s) continuation before the book re-equilibrates.",
+        "max_abs_corr_vs_panel": 0.307,
+        "nearest_panel_factor": "iopv_premium",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.0953,
+            "is_t": 7.67,
+            "oos_mean_ic": 0.0543,
+            "oos_t": 5.45,
+            "retention": 0.57,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.5779,
+                "long_net_bps": -5.4221,
+                "short_gross_bps": 0.2516,
+                "short_net_bps": -5.7484,
+                "n_long": 1450,
+                "n_short": 329,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.4032,
+                "long_net_bps": -5.5968,
+                "short_gross_bps": 0.2636,
+                "short_net_bps": -5.7364,
+                "n_long": 9446,
+                "n_short": 6566,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.4301,
+                "long_net_bps": -5.5699,
+                "short_gross_bps": 0.2636,
+                "short_net_bps": -5.7364,
+                "n_long": 11332,
+                "n_short": 6566,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": 0.0894,
+            "is_t": 4.49,
+            "oos_mean_ic": 0.036,
+            "oos_t": 3.37,
+            "retention": 0.403,
+            "head_stats": []
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.0798,
+            "is_t": 3.31,
+            "oos_mean_ic": 0.0258,
+            "oos_t": 6.73,
+            "retention": 0.323,
+            "head_stats": []
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.0544,
+            "is_t": 2.9,
+            "oos_mean_ic": 0.026,
+            "oos_t": 2.92,
+            "retention": 0.477,
+            "head_stats": []
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.0437,
+            "is_t": 3.78,
+            "oos_mean_ic": 0.0307,
+            "oos_t": 1.82,
+            "retention": 0.701,
+            "head_stats": []
+          }
+        }
+      },
+      {
+        "name": "log_mid_ret_120s",
+        "mechanism": "Two-minute signed mid momentum: bridges the fast 60s drift of the built-in and the slower accumulation state. A sustained 120s directional move reflects a multi-minute order-flow program (index rebalance, creation/redemption, informed accumulation) rather than a single burst, and such programs tend to persist (continuation into 60-300s) until their target size is filled. Conversely, a 120s move that has run far relative to recent vol flags overshoot and reversal. The 120s window decorrelates from the 60s window while still being fast enough for the short-horizon gate.",
+        "max_abs_corr_vs_panel": 0.6156,
+        "nearest_panel_factor": "ofi_60s",
+        "horizons": {
+          "15": {
+            "passed": false,
+            "is_mean_ic": -0.0336,
+            "is_t": -1.48,
+            "oos_mean_ic": -0.0019,
+            "oos_t": -0.2,
+            "retention": 0.056,
+            "head_stats": []
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": -0.0397,
+            "is_t": -1.27,
+            "oos_mean_ic": -0.0059,
+            "oos_t": -0.53,
+            "retention": 0.149,
+            "head_stats": []
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": -0.0398,
+            "is_t": -1.18,
+            "oos_mean_ic": -0.0231,
+            "oos_t": -1.26,
+            "retention": 0.581,
+            "head_stats": []
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": -0.0397,
+            "is_t": -3.68,
+            "oos_mean_ic": -0.0402,
+            "oos_t": -0.86,
+            "retention": 1.013,
+            "head_stats": []
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": -0.0642,
+            "is_t": -5.19,
+            "oos_mean_ic": -0.0913,
+            "oos_t": -2.35,
+            "retention": 1.422,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -4.4262,
+                "long_net_bps": -10.4262,
+                "short_gross_bps": -22.6491,
+                "short_net_bps": -28.6491,
+                "n_long": 214,
+                "n_short": 214,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -2.9891,
+                "long_net_bps": -8.9891,
+                "short_gross_bps": -12.2244,
+                "short_net_bps": -18.2244,
+                "n_long": 1054,
+                "n_short": 1087,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.8013,
+                "long_net_bps": -6.8013,
+                "short_gross_bps": -9.5439,
+                "short_net_bps": -15.5439,
+                "n_long": 2106,
+                "n_short": 2091,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "mid_day_range_pos",
+        "mechanism": "Position within the intraday range encodes anchoring and stop-zone proximity. Traders anchor on the day's high/low and cluster stop orders just beyond them, so a mid near the top of the range (value ~1) sits next to a zone of resting buy-stops (breakout fuel) and overhead resistance, while a mid near the bottom (~0) sits next to sell-stops and support. Approaching an extreme predicts either continuation through the stop cluster or rejection off the level, and the exact rank position disambiguates where in the day's battle the current price sits -- information absent from pure momentum. Bounded [0,1], direction-free in level, ranked.",
+        "max_abs_corr_vs_panel": 0.4066,
+        "nearest_panel_factor": "wdi",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": -0.043,
+            "is_t": -4.07,
+            "oos_mean_ic": -0.0434,
+            "oos_t": -2.3,
+            "retention": 1.01,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.2329,
+                "long_net_bps": -5.7671,
+                "short_gross_bps": -1.0354,
+                "short_net_bps": -7.0354,
+                "n_long": 1115,
+                "n_short": 469,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.0859,
+                "long_net_bps": -5.9141,
+                "short_gross_bps": -1.2035,
+                "short_net_bps": -7.2035,
+                "n_long": 1509,
+                "n_short": 1480,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.238,
+                "long_net_bps": -6.238,
+                "short_gross_bps": -0.9783,
+                "short_net_bps": -6.9783,
+                "n_long": 2566,
+                "n_short": 2654,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": -0.0578,
+            "is_t": -4.04,
+            "oos_mean_ic": -0.0658,
+            "oos_t": -2.59,
+            "retention": 1.138,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.0744,
+                "long_net_bps": -6.0744,
+                "short_gross_bps": -2.3207,
+                "short_net_bps": -8.3207,
+                "n_long": 1112,
+                "n_short": 469,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.4568,
+                "long_net_bps": -6.4568,
+                "short_gross_bps": -2.1757,
+                "short_net_bps": -8.1757,
+                "n_long": 1495,
+                "n_short": 1475,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.7728,
+                "long_net_bps": -6.7728,
+                "short_gross_bps": -1.9708,
+                "short_net_bps": -7.9708,
+                "n_long": 2567,
+                "n_short": 2654,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": -0.0772,
+            "is_t": -4.56,
+            "oos_mean_ic": -0.1014,
+            "oos_t": -3.03,
+            "retention": 1.314,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.7465,
+                "long_net_bps": -6.7465,
+                "short_gross_bps": -7.0229,
+                "short_net_bps": -13.0229,
+                "n_long": 1109,
+                "n_short": 469,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.4965,
+                "long_net_bps": -7.4965,
+                "short_gross_bps": -5.0271,
+                "short_net_bps": -11.0271,
+                "n_long": 1492,
+                "n_short": 1475,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -2.1176,
+                "long_net_bps": -8.1176,
+                "short_gross_bps": -4.2978,
+                "short_net_bps": -10.2978,
+                "n_long": 2549,
+                "n_short": 2646,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": -0.1558,
+            "is_t": -8.58,
+            "oos_mean_ic": -0.2156,
+            "oos_t": -2.6,
+            "retention": 1.384,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 8.0146,
+                "long_net_bps": 2.0146,
+                "short_gross_bps": -24.5053,
+                "short_net_bps": -30.5053,
+                "n_long": 1008,
+                "n_short": 466,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.1843,
+                "long_net_bps": -5.8157,
+                "short_gross_bps": -20.5362,
+                "short_net_bps": -26.5362,
+                "n_long": 1426,
+                "n_short": 1220,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -3.8873,
+                "long_net_bps": -9.8873,
+                "short_gross_bps": -15.7708,
+                "short_net_bps": -21.7708,
+                "n_long": 2553,
+                "n_short": 2584,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": -0.273,
+            "is_t": -9.99,
+            "oos_mean_ic": -0.343,
+            "oos_t": -2.59,
+            "retention": 1.257,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 10.823,
+                "long_net_bps": 4.823,
+                "short_gross_bps": -30.2487,
+                "short_net_bps": -36.2487,
+                "n_long": 901,
+                "n_short": 445,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -7.5347,
+                "long_net_bps": -13.5347,
+                "short_gross_bps": -38.2056,
+                "short_net_bps": -44.2056,
+                "n_long": 1259,
+                "n_short": 1176,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -17.3589,
+                "long_net_bps": -23.3589,
+                "short_gross_bps": -32.6702,
+                "short_net_bps": -38.6702,
+                "n_long": 2213,
+                "n_short": 2272,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "ofi_z_x_spread_z",
+        "mechanism": "Stealth book-building under stress: OFI is dominated by limit-flow at the touch (placement/pull), and its predictive power exceeds signed trade volume (Cont-Kukanov-Stoikov 2014). When spreads are stressed wide, opportunistic liquidity providers retreat, so whoever is still BUILDING the book against the wide quote is likely informed -- passive queue accumulation precisely when passive quoting is most dangerous. Bid-side book growth under wide spreads predicts up-moves at 15-60s; the mirror for asks. Distinct from ti_z_x_spread_z: this conditions the PASSIVE/limit-order channel, which carries different (often leading) information than executed aggression.",
+        "max_abs_corr_vs_panel": 0.4321,
+        "nearest_panel_factor": "ofi_60s",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": -0.0305,
+            "is_t": -3.25,
+            "oos_mean_ic": -0.0466,
+            "oos_t": -3.86,
+            "retention": 1.529,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.7882,
+                "long_net_bps": -6.7882,
+                "short_gross_bps": 0.7774,
+                "short_net_bps": -5.2226,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.0009,
+                "long_net_bps": -6.0009,
+                "short_gross_bps": -0.5017,
+                "short_net_bps": -6.5017,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.1302,
+                "long_net_bps": -6.1302,
+                "short_gross_bps": -0.7948,
+                "short_net_bps": -6.7948,
+                "n_long": 2346,
+                "n_short": 2346,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": -0.0211,
+            "is_t": -1.72,
+            "oos_mean_ic": -0.0321,
+            "oos_t": -2.73,
+            "retention": 1.519,
+            "head_stats": []
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": -0.0163,
+            "is_t": -1.23,
+            "oos_mean_ic": -0.0069,
+            "oos_t": -0.32,
+            "retention": 0.424,
+            "head_stats": []
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": -0.0053,
+            "is_t": -1.11,
+            "oos_mean_ic": -0.0142,
+            "oos_t": -1.3,
+            "retention": 2.651,
+            "head_stats": []
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": -0.001,
+            "is_t": -0.25,
+            "oos_mean_ic": -0.0205,
+            "oos_t": -0.58,
+            "retention": 19.784,
+            "head_stats": []
+          }
+        }
+      },
+      {
+        "name": "oir_mom_60s",
+        "mechanism": "Touch-level book-state momentum: the 60s change of the engine's top-of-book order imbalance ratio (oir). The touch queue can turn independently of the deeper weighted book - fast queue events like sweeps and refill bursts hit level 1 first - so oir momentum is a distinct derivative from wdi momentum: it measures queue-position pressure changing at the EXECUTING level. Rising oir = the bid queue gaining relative weight at the touch, which in queue-reactive price impact pushes the next ticks up; differencing strips the oir level state that market makers have already priced.",
+        "max_abs_corr_vs_panel": 0.6556,
+        "nearest_panel_factor": "oir",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.2584,
+            "is_t": 19.6,
+            "oos_mean_ic": 0.1724,
+            "oos_t": 14.34,
+            "retention": 0.667,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.8735,
+                "long_net_bps": -4.1265,
+                "short_gross_bps": 2.0524,
+                "short_net_bps": -3.9476,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.13,
+                "long_net_bps": -3.87,
+                "short_gross_bps": 1.9258,
+                "short_net_bps": -4.0742,
+                "n_long": 1194,
+                "n_short": 1194,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.025,
+                "long_net_bps": -3.975,
+                "short_gross_bps": 1.703,
+                "short_net_bps": -4.297,
+                "n_long": 2384,
+                "n_short": 2384,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.2374,
+            "is_t": 8.36,
+            "oos_mean_ic": 0.1285,
+            "oos_t": 10.15,
+            "retention": 0.541,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.5962,
+                "long_net_bps": -3.4038,
+                "short_gross_bps": 2.6685,
+                "short_net_bps": -3.3315,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.6195,
+                "long_net_bps": -3.3805,
+                "short_gross_bps": 1.6415,
+                "short_net_bps": -4.3585,
+                "n_long": 1190,
+                "n_short": 1190,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.3336,
+                "long_net_bps": -3.6664,
+                "short_gross_bps": 1.5169,
+                "short_net_bps": -4.4831,
+                "n_long": 2379,
+                "n_short": 2379,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.2016,
+            "is_t": 4.88,
+            "oos_mean_ic": 0.0876,
+            "oos_t": 9.45,
+            "retention": 0.435,
+            "head_stats": []
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.1143,
+            "is_t": 4.5,
+            "oos_mean_ic": 0.0345,
+            "oos_t": 6.11,
+            "retention": 0.302,
+            "head_stats": []
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.0709,
+            "is_t": 4.45,
+            "oos_mean_ic": 0.0256,
+            "oos_t": 16.59,
+            "retention": 0.361,
+            "head_stats": []
+          }
+        }
+      },
+      {
+        "name": "price_accel_60_180",
+        "mechanism": "Momentum acceleration / deceleration: the difference between the trailing-60s and trailing-180s log-mid returns measures how the velocity of the current move is changing. A positive value means the last minute moved faster than the last three minutes -- the move is accelerating, the signature of fresh directional information still being incorporated (continuation likely). A negative value means the move is decelerating -- exhaustion, liquidity re-forming, reversal risk. Level momentum confounds direction with persistence; the first difference of momentum isolates persistence itself, which is what predicts the next 15-300s increment.",
+        "max_abs_corr_vs_panel": 0.2065,
+        "nearest_panel_factor": "trade_imbalance_60s",
+        "horizons": {
+          "15": {
+            "passed": false,
+            "is_mean_ic": -0.0086,
+            "is_t": -2.01,
+            "oos_mean_ic": -0.0024,
+            "oos_t": -0.14,
+            "retention": 0.273,
+            "head_stats": []
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": -0.0082,
+            "is_t": -1.64,
+            "oos_mean_ic": -0.0059,
+            "oos_t": -0.38,
+            "retention": 0.716,
+            "head_stats": []
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": -0.0028,
+            "is_t": -0.46,
+            "oos_mean_ic": -0.008,
+            "oos_t": -0.39,
+            "retention": 2.813,
+            "head_stats": []
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.0173,
+            "is_t": 1.71,
+            "oos_mean_ic": 0.0421,
+            "oos_t": 0.92,
+            "retention": 2.44,
+            "head_stats": []
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": 0.0498,
+            "is_t": 4.58,
+            "oos_mean_ic": 0.0864,
+            "oos_t": 2.35,
+            "retention": 1.735,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 24.3891,
+                "long_net_bps": 18.3891,
+                "short_gross_bps": -2.2545,
+                "short_net_bps": -8.2545,
+                "n_long": 214,
+                "n_short": 214,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 9.35,
+                "long_net_bps": 3.35,
+                "short_gross_bps": 2.353,
+                "short_net_bps": -3.647,
+                "n_long": 1054,
+                "n_short": 1052,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 8.1425,
+                "long_net_bps": 2.1425,
+                "short_gross_bps": 1.1058,
+                "short_net_bps": -4.8942,
+                "n_long": 2095,
+                "n_short": 2101,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "signed_rv_60s",
+        "mechanism": "Directional concentration of variance over the last minute: the rolling sum of sign(ret)*ret^2 is up-RV minus down-RV in absolute (unnormalized) units. Positive means the quadratic variation of the last 60s is dominated by up moves (upside jumps), negative means down moves dominate (stop cascades / distressed selling). Unlike plain rv_60s it keeps the SIGN of which side the variance lives on, and unlike momentum it is variance-weighted, so a few large directional jumps dominate over many small ticks -- exactly the jump signature that carries. Being the 60s unnormalized cousin of the PASSed 900s rv_asym_300s, it targets the fast end of the same semivariance-asymmetry mechanism.",
+        "max_abs_corr_vs_panel": 0.7821,
+        "nearest_panel_factor": "ofi_60s",
+        "horizons": {
+          "15": {
+            "passed": false,
+            "is_mean_ic": -0.0476,
+            "is_t": -1.72,
+            "oos_mean_ic": 0.0092,
+            "oos_t": 0.65,
+            "retention": 0.192,
+            "head_stats": []
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": -0.053,
+            "is_t": -1.39,
+            "oos_mean_ic": -0.0098,
+            "oos_t": -0.53,
+            "retention": 0.186,
+            "head_stats": []
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": -0.0516,
+            "is_t": -1.25,
+            "oos_mean_ic": -0.042,
+            "oos_t": -1.49,
+            "retention": 0.814,
+            "head_stats": []
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": -0.0399,
+            "is_t": -2.5,
+            "oos_mean_ic": -0.0296,
+            "oos_t": -1.09,
+            "retention": 0.742,
+            "head_stats": []
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": -0.0498,
+            "is_t": -3.6,
+            "oos_mean_ic": -0.0592,
+            "oos_t": -2.34,
+            "retention": 1.189,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -10.9541,
+                "long_net_bps": -16.9541,
+                "short_gross_bps": 24.6725,
+                "short_net_bps": 18.6725,
+                "n_long": 211,
+                "n_short": 213,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -6.1605,
+                "long_net_bps": -12.1605,
+                "short_gross_bps": -6.5247,
+                "short_net_bps": -12.5247,
+                "n_long": 1046,
+                "n_short": 1052,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -3.1459,
+                "long_net_bps": -9.1459,
+                "short_gross_bps": -7.5959,
+                "short_net_bps": -13.5959,
+                "n_long": 2102,
+                "n_short": 2102,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "top_book_delta_120s",
+        "mechanism": "Sustained touch-queue accumulation: the 120s delta of top-of-book quantity imbalance integrates REPEATED refill attempts rather than a single rebuild event. When the average touch imbalance drifts one-sided over two minutes, the queue is being strategically worked - iceberg-style replenishment keeping the displayed bid (or ask) heavy through successive consumptions, the passive leg of a meta-order establishing position. This slower touch trend is distinct from the 30s variant (single events) and from the deep depth5 deltas (levels 2-5), giving a third point in the top-vs-deep x fast-vs-slow decomposition of the live depth-momentum dimension.",
+        "max_abs_corr_vs_panel": 0.6743,
+        "nearest_panel_factor": "oir",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.2542,
+            "is_t": 18.59,
+            "oos_mean_ic": 0.1707,
+            "oos_t": 15.41,
+            "retention": 0.672,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.1887,
+                "long_net_bps": -3.8113,
+                "short_gross_bps": 1.6348,
+                "short_net_bps": -4.3652,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.0792,
+                "long_net_bps": -3.9208,
+                "short_gross_bps": 1.8887,
+                "short_net_bps": -4.1113,
+                "n_long": 1189,
+                "n_short": 1189,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.8426,
+                "long_net_bps": -4.1574,
+                "short_gross_bps": 1.871,
+                "short_net_bps": -4.129,
+                "n_long": 2374,
+                "n_short": 2374,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.2371,
+            "is_t": 8.48,
+            "oos_mean_ic": 0.1281,
+            "oos_t": 12.46,
+            "retention": 0.54,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.7896,
+                "long_net_bps": -4.2104,
+                "short_gross_bps": 1.2277,
+                "short_net_bps": -4.7722,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.1229,
+                "long_net_bps": -3.8771,
+                "short_gross_bps": 1.454,
+                "short_net_bps": -4.546,
+                "n_long": 1185,
+                "n_short": 1185,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.8412,
+                "long_net_bps": -4.1588,
+                "short_gross_bps": 1.6283,
+                "short_net_bps": -4.3717,
+                "n_long": 2369,
+                "n_short": 2369,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.203,
+            "is_t": 5.21,
+            "oos_mean_ic": 0.0967,
+            "oos_t": 10.99,
+            "retention": 0.476,
+            "head_stats": []
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.1166,
+            "is_t": 4.46,
+            "oos_mean_ic": 0.0342,
+            "oos_t": 10.15,
+            "retention": 0.293,
+            "head_stats": []
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.0718,
+            "is_t": 4.23,
+            "oos_mean_ic": 0.0313,
+            "oos_t": 11.47,
+            "retention": 0.436,
+            "head_stats": []
+          }
+        }
+      },
+      {
+        "name": "wdi_accel_90s",
+        "mechanism": "Second derivative of book state: how the 90s momentum of weighted depth imbalance is itself changing - the ACCELERATION of one-sided accumulation. Momentum says a build-up is under way; acceleration says whether it is intensifying or exhausting. Accelerating bid-side accumulation flags a fresh information episode still unfolding (continuation expected), while deceleration of a previously strong build-up marks exhaustion of the passive-flow source and precedes stall or reversion. Being a second difference, it is near-orthogonal to both the wdi level and the wdi momentum by construction, adding the turning-point dimension neither carries.",
+        "max_abs_corr_vs_panel": 0.3147,
+        "nearest_panel_factor": "oir",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.146,
+            "is_t": 19.63,
+            "oos_mean_ic": 0.0886,
+            "oos_t": 5.78,
+            "retention": 0.607,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.7924,
+                "long_net_bps": -4.2076,
+                "short_gross_bps": 2.3708,
+                "short_net_bps": -3.6292,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.1678,
+                "long_net_bps": -4.8322,
+                "short_gross_bps": 1.1611,
+                "short_net_bps": -4.8389,
+                "n_long": 1184,
+                "n_short": 1184,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.079,
+                "long_net_bps": -4.921,
+                "short_gross_bps": 0.9777,
+                "short_net_bps": -5.0223,
+                "n_long": 2364,
+                "n_short": 2364,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.1353,
+            "is_t": 10.14,
+            "oos_mean_ic": 0.0683,
+            "oos_t": 4.44,
+            "retention": 0.505,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.537,
+                "long_net_bps": -3.463,
+                "short_gross_bps": 2.4238,
+                "short_net_bps": -3.5762,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.6674,
+                "long_net_bps": -4.3326,
+                "short_gross_bps": 0.9989,
+                "short_net_bps": -5.0011,
+                "n_long": 1180,
+                "n_short": 1180,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.3917,
+                "long_net_bps": -4.6083,
+                "short_gross_bps": 0.8053,
+                "short_net_bps": -5.1947,
+                "n_long": 2359,
+                "n_short": 2359,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": 0.1158,
+            "is_t": 6.63,
+            "oos_mean_ic": 0.0653,
+            "oos_t": 5.17,
+            "retention": 0.564,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.8963,
+                "long_net_bps": -3.1037,
+                "short_gross_bps": 3.0972,
+                "short_net_bps": -2.9028,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.2637,
+                "long_net_bps": -3.7363,
+                "short_gross_bps": 1.2827,
+                "short_net_bps": -4.7173,
+                "n_long": 1175,
+                "n_short": 1175,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.0717,
+                "long_net_bps": -3.9283,
+                "short_gross_bps": 0.9351,
+                "short_net_bps": -5.0649,
+                "n_long": 2349,
+                "n_short": 2349,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.0599,
+            "is_t": 5.98,
+            "oos_mean_ic": 0.0292,
+            "oos_t": 4.5,
+            "retention": 0.487,
+            "head_stats": []
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": 0.0417,
+            "is_t": 5.26,
+            "oos_mean_ic": 0.0283,
+            "oos_t": 5.89,
+            "retention": 0.679,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.3355,
+                "long_net_bps": -2.6645,
+                "short_gross_bps": 4.1744,
+                "short_net_bps": -1.8256,
+                "n_long": 210,
+                "n_short": 210,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 3.916,
+                "long_net_bps": -2.084,
+                "short_gross_bps": 0.9116,
+                "short_net_bps": -5.0884,
+                "n_long": 1035,
+                "n_short": 1035,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 3.8318,
+                "long_net_bps": -2.1682,
+                "short_gross_bps": -0.1032,
+                "short_net_bps": -6.1032,
+                "n_long": 2069,
+                "n_short": 2069,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "wdi_mom_180s",
+        "mechanism": "Slow book-state momentum: the 180s change of the engine's weighted depth imbalance, integrating over intra-minute noise to measure the multi-minute ACCUMULATION REGIME of one-sided book build-up (meta-order passive legs, ETF basket arbitrage inventory). If depth momentum works at the 900s horizon because accumulation episodes persist, a longer delta should align the measurement with a fuller episode and improve OOS stability there; wdi's ~900s half-life means the 180s difference still removes the dead level state. Bracketing the PASS 90s window from above maps the horizon-response curve of book-state momentum.",
+        "max_abs_corr_vs_panel": 0.5723,
+        "nearest_panel_factor": "microprice_dev",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.245,
+            "is_t": 19.26,
+            "oos_mean_ic": 0.1567,
+            "oos_t": 16.04,
+            "retention": 0.64,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.982,
+                "long_net_bps": -4.018,
+                "short_gross_bps": 2.4771,
+                "short_net_bps": -3.5229,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.0407,
+                "long_net_bps": -3.9593,
+                "short_gross_bps": 2.0281,
+                "short_net_bps": -3.9719,
+                "n_long": 1184,
+                "n_short": 1184,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.7655,
+                "long_net_bps": -4.2345,
+                "short_gross_bps": 1.9495,
+                "short_net_bps": -4.0505,
+                "n_long": 2364,
+                "n_short": 2364,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.2286,
+            "is_t": 8.87,
+            "oos_mean_ic": 0.1242,
+            "oos_t": 18.72,
+            "retention": 0.543,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.0668,
+                "long_net_bps": -4.9332,
+                "short_gross_bps": 2.1869,
+                "short_net_bps": -3.8131,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.2454,
+                "long_net_bps": -3.7546,
+                "short_gross_bps": 1.9875,
+                "short_net_bps": -4.0125,
+                "n_long": 1180,
+                "n_short": 1180,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.0734,
+                "long_net_bps": -3.9266,
+                "short_gross_bps": 2.0514,
+                "short_net_bps": -3.9486,
+                "n_long": 2359,
+                "n_short": 2359,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.201,
+            "is_t": 5.14,
+            "oos_mean_ic": 0.0936,
+            "oos_t": 10.39,
+            "retention": 0.465,
+            "head_stats": []
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.1211,
+            "is_t": 4.11,
+            "oos_mean_ic": 0.031,
+            "oos_t": 1.91,
+            "retention": 0.256,
+            "head_stats": []
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.0764,
+            "is_t": 4.07,
+            "oos_mean_ic": 0.0369,
+            "oos_t": 2.7,
+            "retention": 0.483,
+            "head_stats": []
+          }
+        }
+      },
+      {
+        "name": "wdi_mom_30s",
+        "mechanism": "Fast book-state momentum: the 30s change of the engine's weighted depth imbalance (wdi), faster than the PASS wdi_mom_90s. wdi weights depth by price distance from the touch, so its fastest movements reflect near-touch re-pricing of imbalance; a 30s delta captures abrupt one-sided build-ups before the 90s window smooths them away. The parent showed strong short-horizon OOS t at 15-60s while failing IS-retention; this variant tests whether book-state momentum has a distinct fast component that carries at 15-60s, where the short-horizon reward for fast-moving state lives.",
+        "max_abs_corr_vs_panel": 0.5581,
+        "nearest_panel_factor": "oir",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.2635,
+            "is_t": 25.01,
+            "oos_mean_ic": 0.1674,
+            "oos_t": 9.86,
+            "retention": 0.635,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.4869,
+                "long_net_bps": -2.5131,
+                "short_gross_bps": 3.326,
+                "short_net_bps": -2.674,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.3684,
+                "long_net_bps": -3.6316,
+                "short_gross_bps": 2.2862,
+                "short_net_bps": -3.7138,
+                "n_long": 1195,
+                "n_short": 1195,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.1379,
+                "long_net_bps": -3.8621,
+                "short_gross_bps": 1.766,
+                "short_net_bps": -4.234,
+                "n_long": 2389,
+                "n_short": 2389,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.2417,
+            "is_t": 11.44,
+            "oos_mean_ic": 0.1248,
+            "oos_t": 7.36,
+            "retention": 0.516,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 4.9714,
+                "long_net_bps": -1.0286,
+                "short_gross_bps": 3.8293,
+                "short_net_bps": -2.1707,
+                "n_long": 240,
+                "n_short": 240,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.9098,
+                "long_net_bps": -3.0902,
+                "short_gross_bps": 2.2246,
+                "short_net_bps": -3.7754,
+                "n_long": 1194,
+                "n_short": 1194,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.5234,
+                "long_net_bps": -3.4766,
+                "short_gross_bps": 1.5934,
+                "short_net_bps": -4.4066,
+                "n_long": 2384,
+                "n_short": 2384,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.204,
+            "is_t": 6.32,
+            "oos_mean_ic": 0.0913,
+            "oos_t": 7.97,
+            "retention": 0.448,
+            "head_stats": []
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.1135,
+            "is_t": 5.51,
+            "oos_mean_ic": 0.0446,
+            "oos_t": 5.18,
+            "retention": 0.393,
+            "head_stats": []
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.0677,
+            "is_t": 5.83,
+            "oos_mean_ic": 0.0331,
+            "oos_t": 6.25,
+            "retention": 0.488,
+            "head_stats": []
+          }
+        }
+      }
+    ],
+    "dedup_killed": [
+      {
+        "name": "microprice_dev_mom_60s",
+        "screen_passed_horizons": [
+          15,
+          30
+        ],
+        "max_abs_corr_vs_panel": 0.6521,
+        "killed_reason": "rho=0.996 vs oir_mom_60s (keep oir_mom_60s)"
+      },
+      {
+        "name": "vol_adj_mom_60s",
+        "screen_passed_horizons": [
+          900
+        ],
+        "max_abs_corr_vs_panel": 0.8494,
+        "killed_reason": "rho=0.974 vs signed_rv_60s; also 0.849 vs panel ofi_60s (keep signed_rv_60s)"
+      },
+      {
+        "name": "top_book_delta_30s",
+        "screen_passed_horizons": [
+          15,
+          30
+        ],
+        "max_abs_corr_vs_panel": 0.6225,
+        "killed_reason": "rho=0.878 vs wdi_mom_30s (keep wdi_mom_30s: lower panel corr 0.558 vs 0.622, higher OOS IC)"
+      }
+    ],
+    "fail_groups": {
+      "premium_iopv": {
+        "n": 8,
+        "names": [
+          "iopv_premium_mom_60s",
+          "iopv_premium_z_120s",
+          "iopv_premium_z_600s",
+          "premium_dev_day",
+          "prem_reversion_x_rv",
+          "prem_x_cancel",
+          "prem_x_depth_imb",
+          "ofi_x_premium_sign"
+        ],
+        "cause": "regime break: IS t -3..-8 collapses to OOS |t|<=1.5, retention <=0.31; confirms rescreen warning - unconditional premium factors are dead"
+      },
+      "rv_vol": {
+        "n": 5,
+        "names": [
+          "rv_z_300s",
+          "rv_ratio_60_300",
+          "rv_ratio_z_300s",
+          "vol_confirmed_mom",
+          "vol_rate_x_ti"
+        ],
+        "cause": "RV z/ratio variants IS-dead (|t|<=2); vol_rate_x_ti IS t 5.7 but OOS retention 0.27"
+      },
+      "ofi_flow": {
+        "n": 5,
+        "names": [
+          "ofi_fast_slow",
+          "ofi_mom_60s",
+          "ofi_ti_agree_60s",
+          "cancel_x_ofi",
+          "flow_accel_signed"
+        ],
+        "cause": "IS t 5-10 collapses to OOS |t|<=1.7 (retention 0.5-0.64 just short); flow_accel_signed flips sign; cancel_x_ofi structurally NaN on SSE"
+      },
+      "ti_aggressor": {
+        "n": 5,
+        "names": [
+          "ti_accum_120s",
+          "ti_z_x_large_share",
+          "ti_z_x_spread_z",
+          "arrival_accel_x_ti",
+          "aggressor_share_60s"
+        ],
+        "cause": "retention collapse 0.10-0.20 or IS-dead; aggressor_share_60s OOS t 1.61 just short @900s"
+      },
+      "depth_slope_level": {
+        "n": 5,
+        "names": [
+          "book_slope_delta_60s",
+          "book_slope_z_300s",
+          "depth_ratio_5to1_z",
+          "depth_thickness_z_300s",
+          "queue_pressure_x_slope"
+        ],
+        "cause": "IS-dead or sign-flip; queue_pressure_x_slope IS t 7.2 but retention 0.35"
+      },
+      "short_momentum": {
+        "n": 5,
+        "names": [
+          "log_mid_ret_15s",
+          "log_mid_ret_30s",
+          "last_mid_gap_ma_30s",
+          "gap_x_direction",
+          "signed_arrival_z"
+        ],
+        "cause": "raw short-window momentum fails retention (0.33-0.49) or sign-flips; only log_mid_ret_120s survives (at 900s, admitted); signed_arrival_z uses order_arrival_60s = NaN on SSE"
+      },
+      "spread": {
+        "n": 2,
+        "names": [
+          "spread_z_60s",
+          "spread_z_120s"
+        ],
+        "cause": "spread level IS-dead (|t|<=1.4): spread alone has no directional power; it works only as a conditioning state (ofi_z_x_spread_z / flow_divergence_x_spread_z pass)"
+      },
+      "large_trade": {
+        "n": 2,
+        "names": [
+          "large_share_mom_300s",
+          "large_share_z_x_ti"
+        ],
+        "cause": "IS-dead (|t|<=1.5)"
+      },
+      "session_regime": {
+        "n": 2,
+        "names": [
+          "session_u_x_mom",
+          "regime_vol_x_flow"
+        ],
+        "cause": "OOS collapse (retention 0.08-0.43)"
+      },
+      "duplicate_of_library": {
+        "n": 1,
+        "names": [
+          "microprice_dev_z_300s"
+        ],
+        "cause": "screen dedup gate: 0.902 vs library microprice_dev (IC itself passed 15/30s)"
+      },
+      "other": {
+        "n": 1,
+        "names": [
+          "size_x_direction"
+        ],
+        "cause": "sign-flip IS->OOS"
+      }
+    },
+    "lessons": [
+      "Book-imbalance momentum/delta is the strongest 15/30s cluster (8 of 16 admitted): OOS IC 0.09-0.17, t 5-15; wdi_accel_90s spans 15/30/60/900s.",
+      "Within-family redundancy is severe: 3 of 19 screen-pass protos are within-batch duplicates (rho 0.88-0.996); same construction on different bases (oir vs microprice_dev momentum) can be near-identical. Check within-family correlations BEFORE submitting more variants.",
+      "mid_day_range_pos passes ALL 5 horizons (negative IC: near day-high => lower future return, mean reversion) and is independent of everything (max rho 0.41) - a genuinely new signal source; round 2 should expand it (range expansion speed, proximity-to-low variants).",
+      "flow_divergence passes at 60/120/300s windows (pairwise rho 0.55-0.78): robust family but saturated; do not extend further.",
+      "Premium/iopv family 0/8 (regime break confirmed twice now). Only regime-CONDITIONAL premium constructions are worth trying; no more unconditional premium factors.",
+      "cancel_ratio_60s and order_arrival_60s are UNAVAILABLE on SSE (all NaN): anything multiplying them (cancel_x_ofi, prem_x_cancel, signed_arrival_z) is structurally dead. Never use in SSE specs.",
+      "Raw short-window momentum (log_mid_ret_15s/30s) fails retention; momentum needs book/flow information to work at short horizons. 300/900s winners are slow state variables (depth5_delta_120s, mid_day_range_pos, log_mid_ret_120s, price_accel_60_180, signed_rv_60s).",
+      "Spread level has no direct predictive power (spread_z IS-dead) but flow-x-spread-state interactions pass @15s (ofi_z_x_spread_z, flow_divergence_x_spread_z): condition flow by spread state.",
+      "Head stats: tau5% head gross returns mostly 1-6bp, cannot cover 6bp round-trip; net mostly negative. Value is in ranking/conditioning, head stats stay descriptive only."
+    ],
+    "artifacts": {
+      "screen_reports": "scratch-iter003/reports_round1/ (60 JSONs)",
+      "screen_log": "scratch-iter003/iter003_round1_screen.log",
+      "corr": "scratch-iter003/iter003_round1_corr.json + .txt (server copies: /data/factor_lzt/iterations/)",
+      "admitted_detail": "scratch-iter003/round1_admitted_detail.json",
+      "chinese_report": "scratch-iter003/iter003_round1_report.md (server copy: /data/factor_lzt/iterations/)"
+    }
   }
 }
