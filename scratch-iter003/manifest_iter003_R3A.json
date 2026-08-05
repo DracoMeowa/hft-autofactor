@@ -1,0 +1,100 @@
+[
+  {
+    "name": "dev_open_z_300s",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "Trailing-300s z of the open-deviation measures overextension vs TODAY'S recent deviation regime: 'more stretched than this morning justifies' accumulates anchored reversion pressure, while the rolling normalization strips the slow trend that dominates the dev_from_open_bps level, asking regime-surprise instead of accumulated state.",
+    "columns_used": ["mid_px", "open_px"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "abs_open_dev_delta_300s",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "300s change in |deviation from open| signs moves by travel relative to the ANCHOR, not price direction: rising = stretch actively extending (anchor pull not yet winning), falling = reversion toward the open already in progress (and reversion episodes persist until the gap closes). The abs-fold is nonlinear in mid, so this is not a momentum clone.",
+    "columns_used": ["mid_px", "open_px"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "open_dev_z_accel",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "Second derivative of the anchor stretch: 60s diff of the 300s deviation-z asks whether overextension is still BUILDING vs the day's regime (fresh one-sided pressure, continuation-or-exhaustion decision point) or already DECAYING (reversion started in relative terms even if price is still far from the open). Change in regime-surprise, distinct from raw price acceleration.",
+    "columns_used": ["mid_px", "open_px"],
+    "target_horizons": [15, 30, 60, 300]
+  },
+  {
+    "name": "open_dev_extremeness",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "|dev| / cum_max(|dev|) locates the current stretch vs the day's own record one-sidedness: near 1 = maximally stretched state where anchored reversion force per bp peaks (breakout-or-snap decision point); near 0 = operating well inside the day's demonstrated envelope (calm two-sided state). Whole-day envelope normalization makes quiet and violent days comparable.",
+    "columns_used": ["mid_px", "open_px"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "gap_fill_ratio",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "(mid - pre_close)/(open - pre_close) prices how much of the overnight gap the session has given back: 1 = gap intact (overnight trend uncontested), 0 = exactly filled (the open's reason consumed), <0 = overfilled (overnight move being REVERSED). Gap-scaling makes small- and large-gap days comparable; sign-log compression keeps ordering while bounding tiny-gap blowups.",
+    "columns_used": ["mid_px", "open_px", "pre_close_px"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "open_dev_x_gapdir",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "Open-deviation signed by the overnight gap direction folds continuation vs reversal onto one axis: positive = intraday stretch EXTENDS the overnight repricing (two timeframes agreeing, drift persists), negative = intraday stretch UNDOES it (gap-fill/reversal regime with counter-pressure). Retry of the dead overnight_gap x range_pos question on the anchor axis that won round 2.",
+    "columns_used": ["mid_px", "open_px", "pre_close_px"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "ofi_z_x_gap_fill_dir",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "Order-flow regime z gated by the direction toward the pre-close: positive = unusual queue pressure actively pushing mid toward the second anchor (genuine flow-driven gap-fill regime, persists until the anchor is reached), negative = flow fighting the fill (absorption, snap-back toward the open favored). Turns direction-free OFI regime into goal-directed pressure vs the pre-close.",
+    "columns_used": ["ofi_60s", "mid_px", "pre_close_px"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "open_side_hold_bars",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "Signed duration of the current spell on one side of the open: a long unbroken hold above/below the anchor means every dip toward it was bought/sold for minutes at a time (inventory migrated, anchored reversion pressure decays with spell length -> continuation), while short values mark the anchor actively contested (two-sided flow, reversion-across-anchor dominates). Duration-of-sign state invisible to level and momentum.",
+    "columns_used": ["mid_px", "open_px", "ts_ms"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "bars_since_open_cross",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "Unsigned inventory-pressure clock: each bar on one side of the open without recrossing accumulates inventory skew and benchmark imbalance against the anchor (spring winding), so long durations flag stored snap-pressure and imminent two-sided resolution, while fresh crosses mark just-resolved anchors where the new side's flow typically has follow-through.",
+    "columns_used": ["mid_px", "open_px", "ts_ms"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "open_pos_roll_range_300s",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "Position of the open anchor within the trailing-300s range: has the last five minutes explored above or below the opening consensus? Open near window bottom = local battle won upward (dips bought, local drift regime up); open mid-window = two-sided churn around the anchor (reversion dominates). The recycling window tracks the current skirmish, moving every snapshot unlike cumulative-range constructions.",
+    "columns_used": ["mid_px", "open_px"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "stretch_per_day_range",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "(mid - open)/(day high-low) prices the deviation in the day's own currency: a deviation large vs the running range is a one-sided stretch built on a thin tape where anchored arbitrage has most to gain from snap-back, while the same absolute deviation on a wide-range day is earned trend. Bounded [-1,1] intensity; division (not blending) keeps it distinct from its two parent constructs.",
+    "columns_used": ["mid_px", "open_px"],
+    "target_horizons": [30, 60, 300, 900]
+  },
+  {
+    "name": "open_dev_z_x_ofi_z",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "Queue-pressure regime z x deviation-regime z: positive = unusual one-sided order-book flow pushing the unusual stretch FURTHER (fresh-information extension, continuation favored), negative = flow FIGHTING the stretch (the pre-reversion state in which inventory desks and open-referenced arbitrage restore the anchor). Both inputs regime-z'd so the interaction isolates unusual-vs-unusual comovement; OFI leads price.",
+    "columns_used": ["mid_px", "open_px", "ofi_60s"],
+    "target_horizons": [15, 30, 60, 300]
+  },
+  {
+    "name": "open_dev_z_x_ti_60s",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "Executed-aggression confirmation of the stretch: trade_imbalance_60s gated by the deviation-regime z. Positive product = aggressors harvesting/lifting WITH the unusual stretch (real participation consuming liquidity in the extension direction, informed-continuation footprint); negative = marketable flow trading AGAINST the stretch, the physical mechanism of anchored reversion.",
+    "columns_used": ["mid_px", "open_px", "trade_imbalance_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "open_dev_sign_x_wdi",
+    "family": "R3A_anchor_deviation",
+    "hypothesis": "Resting-inventory alignment: sign(mid-open) x wdi asks whether 5-level depth leans WITH the anchor stretch (support under the extension, absorption of the anchored pull, persistence) or back toward the anchor (quotes positioned to fade the move, reversion pressure stored in the book). The STOCK-of-liquidity lens complements the two FLOW lenses (OFI, TI) on slower, deliberate adjustment timescales.",
+    "columns_used": ["mid_px", "open_px", "wdi"],
+    "target_horizons": [30, 60, 300]
+  }
+]

@@ -1,0 +1,100 @@
+[
+  {
+    "name": "dev_open_x_ofi_z",
+    "family": "R3D",
+    "hypothesis": "Flow-conditional reversion of the open anchor: reversion of a stretch from the open only triggers once sustained passive book flow (300s z of ofi_60s) flips AGAINST the stretch; while informed book-building agrees with the deviation it continues. Product dev x z(ofi) carries POSITIVE IC -- re-ranks stretches by informed-flow endorsement rather than rescaling the parent (OFI = passive/informed channel per round-1 stealth-building lesson).",
+    "columns_used": ["mid_px", "open_px", "ofi_60s"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "dev_open_x_ti15",
+    "family": "R3D",
+    "hypothesis": "Chasing-exhaustion gate on the open anchor via the FAST EXECUTION channel -- competing hypothesis to dev_open_x_ofi_z: marketable aggression into an already-stretched price is late arrival; makers/inventory holders unload into it and the stretch snaps back. Product dev x trade_imbalance_15s (raw bounded sign state) carries NEGATIVE IC. If negative here while the OFI gate is positive: passive flow endorses, aggressive flow exhausts.",
+    "columns_used": ["mid_px", "open_px", "trade_imbalance_15s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "dev_open_x_spread_z",
+    "family": "R3D",
+    "hypothesis": "Quoting-stress gate on the open anchor: an unusually wide spread while price is stretched from the open = LPs retreating from the stretched level; reversion needs someone to quote against the stretch, withdrawal removes the cushion -> snap-back accelerates. Product dev x z(spread) carries NEGATIVE IC. Different anchor AND hypothesis direction from admitted range_pos_x_spread_z (reversion amplification vs boundary resolution).",
+    "columns_used": ["mid_px", "open_px", "quoted_spread_ticks"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "top5div_x_spread_z",
+    "family": "R3D",
+    "hypothesis": "Quoting-regime gate on the strongest-15s-IC factor: when spreads are stressed wide, routine two-sided making retreats and displayed-vs-deep structure carries maximum adverse-selection information; tight spreads make divergence routine noise. Stress AMPLIFIES without flipping: product div_z x spread_z carries POSITIVE IC, stronger short-horizon than parent. Falsifiable amplification claim.",
+    "columns_used": ["wdi", "total_bid_vol", "total_ask_vol", "quoted_spread_ticks"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "top5div_x_extremes",
+    "family": "R3D",
+    "hypothesis": "Resolution-zone gate: mid-range divergence is untested noise; at day extremes thin-backed displayed strength (div_z>0) fails probing (rejection/breakdown = DOWN both zones) while deep-backed structure holds (UP both zones) -> product div_z x |day_pos-0.5|x2 carries NEGATIVE IC. AMPLITUDE gate (not the dead linear centered product of round-2's range_pos_x_ofi_z/wdi): mid-range rows compress to zero -> re-ranking, not rescaling.",
+    "columns_used": ["wdi", "total_bid_vol", "total_ask_vol", "mid_px"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "top5div_x_ofi_z",
+    "family": "R3D",
+    "hypothesis": "Divergence-flow directional agreement (round-2 report's explicit follow-up): structural mismatch predicts best when sustained book flow times it -- thin-backed strength still propped by buy book-building continues short-term; structure against flow fails faster. Product div_z x z(ofi_60s,300s) carries POSITIVE IC at 15-60s. Distinct from parent (no flow timing), from dead hidden_imb raw momenta, from dead iopv_vel_x_ofi_z form (product-of-z vs z-of-product).",
+    "columns_used": ["wdi", "total_bid_vol", "total_ask_vol", "ofi_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "fbi_z_x_rv_z",
+    "family": "R3D",
+    "hypothesis": "Quiet-market gate on the patient-reservoir state: full-book imbalance z (institutional/creation-redemption positioning) has predictive content only when turbulence isn't running over queue structure; in high-rv regimes exogenous shocks dominate. Product fbi_z x rv_z carries NEGATIVE IC (bid-heavy book predicts up only when rv_z<0). RV strictly a conditioning state (its predictor forms died round 1); opposing hypothesis to dead regime_vol_x_flow (which tested turbulence AMPLIFYING fast flow).",
+    "columns_used": ["total_bid_vol", "total_ask_vol", "rv_60s"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "conc_imb_x_rv_z",
+    "family": "R3D",
+    "hypothesis": "Turbulence-amplifies-urgency gate -- the competing vol hypothesis to fbi_z_x_rv_z: head-heavy one-sided concentration in CALM is routine MM posture, but in turbulence it is aggressive queue-priority competition by informed traders. Product conc_z x rv_z carries POSITIVE IC (urgency states feed on turbulence while reservoir states decay in it -- the pair spans both falsifiable answers).",
+    "columns_used": ["depth_bid5", "depth_ask5", "total_bid_vol", "total_ask_vol", "rv_60s"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "conc_imb_x_spread_z",
+    "family": "R3D",
+    "hypothesis": "Quoting-stress gate on placement urgency: stacking one side's orders at the touch under an unusually WIDE spread (when passive quoting is dangerous) is urgent informed positioning expecting the spread to resolve in its favor; under tight quoting the same structure is routine. Product conc_z x spread_z carries POSITIVE IC at 300-900s (parent's admitted horizons). Different conditioning state from the rv-gate sibling (endogenous quoting stress vs exogenous vol).",
+    "columns_used": ["depth_bid5", "depth_ask5", "total_bid_vol", "total_ask_vol", "quoted_spread_ticks"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "rollrpos_x_ti15",
+    "family": "R3D",
+    "hypothesis": "Local-edge resolution follows fast flow: at the rolling-300s range boundary, contemporaneous aggressive execution decides resolution (buy pressure at local ceiling = breakout fuel; at floor = defense). Product |roll_pos-0.5|x2 x trade_imbalance_15s carries POSITIVE IC -- flow direction wins at edges vs the bare range-pos average reversion; mid-range rows compress to ~0 (amplitude gate localizes flow info at boundaries). Structurally distinct from dead round-2 range_pos_x_ofi_z/wdi (rolling anchor, execution channel, amplitude gate vs linear sign-flipping product).",
+    "columns_used": ["mid_px", "trade_imbalance_15s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "dayedge_x_ti60",
+    "family": "R3D",
+    "hypothesis": "Day-edge resolution follows flow on the slower clock: the day's cumulative extremes cluster stops/resting interest; mid_day_range_pos's all-horizon NEGATIVE IC is the unconditional average over edge rows regardless of flow. Conditioned on edge proximity, 60s aggressive imbalance decides: product |day_pos-0.5|x2 x trade_imbalance_60s carries POSITIVE IC at 60-900s (flow flips the average reversion sign at edges). Amplitude gate, executed-aggression channel -- distinct from dead range_pos_x_wdi (resting book, linear product).",
+    "columns_used": ["mid_px", "trade_imbalance_60s"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "rollrpos_x_spread_z",
+    "family": "R3D",
+    "hypothesis": "The admitted range_pos_x_spread_z question moved to the LOCAL rolling anchor and faster clock: local boundaries recycle many times/day and resolve on scalper time; stressed quoting at a freshly contested local edge marks imminent resolution in the direction it presses -> centered rolling position x spread z carries POSITIVE IC at 30-300s. Falsifiable: negative IC would mean local-edge stress precedes rejection instead. Rolling anchor decorrelates from the cumulative day-position parent.",
+    "columns_used": ["mid_px", "quoted_spread_ticks"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "iopv_vel_x_wdi",
+    "family": "R3D",
+    "hypothesis": "Book-state gate on arbitrage velocity: the ETF tracks a moving NAV anchor only when the book lets it through -- one-sided book leaning WITH the velocity provides the liquidity path for creation/redemption (continuation); opposing book is a liquidity wall (arb stalls); balanced book discounts velocity. Product z(iopv_velocity,300s) x wdi carries POSITIVE IC; the wdi multiplier doubles as the brief's one-sidedness-vs-balanced gate. Distinct from dead iopv_vel_x_ofi_z (z-of-product, OFI channel): resting-book gate on z(velocity).",
+    "columns_used": ["iopv_velocity", "wdi"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "iopv_drift_x_fbi",
+    "family": "R3D",
+    "hypothesis": "Slow-x-slow: sustained NAV drift (iopv_vel_drift reconstruction) converts into ETF drift only when the BROAD BOOK accommodates -- the outer queue parks creation/redemption programs; full-book regime leaning with the drift sponsors the arb trend (continuation amplified at 300-900s), opposing book absorbs it (drift decays). Product drift x fbi_z carries POSITIVE IC; incremental to both parents (drift parent averages over book state, fbi parent over anchor motion).",
+    "columns_used": ["iopv_velocity", "total_bid_vol", "total_ask_vol"],
+    "target_horizons": [300, 900]
+  }
+]

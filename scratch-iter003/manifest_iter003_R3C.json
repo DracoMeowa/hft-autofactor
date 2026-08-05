@@ -1,0 +1,107 @@
+[
+  {
+    "name": "ofi_sign_persist_60s",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Fast book-flow commitment: fraction of the trailing 60s where consecutive ofi_15s readings kept the same sign, centered and signed by the current direction. Second-order run-structure statistic (transition-to-transition sign retention of the 15s column), magnitude-free, so not another ofi level/z and not the dead pos_frac_300s family (60s columns, positive-row fraction). Committed buy-side building continues 15-60s (CKS 2014 persistence-monotone impact).",
+    "columns_used": ["ofi_15s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_sign_run_300s",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Magnitude-free directional commitment of the book channel: rolling sum of sign(ofi_15s) over 300s (bounded [-1,1]). A state/regime statistic, not a raw magnitude accumulation (the dead ti15_accum family summed sizes); steady one-sided queue-building regimes continue drifting at 300-900s. Reads signs off the 4x-faster ofi_15s column, so flips that ofi_60s averages away still break the run (finer-grained than the dead ofi_pos_frac_300s).",
+    "columns_used": ["ofi_15s"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "ti_sign_streak_30s",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Unbroken aggression streaks mark a working meta-order (Kyle 1985 slicing): when the trade_imbalance_15s sign survives 10 consecutive 3s transitions (>=30s one-sided with no reversal), the factor carries the live imbalance strength, else exactly 0. The sign-survival gate plus the zero mass structurally breaks rank correlation with panel trade_imbalance_60s; a broken streak no longer evidences commitment, so the factor goes silent.",
+    "columns_used": ["trade_imbalance_15s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ti15_sign_x_ofi_z",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Cross-channel AND cross-scale agreement: sign(trade_imbalance_15s) re-signs z_300(ofi_60s). Large positive = aggressors and the book regime push the same way at their own scales (highest conviction, continues 15-60s); large negative = aggressors hitting a book that is not confirming (absorption warning). Not the dead ofi_ti_agree_60s (same-window sign share), not the saturated flow_divergence family (magnitude gap), not ofi_concord_15_60 (same-channel cross-window).",
+    "columns_used": ["trade_imbalance_15s", "ofi_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "trade_book_conflict_60s",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Aggression without book confirmation is absorption in progress (Buti & Rindi 2013): share of the trailing 60s where sign(trade_imbalance_15s) != sign(ofi_60s), multiplied by (-trade_imbalance_15s). Sustained conflict fades the aggressor direction at 15-60s (impact is temporary when the book rebuilds against it); when the book confirms, the factor is silent -- it never fights confirmed flow, so it cannot degenerate into a bare contrarian imbalance level.",
+    "columns_used": ["trade_imbalance_15s", "ofi_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "book_leads_trade_120s",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Temporal-order (lead-lag) structure between channels: share of the trailing 120s where sign(trade_imbalance_15s now) matched sign(z_300(ofi_60s) 6s earlier), centered and signed by the current book-regime sign. Book-led tapes (limit flow reprices first, aggressors chase) continue in the book regime's direction at 15-60s (Hasbrouck 1995 discovery logic). No registered factor measures cross-channel temporal order -- all existing ofi/ti factors are contemporaneous.",
+    "columns_used": ["trade_imbalance_15s", "ofi_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_per_vol_z_300s",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Flow surprise per unit of volatility risk, DIVISION form: z_300(ofi_60s) divided by relative rv_60s regime (rv_60s / trailing-300s mean, clipped [0.5, 2]). The same flow z is cleaner information on a quiet tape (undiluted repricing) than in a vol burst (partly reactive churn), so quiet-tape flow is amplified. Not the dead regime_vol_x_flow (that multiplied z(rv_300s) x z(ti_60s)): different operation, different vol column, different channel; volatility is only the normalizer, never the signal.",
+    "columns_used": ["ofi_60s", "rv_60s"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "ti15_per_vol_regime",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Aggression per unit of vol risk: raw trade_imbalance_15s divided by relative rv_60s regime (clipped [0.5, 2]). One-sided marketable flow on a quiet tape is conspicuous informed arrival (Kyle 1985); the same imbalance in a vol burst is more likely reactive and is discounted. Deliberately not another z-of-ti (ti_15s_z_120s died panel-correlated): the vol-regime denominator re-ranks rows across volatility states instead of across the flow's own history.",
+    "columns_used": ["trade_imbalance_15s", "rv_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_flow_tstat_300s",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Signal-to-noise of the book channel: trailing-300s rolling mean(ofi_15s) / rolling std(ofi_15s), the t-statistic of flow. Steady one-sided building (high |t|) is committed, likely-informed queue investment continuing at 60-900s; violent two-sided sloshing with the same average (low |t|) is churn that mean-reverts. Divides the flow's first moment by its second -- no registered OFI factor does, so noisy tapes with strong average flow score LOW here where magnitude factors score high.",
+    "columns_used": ["ofi_15s"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "buysell_regime_gap_300s",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Which aggressive side is more stretched against ITS OWN 300s regime: z_300(buy_vol_60s) - z_300(sell_vol_60s). Naive (B-S)/(B+S) asymmetry is by construction the panel trade_imbalance_60s (dedup death), but per-side regime-adjusted stretch is a different object: both-sides bursts cancel (churn, scored ~0) while one-sided stretch flags accumulation/distribution continuing at 60-900s. Per-side z-referencing removes the shared volume level that makes raw asymmetry a clone.",
+    "columns_used": ["buy_vol_60s", "sell_vol_60s"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "ltns_confirms_ofi_z",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Institutional confirmation GATE on the book channel: z_300(ofi_60s) passes through only when sign(large_trade_net_share_60s) agrees (nonzero); otherwise exactly 0. Bare ltns died all 3 round-2 attempts, but as a gate it is the conditional form the archive prescribes: whale-corroborated book-flow regime = informed queue investment plus informed executions, continuing 30-300s; unconfirmed surprises are silent, not contrarian. Gate form, book channel -- distinct from the dead ltns_x_ti_60s (product form, trade channel).",
+    "columns_used": ["large_trade_net_share_60s", "ofi_60s"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "ltns_confirms_ti15_z",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Whale-confirmed aggression surprise: z_120(trade_imbalance_15s) gated by sign agreement of large_trade_net_share_60s, else 0. The bare ti_15s_z_120s died panel-correlated; the gate zeroes roughly half the rows, structurally breaking the rank correlation with panel trade_imbalance_60s and leaving only institutionally corroborated surprises -- program slices working with big-ticket participation (Kyle 1985), continuing 15-60s.",
+    "columns_used": ["large_trade_net_share_60s", "trade_imbalance_15s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_z_cross_vel_15s",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Fresh book-flow regime-switch events, causal: z_300(ofi_60s) crossed zero within the last 15s (current z vs lagged z sign test); value = z-velocity at crossings, exactly 0 elsewhere. A regime that was one-sided for minutes but reversed in seconds is information-dense; fast decisive crosses (queue pull-and-rebuild) continue in the new direction at 15-60s. Event-sparse, unlike the dead ofi_mom_60s which is z-momentum active every row.",
+    "columns_used": ["ofi_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_flip_fade_300s",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Direction-flip intensity of the book-flow regime: share of the trailing 300s where sign(z_300(ofi_60s)) flipped vs the prior row, scored as -flip_rate x current z. A high flip rate = two-sided battle with no committed participant, so whichever side leads now is the most likely to give way -- fade it with strength proportional to instability and regime extremity; stable regimes leave the factor silent. No registered factor measures OFI-regime reversal frequency.",
+    "columns_used": ["ofi_60s"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "ofi_regime_mature_60s",
+    "family": "cross_scale_flow_structure",
+    "hypothesis": "Regime maturity gate: z_300(ofi_60s) is passed through only when its sign has held unbroken for >=60s (rolling_min over 20 same-sign transitions); young/just-flipped regimes score 0. Persistence amplifies OFI impact (CKS 2014), so continuation weight goes only to regimes with demonstrated staying power. A duration gate, not a level: identical z values score differently by how long the sign has held. Completes the cross/fade/maturity partition of the regime-switch family.",
+    "columns_used": ["ofi_60s"],
+    "target_horizons": [30, 60, 300]
+  }
+]

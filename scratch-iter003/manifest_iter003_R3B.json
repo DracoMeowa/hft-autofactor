@@ -1,0 +1,100 @@
+[
+ {
+  "name": "div_pos_frac_300s",
+  "family": "R3B",
+  "hypothesis": "Trailing-300s fraction of snapshots with (wdi - full-book imbalance) > 0: the DURATION of the touch-leading-queue regime, not its magnitude. A persistently positive top5-vs-full divergence is a durable structural posture (displayed liquidity consistently out front of hidden liquidity) that decays slowly; occupancy is near-orthogonal to the library z-score (intensity) and to all momentum factors, aimed at the slow regime horizons.",
+  "columns_used": ["wdi", "total_bid_vol", "total_ask_vol"],
+  "target_horizons": [60, 300, 900]
+ },
+ {
+  "name": "book_div_z_120s",
+  "family": "R3B",
+  "hypothesis": "Trailing-120s z of the top5-vs-full-book divergence (wdi - fbi): a faster mismatch clock than the library's 300s z. The shorter reference window isolates the ONSET of the touch breaking away from (or snapping back to) the deep queue, catching divergence formation as it happens rather than the settled regime, aimed at 15-60s where fast book state carried round-1.",
+  "columns_used": ["wdi", "total_bid_vol", "total_ask_vol"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_bid_support_z_300s",
+  "family": "R3B",
+  "hypothesis": "Trailing-300s z of the bid-side hidden share (total_bid_vol - depth_bid5)/total_bid_vol: the fraction of bid depth parked BEYOND the executable top-5. A bid side stacked deep is patient demand below the touch - a durable reservoir that refills the visible bid and supports upward drift / a firm floor. One-sided hidden-placement level, distinct from conc_imb_z (bid-vs-ask asymmetry) and from imbalance ratios; z keeps it in the live regime class.",
+  "columns_used": ["depth_bid5", "total_bid_vol"],
+  "target_horizons": [60, 300, 900]
+ },
+ {
+  "name": "hidden_ask_supply_z_300s",
+  "family": "R3B",
+  "hypothesis": "Trailing-300s z of the ask-side hidden share (total_ask_vol - depth_ask5)/total_ask_vol: patient SELLING interest stacked above the touch that keeps refilling the visible offer and caps rallies. The supply-side twin of hidden bid support; decomposing by side exposes where hidden liquidity sits that a net imbalance washes out.",
+  "columns_used": ["depth_ask5", "total_ask_vol"],
+  "target_horizons": [60, 300, 900]
+ },
+ {
+  "name": "hidden_imb_z_300s",
+  "family": "R3B",
+  "hypothesis": "Trailing-300s z of the hidden-layer imbalance (hidden_bid - hidden_ask)/(hidden_bid + hidden_ask), using ONLY depth beyond the top-5. fullbook_imb_z blends the touch in; this reads the queued-intent layer alone. Hidden depth is posted deliberately and not forced to execute, so a persistently hidden-bid-skewed book is patient accumulation the displayed book can mask, preceding visible queue changes at 300-900s. Ratio/z form (raw hidden-qty momentum died in round 2).",
+  "columns_used": ["total_bid_vol", "total_ask_vol", "depth_bid5", "depth_ask5"],
+  "target_horizons": [15, 30, 60, 300, 900]
+ },
+ {
+  "name": "visible_share_z_300s",
+  "family": "R3B",
+  "hypothesis": "Trailing-300s z of the top-5 share of TOTAL book depth ((depth_bid5+depth_ask5)/(total_bid_vol+total_ask_vol)): the book-concentration regime. A scale-free, SIGN-BLIND shape variable (where liquidity lives, not which side it favors) orthogonal to every imbalance/divergence factor. High share = concentrating at the touch with little hidden buffer behind -> once the visible tip is consumed price walks far per unit flow; low share = deep reserves absorb flow.",
+  "columns_used": ["depth_bid5", "depth_ask5", "total_bid_vol", "total_ask_vol"],
+  "target_horizons": [60, 300, 900]
+ },
+ {
+  "name": "vis_share_x_ti",
+  "family": "R3B",
+  "hypothesis": "Book-concentration z x trade_imbalance_60s: aggressive flow striking a touch-concentrated (hidden-buffer-thin) book has amplified, direction-persistent impact. Positive product = flow direction backed by a brittle, touch-heavy book with little hidden depth to absorb it -> continuation; deep-heavy books damp the same flow. Sign-symmetric product of a sign-blind shape state and a signed flow, near-orthogonal to either parent.",
+  "columns_used": ["depth_bid5", "depth_ask5", "total_bid_vol", "total_ask_vol", "trade_imbalance_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "div_x_ti_align",
+  "family": "R3B",
+  "hypothesis": "Top5-vs-full divergence z x trade_imbalance_60s: when the structural touch-vs-queue mismatch AGREES with the aggressive flow direction (positive product), resting depth validates the flow (hidden absorption) and the move persists at 15-60s; disagreement flags a touch bias attacked without deep-queue support - fragile, prone to revert. Turns a static mismatch regime into a flow-conditioned directional signal.",
+  "columns_used": ["wdi", "total_bid_vol", "total_ask_vol", "trade_imbalance_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "div_x_ofi_align",
+  "family": "R3B",
+  "hypothesis": "Top5-vs-full divergence z x z(ofi_60s): OFI is where resting orders are added/pulled right now. Agreement means the queue is actively REBUILDING on the side the deep book already favors (fresh interest backing the mismatch -> continuation); opposition means the favored side is being hollowed out (orders pulled -> reversion). OFI is the natural book-side flow companion for a book-structure mismatch, complementing div_x_ti_align (executed aggression).",
+  "columns_used": ["wdi", "total_bid_vol", "total_ask_vol", "ofi_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "div_z_x_spread_z",
+  "family": "R3B",
+  "hypothesis": "Top5-vs-full divergence z x spread-state z (quoted_spread_ticks, 300s): a touch-vs-queue mismatch under WIDE stressed spreads is likely informed positioning (makers fearful yet the book still builds a one-sided touch bias) -> strong continuation at 15-60s; the same structure under tight comfortable spreads may be benign churn. Stress-gating the mismatch; distinct from flow_divergence_x_spread_z which conditions the FLOW divergence, not the book-structure divergence.",
+  "columns_used": ["wdi", "total_bid_vol", "total_ask_vol", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_imb_x_ti",
+  "family": "R3B",
+  "hypothesis": "Hidden-layer imbalance x trade_imbalance_60s: alignment of patient queued depth (beyond top-5) with aggressive flow. Positive product = hidden layer and aggression lean the same way (hidden depth positioned to absorb/validate the flow -> persistence); negative = aggression attacking OPPOSITE the hidden reservoir (patient depth absorbs the blows -> exhaustion/reversal of the aggressive side). Interaction member of the hidden-imbalance pair, bounded x bounded.",
+  "columns_used": ["total_bid_vol", "total_ask_vol", "depth_bid5", "depth_ask5", "trade_imbalance_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "bid_absorb_x_sell",
+  "family": "R3B",
+  "hypothesis": "Hidden-bid-support z x (-trade_imbalance_60s): aggressive SELLING meeting an unusually DEEP hidden-bid reservoir. Patient bids parked below the touch absorb downside aggression without executing - impact blunted, the move exhausts, setting up a floor / upward reversion at 15-60s. Fires only when hidden demand and sell aggression co-occur; a one-sided absorption bet distinct from the symmetric hidden_imb_x_ti and from the hidden_bid_support_z level.",
+  "columns_used": ["depth_bid5", "total_bid_vol", "trade_imbalance_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_imb_pos_frac_300s",
+  "family": "R3B",
+  "hypothesis": "Trailing-300s fraction of snapshots with hidden-layer imbalance > 0: the DURATION of the hidden bid-skew regime. A persistently hidden-bid-skewed queue is entrenched patient accumulation that has stayed parked below the touch across many snapshots (not a flicker), decaying slowly and conditioning 300-900s drift. Duration vs intensity (hidden_imb_z) are different economic questions; occupancy near-orthogonal to z and momentum.",
+  "columns_used": ["total_bid_vol", "total_ask_vol", "depth_bid5", "depth_ask5"],
+  "target_horizons": [60, 300, 900]
+ },
+ {
+  "name": "div_x_vis_share",
+  "family": "R3B",
+  "hypothesis": "Divergence z x concentration z: algebraically divergence = hidden_share x (visible imbalance - hidden imbalance), so its magnitude is mechanically damped when depth concentrates at the touch. A divergence that stays large WHILE the book is touch-concentrated implies an outsized visible-vs-hidden dislocation hidden reserves cannot explain - an acute structural conflict at the executable levels resolving directionally at 15-60s; the same divergence in a deep-heavy book is buffered and benign.",
+  "columns_used": ["wdi", "total_bid_vol", "total_ask_vol", "depth_bid5", "depth_ask5"],
+  "target_horizons": [15, 30, 60]
+ }
+]
