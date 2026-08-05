@@ -25,6 +25,7 @@ from hft_autofactor.explore.runner import run_prototype
 from hft_autofactor.explore.screen import (
     PANEL_FACTORS,
     ScreenConfig,
+    head_long_short_stats,
     library_correlations,
     screen_prototype,
 )
@@ -315,6 +316,105 @@ def test_screen_respects_custom_thresholds(explore_cfg):
     tight = ScreenConfig(min_retention=1.5)  # impossible retention
     report = screen_prototype(explore_cfg, signal_proto(), DATES, screen_cfg=tight)
     assert report.passed is False
+
+
+# --------------------------------------------------------------------- #
+# eval v2: descriptive head long/short stats                            #
+# --------------------------------------------------------------------- #
+def _head_panel(dates=("20250602", "20250603"), n_rows: int = 100) -> pl.DataFrame:
+    """Deterministic panel: factor = 0..n_rows-1 per date (exact quantiles),
+    label = (factor - mid) * 1e-4 so head returns are exact in bps."""
+    records = []
+    for date in dates:
+        for r in range(n_rows):
+            records.append(
+                {
+                    "date": date,
+                    "factor_f": float(r),
+                    "fwd_mid_ret_60s": (r - (n_rows - 1) / 2.0) * 1e-4,
+                }
+            )
+    return pl.DataFrame(records)
+
+
+def test_head_stats_exact_quantile_heads():
+    """tau = 1%/5%/10% heads on an arange factor give exact gross bps."""
+    panel = _head_panel()  # 2 dates x 100 rows, factor 0..99, mid = 49.5
+    rows = head_long_short_stats(panel, "factor_f", 60)
+    assert [row["tau"] for row in rows] == [0.01, 0.05, 0.10]
+    # rows >= quantile(0.99) = 98.01 -> value 99 only (per date);
+    # >= quantile(0.95) = 94.05 -> 95..99; >= quantile(0.90) = 89.1 -> 90..99
+    assert [row["n_long"] for row in rows] == [2, 10, 20]
+    assert [row["n_short"] for row in rows] == [2, 10, 20]
+    # both dates contribute to every head
+    for row in rows:
+        assert row["n_days_long"] == 2
+        assert row["n_days_short"] == 2
+    # mean(top) - 49.5: {99} -> 49.5; {95..99} -> 47.5; {90..99} -> 45.0
+    for row, expected in zip(rows, (49.5, 47.5, 45.0)):
+        assert row["long_gross_bps"] == pytest.approx(expected)
+        assert row["short_gross_bps"] == pytest.approx(expected)
+        # net = gross - 2 * cost_bps_per_side (default 3bp/side = 6bp RT)
+        assert row["long_net_bps"] == pytest.approx(expected - 6.0)
+        assert row["short_net_bps"] == pytest.approx(expected - 6.0)
+
+
+def test_head_stats_custom_cost_per_side():
+    panel = _head_panel(dates=("20250602",))
+    rows = head_long_short_stats(
+        panel, "factor_f", 60, taus=(0.10,), cost_bps_per_side=1.0
+    )
+    assert len(rows) == 1
+    assert rows[0]["long_net_bps"] == pytest.approx(rows[0]["long_gross_bps"] - 2.0)
+    zero = head_long_short_stats(
+        panel, "factor_f", 60, taus=(0.10,), cost_bps_per_side=0.0
+    )
+    assert zero[0]["long_net_bps"] == pytest.approx(zero[0]["long_gross_bps"])
+
+
+def test_head_stats_missing_columns_or_all_null_labels():
+    panel = _head_panel(dates=("20250602",))
+    assert head_long_short_stats(panel, "no_such_column", 60) == []
+    assert head_long_short_stats(panel, "factor_f", 9999) == []  # label absent
+    # label column present but all-null -> nothing to score
+    nulled = panel.with_columns(
+        pl.lit(None, dtype=pl.Float64).alias("fwd_mid_ret_15s")
+    )
+    assert head_long_short_stats(nulled, "factor_f", 15) == []
+
+
+def test_screen_horizon_rows_carry_head_stats(explore_cfg):
+    """eval v2 wiring: every horizon row reports 3 tau-heads on the OOS
+    block; the planted signal makes the long head gross-positive."""
+    _run(explore_cfg, signal_proto())
+    report = screen_prototype(explore_cfg, signal_proto(), DATES)
+    assert report.status == "ok"
+    for row in report.horizons:
+        heads = row["head_stats"]
+        assert [h["tau"] for h in heads] == [0.01, 0.05, 0.10]
+        for h in heads:
+            assert h["n_long"] > 0 and h["n_short"] > 0
+            assert h["n_days_long"] >= 1
+            # net = gross - 6bp round trip (fixed 3bp/side)
+            assert h["long_net_bps"] == pytest.approx(h["long_gross_bps"] - 6.0)
+            assert h["short_net_bps"] == pytest.approx(h["short_gross_bps"] - 6.0)
+        # planted signal: top rows carry positive fwd returns at every horizon
+        assert heads[-1]["long_gross_bps"] > 0.0  # tau = 10% head
+    # the descriptive stats survive into the persisted report
+    payload = json.loads(report.report_path.read_text(encoding="utf-8"))
+    assert all(len(row["head_stats"]) == 3 for row in payload["horizons"])
+
+
+def test_screen_head_stats_respect_cost_config(explore_cfg):
+    """ScreenConfig.cost_bps_per_side flows into the head stats."""
+    _run(explore_cfg, signal_proto())
+    free = ScreenConfig(cost_bps_per_side=0.0, head_taus=(0.10,))
+    report = screen_prototype(explore_cfg, signal_proto(), DATES, screen_cfg=free)
+    for row in report.horizons:
+        assert len(row["head_stats"]) == 1
+        h = row["head_stats"][0]
+        assert h["tau"] == 0.10
+        assert h["long_net_bps"] == pytest.approx(h["long_gross_bps"])
 
 
 # --------------------------------------------------------------------- #

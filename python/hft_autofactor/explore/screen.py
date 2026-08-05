@@ -17,6 +17,12 @@ A cheap gate between "prototype computes" and the full Stage-4 evaluation:
 Every screened (prototype, horizon) is appended to the shared trial ledger
 BEFORE thresholds are read -- exploration trials count against the zoo's
 honest N exactly like Stage-1 candidates.
+
+Eval v2 (2026-08-05, docs/design/eval-v2-ic-primary.md): the IC gate above
+stays the ADMISSION criterion; each horizon row additionally carries a
+DESCRIPTIVE head long/short stat (:func:`head_long_short_stats`) computed on
+the OOS block with a fixed cost of ``cost_bps_per_side`` per side.  The old
+#86 conditional matrix no longer gates anything.
 """
 from __future__ import annotations
 
@@ -42,6 +48,7 @@ __all__ = [
     "PANEL_FACTORS",
     "ScreenConfig",
     "ScreenReport",
+    "head_long_short_stats",
     "library_correlations",
     "screen_prototype",
 ]
@@ -71,6 +78,12 @@ class ScreenConfig:
     embargo_days: int = 1          # purged days between train end and test start
     n_test_days: int = 5           # OOS block size of the walk-forward folds
     max_corr_obs: int = 200_000    # deterministic subsample cap for correlations
+    # --- eval v2 (2026-08-05, docs/design/eval-v2-ic-primary.md) ----------
+    # IC remains the admission gate; the head long/short stats below are a
+    # DESCRIPTIVE companion.  Fixed trading cost of cost_bps_per_side per
+    # side (one entry + one exit = 2 * cost_bps_per_side per round trip).
+    cost_bps_per_side: float = 3.0
+    head_taus: tuple[float, ...] = (0.01, 0.05, 0.10)
 
 
 @dataclass
@@ -130,6 +143,67 @@ def library_correlations(
 
 def _filter_dates(panel: pl.DataFrame, dates: Sequence[str]) -> pl.DataFrame:
     return panel.filter(pl.col("date").is_in(list(dates)))
+
+
+def head_long_short_stats(
+    panel: pl.DataFrame,
+    column: str,
+    horizon_s: int,
+    *,
+    taus: Sequence[float] = (0.01, 0.05, 0.10),
+    cost_bps_per_side: float = 3.0,
+    label: str = "fwd_mid_ret",
+) -> list[dict]:
+    """Descriptive head long/short stats (eval v2, NOT an admission gate).
+
+    For each ``tau``: rows whose factor value falls in the top ``tau``
+    within-day quantile form the LONG head, the bottom ``tau`` the SHORT
+    head (quantiles are computed PER DATE so "top 1%" means top 1% of that
+    day -- correct for a single-instrument panel where there is no
+    cross-section).  Reports gross and net mean forward return per head in
+    bps; net subtracts a fixed round-trip cost of ``2 * cost_bps_per_side``.
+    Labels are the horizon's ``fwd_mid_ret`` returns; nulls dropped.
+    """
+    lab = label_column(horizon_s, label)
+    if column not in panel.columns or lab not in panel.columns:
+        return []
+    df = panel.select(["date", column, lab]).drop_nulls(subset=[column, lab])
+    if df.is_empty():
+        return []
+    round_trip_bps = 2.0 * float(cost_bps_per_side)
+    rows: list[dict] = []
+    for tau in taus:
+        tau = float(tau)
+        q = df.group_by("date").agg(
+            pl.col(column)
+            .quantile(1.0 - tau, interpolation="linear")
+            .alias("hi"),
+            pl.col(column).quantile(tau, interpolation="linear").alias("lo"),
+        )
+        j = df.join(q, on="date", how="left")
+        top = j.filter(pl.col(column) >= pl.col("hi"))
+        bot = j.filter(pl.col(column) <= pl.col("lo"))
+
+        def _mean_bps(part: pl.DataFrame) -> float:
+            m = part[lab].mean() if part.height else None
+            return float(m) * 1e4 if m is not None and np.isfinite(m) else float("nan")
+
+        long_gross = _mean_bps(top)
+        short_gross = -_mean_bps(bot)
+        rows.append(
+            {
+                "tau": tau,
+                "long_gross_bps": long_gross,
+                "long_net_bps": long_gross - round_trip_bps,
+                "short_gross_bps": short_gross,
+                "short_net_bps": short_gross - round_trip_bps,
+                "n_long": top.height,
+                "n_short": bot.height,
+                "n_days_long": top["date"].n_unique(),
+                "n_days_short": bot["date"].n_unique(),
+            }
+        )
+    return rows
 
 
 def screen_prototype(
@@ -286,6 +360,16 @@ def screen_prototype(
                 "is_t_ok": bool(is_t_ok),
                 "oos_t_ok": bool(oos_t_ok),
                 "passed": bool(retention_ok and is_t_ok and oos_t_ok),
+                # eval v2 descriptive companion (NOT part of the gate):
+                # head long/short stats on the OOS block, fixed cost
+                # sc.cost_bps_per_side per side
+                "head_stats": head_long_short_stats(
+                    oos_panel,
+                    proto.name,
+                    h,
+                    taus=sc.head_taus,
+                    cost_bps_per_side=sc.cost_bps_per_side,
+                ),
             }
         )
 
@@ -350,6 +434,15 @@ def _write_screen_report(
         encoding="utf-8",
     )
     if report.horizons:
-        pl.DataFrame(report.horizons).write_csv(path.with_suffix(".csv"))
+        # CSV is flat: serialize the nested eval-v2 head_stats column to a
+        # JSON string (the JSON report keeps the structured form)
+        csv_rows = [
+            {
+                k: (json.dumps(v, ensure_ascii=False) if k == "head_stats" else v)
+                for k, v in row.items()
+            }
+            for row in report.horizons
+        ]
+        pl.DataFrame(csv_rows).write_csv(path.with_suffix(".csv"))
     report.report_path = path
     return path
