@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
@@ -33,7 +34,14 @@ from ..config import PipelineConfig
 from ..eval.gating import GateConfig, TrialLedger, permutation_noise_floor, stage1_screen, stage2_oos_gate
 from ..eval.ic import ic_stats, rank_ic_cross_section, rank_ic_time_series
 from ..eval.splits import purged_day_splits
-from ..ingest import DEFAULT_FACTORS, DayJob, build_day_parquet, discover_jobs, load_panel
+from ..ingest import (
+    DEFAULT_FACTORS,
+    DayJob,
+    build_day_parquet,
+    discover_jobs,
+    load_panel,
+    raw_channel_csvs,
+)
 from ..validation.golden import hash_output_csv, store_golden
 from ..validation.mask_test import engine_cli_args, mask_test_day, run_engine
 
@@ -322,6 +330,15 @@ def run_convert_stage(
     cfg.ensure_dirs()
     paths: list[Path] = []
     for date in sorted(set(dates)):
+        if not raw_channel_csvs(cfg.raw_dir / date):
+            # calendar-range date specs include non-trading days; only dates
+            # the factors stage actually produced CSVs for can be converted.
+            print(
+                f"warning: skipping {date}: no raw channel CSVs under "
+                f"{cfg.raw_dir / date}",
+                file=sys.stderr,
+            )
+            continue
         paths.append(
             build_day_parquet(
                 date, cfg, overwrite=overwrite, instruments=instruments

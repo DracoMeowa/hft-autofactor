@@ -285,6 +285,22 @@ def test_build_day_parquet_legacy_partition_without_sidecar_reused(small_cfg):
 
 
 # --------------------------------------------------------------------- #
+# convert stage: calendar ranges include dataless dates                 #
+# --------------------------------------------------------------------- #
+def test_convert_stage_skips_dates_without_raw_csvs(small_cfg, capsys):
+    """A calendar-range date spec (e.g. 20250701..20250930) includes
+    non-trading days the factors stage never produced CSVs for; the convert
+    stage must skip those with a warning instead of dying on the first one
+    (mat17 batch rc=1: died on Saturday 20250705)."""
+    _write_raw_day(small_cfg, DATE, [INST])
+    paths = orchestrator.run_convert_stage(small_cfg, [DATE, "20250604"])
+    assert small_cfg.parquet_path(DATE).is_file()
+    assert not small_cfg.parquet_path("20250604").exists()
+    assert len(paths) == 1
+    assert "20250604" in capsys.readouterr().err
+
+
+# --------------------------------------------------------------------- #
 # eval stage end-to-end on ONE instrument                               #
 # --------------------------------------------------------------------- #
 def test_eval_stage_single_instrument_skips_cross_section(small_cfg):

@@ -227,6 +227,10 @@ def _raw_channel_csvs(raw_day_dir: Path) -> list[Path]:
     )
 
 
+#: Public alias (the convert stage uses this to skip dataless dates).
+raw_channel_csvs = _raw_channel_csvs
+
+
 def _convert_uptodate(
     date: str, cfg: PipelineConfig, instruments: list[str] | None
 ) -> bool:
