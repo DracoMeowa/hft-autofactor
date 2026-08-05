@@ -2544,32 +2544,56 @@
     {
       "name": "large_trade_share_60s",
       "lens": "flow-queue",
-      "verdict": "needs_materialization",
+      "verdict": "rejected",
       "admitted_horizons": [],
-      "promotion": "needs_materialization",
+      "promotion": "none",
       "mechanism": "Trade-size conditioning: share of trailing-60s aggressive volume carried by large prints. Large trades carry more information (urgent informed flow splits less); the size DISTRIBUTION of flow - not just its signed sum - should condition continuation/reversal. Complements ofi/ti which are size-blind sums.",
-      "info_set": "NOT COMPUTABLE FROM PANEL: needs per-trade Volume + aggressor side (TrdBSFlag) from the tick stream.",
+      "info_set": "Materialized 2026-08-05 (#137): engine column large_trade_share_60s computed from per-trade Volume + TrdBSFlag, replayed over all 66 days (42-col panel).",
       "inspiration": "Lens mandate 'trade-size conditioning'; digest opportunity map 'large-order depth share' unexplored; Kyle (1985); Bouchaud et al. (2004) square-root meta-order impact.",
-      "causal_prefix_ok": null,
-      "detail": "Mechanism and spec drafted but the materialized panel lacks per-trade sizes. Cheapest path: add avg_trade_size_60s / large_trade_share_60s to the C++ engine factor set and replay via the instrument-level cache (~0.4s/day for 588000). Register in iter-002 once the column exists.",
-      "is_stats": null,
-      "oos_stats": null,
-      "max_corr_library": null
+      "causal_prefix_ok": true,
+      "detail": "iter-002, eval v2 (IC-primary gate, cost 3bp/side, OOS = 20250924-0930, 5 days, train 20250701-0923): screened as identity prototype large_trade_share_level (spec c8f7602). rejected_duplicate flag is STRUCTURAL (identity of the source column, corr 1.0 vs PANEL_FACTORS universe) and not informative; the IC rows are the evidence: |IC| <= 0.025 with |t| <= 1.90 at ALL horizons 15/30/60/300/900s; the borderline 300/900s IS t (-1.65/-1.90) flips sign OOS (no retention). Head stats tau=5% OOS: long gross +0.5/+0.9/+1.1bp at 15/30/60s (net -5.5/-5.1/-5.0bp after 6bp RT), 300/900s long gross +3.5/+1.2bp with short gross -7.0/-6.7bp but IC gate fails (noise). VERDICT: the LEVEL of the large-trade share does not predict 588000 mid returns at any horizon; mechanism may still work as a CONDITIONING variable (interactions, e.g. flow x large-share) -- see iter-003.",
+      "is_stats": {
+        "15": {"rank_ic": -0.0008, "t_nw": -0.18},
+        "30": {"rank_ic": -0.0011, "t_nw": -0.20},
+        "60": {"rank_ic": -0.0017, "t_nw": -0.24},
+        "300": {"rank_ic": -0.0167, "t_nw": -1.65},
+        "900": {"rank_ic": -0.0249, "t_nw": -1.90}
+      },
+      "oos_stats": {
+        "15": {"rank_ic": 0.0133, "t_nw": 1.31},
+        "30": {"rank_ic": 0.0079, "t_nw": 0.50},
+        "60": {"rank_ic": -0.0137, "t_nw": -0.66},
+        "300": {"rank_ic": 0.0116, "t_nw": 0.73},
+        "900": {"rank_ic": 0.0046, "t_nw": 0.13}
+      },
+      "max_corr_library": 1.000
     },
     {
       "name": "trade_arrival_burst",
       "lens": "accumulation-regime",
-      "verdict": "needs_materialization",
+      "verdict": "rejected",
       "admitted_horizons": [],
-      "promotion": "needs_materialization",
+      "promotion": "none",
       "mechanism": "Trade-arrival bursts (Hawkes self-excitation / ACD): information events cluster, so a burst in trade-arrival rate relative to its trailing baseline flags the start of an information episode that unfolds over minutes (300/900s signal). Requires actual trade counts or inter-trade durations.",
-      "info_set": "REQUIRED: cum_trade_vol or trade_gap_ms/trade counts (absent from panel); order_arrival_60s present but NaN-by-design on SSE.",
+      "info_set": "Materialized 2026-08-05 (#137): n_trades_60s engine column; prototype = z-score of 300s arrival intensity (rolling mean of n_trades_60s, FAST=100 rows) vs trailing-1800s baseline (BASE=600 rows), spec b9592ff.",
       "inspiration": "Engle & Russell (1998) ACD; Hawkes self-excitation; digest: arrival/cancel dynamics only testable on SZSE or via snapshot-delta reconstruction.",
-      "causal_prefix_ok": null,
-      "detail": "Untestable on the current 588000 panel; the only panel-feasible proxy (1-bit last_px-changed indicator) cannot separate arrival RATE from trade SIZE and conflates the mechanism with time-of-day seasonality, so it was deliberately NOT registered (would spend honest-N ledger trials without testing the mechanism). Panel wishlist: cum_trade_vol (zero engine-logic cost) and/or trade_gap_ms. On SZSE instruments order-arrival decode IS reliable -- test there first in the multi-asset phase.",
-      "is_stats": null,
-      "oos_stats": null,
-      "max_corr_library": null
+      "causal_prefix_ok": true,
+      "detail": "iter-002, eval v2 (IC-primary gate, cost 3bp/side, OOS = 20250924-0930, 5 days, train 20250701-0923): run + screen over all 66 days, dedup universe = PANEL_FACTORS, max |corr| 0.320 (novel, not a duplicate). FAIL at ALL horizons 15/30/60/300/900s: |IC| <= 0.012 with |t| <= 0.77 IS and <= 1.18 OOS; the only notable cell (OOS 900s IC -0.093, t -1.18) flips sign vs IS (no retention). Head stats tau=5% OOS: long gross +0.4/+0.6/+1.0bp at 15/30/60s (net -5.6/-5.4/-5.0bp after 6bp RT), short gross ~0; 300/900s both heads negative. VERDICT: direction-free arrival INTENSITY (burst z-score) carries no rank information about 588000 mid returns at any horizon; signed-arrival or conditional variants (burst x concurrent direction) remain untested -- see iter-003.",
+      "is_stats": {
+        "15": {"rank_ic": 0.0037, "t_nw": 0.77},
+        "30": {"rank_ic": 0.0027, "t_nw": 0.40},
+        "60": {"rank_ic": 0.0032, "t_nw": 0.32},
+        "300": {"rank_ic": 0.0024, "t_nw": 0.11},
+        "900": {"rank_ic": -0.0011, "t_nw": -0.04}
+      },
+      "oos_stats": {
+        "15": {"rank_ic": -0.0046, "t_nw": -0.33},
+        "30": {"rank_ic": -0.0045, "t_nw": -0.25},
+        "60": {"rank_ic": -0.0120, "t_nw": -0.47},
+        "300": {"rank_ic": 0.0043, "t_nw": 0.11},
+        "900": {"rank_ic": -0.0926, "t_nw": -1.18}
+      },
+      "max_corr_library": 0.320
     }
   ]
 }
