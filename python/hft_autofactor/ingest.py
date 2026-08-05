@@ -63,6 +63,24 @@ WISHLIST_FACTORS: tuple[str, ...] = (
     "large_trade_share_60s",
     "trade_gap_ms",
     "cum_trade_vol",
+    # batch 2 (2026-08-06, #144): snapshot pass-throughs + short-window flow
+    "total_bid_vol",
+    "total_ask_vol",
+    "bid_orders5",
+    "ask_orders5",
+    "open_px",
+    "high_px",
+    "low_px",
+    "pre_close_px",
+    "iopv_velocity",
+    "ofi_15s",
+    "ofi_30s",
+    "trade_imbalance_15s",
+    "trade_imbalance_30s",
+    "buy_vol_60s",
+    "sell_vol_60s",
+    "large_trade_net_share_60s",
+    "book_event_intensity_60s",
 )
 
 #: Interchange columns that are always present and are not factor columns.

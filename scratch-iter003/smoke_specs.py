@@ -79,6 +79,24 @@ def synth_arrays(n: int = N, seed: int = 7) -> dict:
         "large_trade_share_60s": np.clip(_causal_mean(rng.normal(0.3, 0.2, n), 20), 0, 1),
         "trade_gap_ms": rng.exponential(1200.0, n) + 40.0,
         "cum_trade_vol": np.cumsum(np.exp(rng.normal(4.0, 0.8, n))),
+        # --- batch-2 wishlist columns (#144, materialized 2026-08-06) ---
+        "total_bid_vol": np.exp(rng.normal(9.5, 0.5, n)),
+        "total_ask_vol": np.exp(rng.normal(9.4, 0.5, n)),
+        "bid_orders5": np.round(np.exp(rng.normal(2.2, 0.6, n))),
+        "ask_orders5": np.round(np.exp(rng.normal(2.1, 0.6, n))),
+        "open_px": np.full(n, mid[0]),
+        "high_px": np.maximum.accumulate(last),
+        "low_px": np.minimum.accumulate(last),
+        "pre_close_px": np.full(n, mid[0] * 0.998),
+        "iopv_velocity": rng.normal(0.0, 0.03, n),
+        "ofi_15s": _causal_mean(rng.normal(0.0, 400.0, n), 5),
+        "ofi_30s": _causal_mean(rng.normal(0.0, 400.0, n), 10),
+        "trade_imbalance_15s": np.tanh(np.cumsum(rng.normal(0.0, 0.10, n))),
+        "trade_imbalance_30s": np.tanh(np.cumsum(rng.normal(0.0, 0.08, n))),
+        "buy_vol_60s": np.exp(_causal_mean(rng.normal(6.5, 0.6, n), 20)),
+        "sell_vol_60s": np.exp(_causal_mean(rng.normal(6.4, 0.6, n), 20)),
+        "large_trade_net_share_60s": np.clip(_causal_mean(rng.normal(0.0, 0.5, n), 20), -1, 1),
+        "book_event_intensity_60s": rng.exponential(6.0, n) + 2.0,
     }
 
 
