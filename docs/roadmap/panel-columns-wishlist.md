@@ -87,3 +87,48 @@ signed 大单占比变体作为后续候选，不在本批。
 - 两候选（large_trade_share_level、trade_arrival_burst）已于 eval v2 下
   完成首测，均 rejected（详见 /data/factor_lzt/iterations/eval_v2_iter002.md
   与 library/candidates.json，6e849bb）。
+
+### 2026-08-06 第二批（iter-003 宽表迭代解锁，#144，588000 试点）
+
+同样以 **opt-in 因子列**实现（不进 `kDefaultFactorNames`；`WISHLIST_FACTORS`
+扩至 22 列，注册表保留名同步扩容）。面板由 42 列 → **59 列**
+（CSV 58 列 + channel；314,053 行 × 66 交易日 × 仅 588000）。
+
+| 列 | 组别 | 说明 |
+|---|---|---|
+| `total_bid_vol` / `total_ask_vol` | A 组 | 全簿买卖量合计（比 depth_*5 更宽） |
+| `bid_orders5` / `ask_orders5` | A 组（名义） | 五档委托笔数合计——**SSE 上结构性为 0**（见下） |
+| `open_px` / `high_px` / `low_px` / `pre_close_px` | A 组 | 日内参考价直通；high/low 为行情流滚动极值，因果成立 |
+| `iopv_velocity` | A 组 | IOPV 60s 变化率（bps/s） |
+| `ofi_15s` / `ofi_30s` | B 组 | 与 ofi_60s 同式的短窗订单流不平衡 |
+| `trade_imbalance_15s` / `trade_imbalance_30s` | B 组 | 短窗主动成交不平衡 ∈[-1,1] |
+| `buy_vol_60s` / `sell_vol_60s` | B 组 | 方向归因成交量（≥0） |
+| `large_trade_net_share_60s` | B 组 | 大单（最大 ~10% 笔）**带符号**净占比 ∈[-1,1] |
+| `book_event_intensity_60s` | B 组 | 每秒订单簿事件数（逐笔驱动） |
+
+执行：stage2 replay `hftaf factors --dates 20250701..20250930 --cache use
+--overwrite --workers 4`（仅 ch5 有缓存，其余 5 通道报
+"cannot open cache meta" 属预期）+ stage3 `hftaf convert --instruments 588000
+--overwrite`。schema 驱动（CSV 头 → Float64），python 层零改动直通。
+
+**成本实测**：stage2 wall ≈ 40 min（34 个因子列；第一批 17 列时 31 min，
+I/O 主导、随列数缓增）；stage3 convert 合计 ≈ 1 min。
+
+**三个坑（务必记住）**：
+
+1. **周六测试数据混入**：缓存目录含 5 个周六（20250809/20250823/20250906/
+   20250920/20250927）的 SSE 测试行情。`--dates` 按缓存目录展开而非交易日历，
+   replay 把这 5 天也物化了（raw+parquet 一度 71 天）。已删除这 5 天的派生输出
+   （均为 /data/factor_lzt 下派生物，未触碰原始数据），恢复 66 天与第一轮
+   评估全域一致。**教训：物化后必须核对分区集 == 交易日集；`ls` 缓存目录
+   不等于交易日历。**
+2. **bid_orders5/ask_orders5 在 SSE 上恒为 0**：SSE 快照无逐档委托数字段、
+   亦无逐笔委托事件，`book.cpp` 的 num_orders 只在委托事件 insert_level 时
+   累加。列保留（SZSE 阶段可能有效）但当前无效；"平均每单规模/单数不均衡"
+   类想法改用成交口径（avg_trade_size_60s、n_trades_60s）。
+3. **`set -e` 脚本别串 stage2**：无缓存通道使 factors CLI 退出码非 0，
+   属预期失败；批处理脚本应在 stage2 后显式判断而非 `set -e` 直落。
+
+验证：`/data/factor_lzt/scripts/verify_mat59.py` 全 PASS（66 分区、59 列、
+仅 588000、314,053 行；取值范围与 warm-up 空值全部正常；orders5 检查改为
+"恒 0 为预期、非 0 才报错"）。
