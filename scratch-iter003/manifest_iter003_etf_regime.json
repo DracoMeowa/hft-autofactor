@@ -1,0 +1,100 @@
+[
+  {
+    "name": "iopv_premium_z_120s",
+    "family": "etf_regime",
+    "hypothesis": "Premium z-scored vs its trailing 120s distribution isolates transient stretch episodes from the structural day-level premium regime; a premium unusually high vs recent minutes means the ETF ran ahead of fair value faster than arbitrage responded, so reversion toward IOPV follows (negative IC expected). Differs from dead iter-001 forms: univariate relative-stretch transform, not level-momentum or flow interaction.",
+    "columns_used": ["iopv_premium"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "iopv_premium_z_600s",
+    "family": "etf_regime",
+    "hypothesis": "Premium unusual vs the trailing ten minutes separates mispricings that survived several arbitrage cycles (capacity-constrained, eventual closure) from already-arbitraged norms; the slow-frame stretch is the risk-bearing state variable predicting reversion at 60-900s. Decorrelates from the 120s sibling during sustained stretch episodes where the fast frame re-normalizes.",
+    "columns_used": ["iopv_premium"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "iopv_premium_mom_60s",
+    "family": "etf_regime",
+    "hypothesis": "60s premium velocity spans a full IOPV-refresh + arbitrage-response cycle (the dead iter-001 30s form sat inside the refresh cycle and measured refresh noise); premium still widening after a full cycle means arb flow has not yet dominated -> price continuation in the premium direction at 15-60s; narrowing means arb is winning.",
+    "columns_used": ["iopv_premium"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "premium_dev_day",
+    "family": "etf_regime",
+    "hypothesis": "Premium minus its expanding intraday mean removes today's flow-regime norm without any fixed window; the residual is the transient dislocation vs the day itself, reverting toward the day norm (negative IC on positive deviations). Reference frame 'unusual vs today' is distinct from rolling-z 'unusual vs recent minutes'.",
+    "columns_used": ["iopv_premium"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "prem_reversion_x_rv",
+    "family": "etf_regime",
+    "hypothesis": "During vol bursts ETF price outruns the <=15s IOPV refresh, so premium spikes in high-vol episodes are largely mechanical (stale-denominator) dislocations that close within 1-5 minutes; -z(premium) x z(rv_300s) concentrates reversion bets exactly where dislocations are most transient. Conditioning axis is VOLATILITY, unlike the dead flow-conditioned prem_x_ofi/prem_x_wdi.",
+    "columns_used": ["iopv_premium", "rv_300s"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "prem_x_depth_imb",
+    "family": "etf_regime",
+    "hypothesis": "Re-run of dead prem_x_wdi with two structural changes: 120s premium frame (execution horizon, not 300s regime) and RAW wdi tilt magnitude (arb-flow 'room' is an absolute-tilt notion; z(wdi) discarded it). Premium stretch backed by same-direction book depth is a flow-fed episode -> continuation (positive IC); stretch against the tilt is exposed to arbitrage reversion.",
+    "columns_used": ["iopv_premium", "wdi"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "vol_confirmed_mom",
+    "family": "etf_regime",
+    "hypothesis": "Short price moves on unusually heavy volume vs trailing 300s are information-driven and continue at 15-60s; thin-volume moves are quote drift that revert. z(per-snapshot volume increment from cum_trade_vol) x sign(60s mid momentum); opens the untouched intraday volume-pacing dimension.",
+    "columns_used": ["cum_trade_vol", "mid_px"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "vol_rate_x_ti",
+    "family": "etf_regime",
+    "hypothesis": "Heavy tape in the aggressor-flow direction = Kyle-style informed flow whose impact persists at 30-300s; heavy-but-balanced tape is churn and scores ~0 by construction. z(volume increment) x sign(trade_imbalance_60s): direction from FLOW rather than realized price momentum (the sibling vol_confirmed_mom's direction source).",
+    "columns_used": ["cum_trade_vol", "trade_imbalance_60s"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "arrival_accel_x_ti",
+    "family": "etf_regime",
+    "hypothesis": "Hawkes self-excitation makes arrival ACCELERATION the episode-onset marker; the dead iter-002 level burst confounded onsets with in-progress episodes. 30s delta of the arrival z signed by aggressor flow: accelerating activity with the flow direction = unfolding informed episode -> continuation; deceleration = exhaustion.",
+    "columns_used": ["n_trades_60s", "trade_imbalance_60s"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "large_share_z_x_ti",
+    "family": "etf_regime",
+    "hypothesis": "Informed/institutional prints are directional (they lift/hit under information decay): large-trade share unusual vs the trailing-300s size regime, signed by aggressor flow, flags informed participation on a specific side -> continuation. Two departures from the dead level form: regime-relative z instead of level, and sign(trade_imbalance_60s) supplying the direction the level never had.",
+    "columns_used": ["large_trade_share_60s", "trade_imbalance_60s"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "large_share_mom_300s",
+    "family": "etf_regime",
+    "hypothesis": "300s delta of the large-trade share detects regime TRANSITIONS of institutional participation (execution algorithms ramp over minutes); transitions persist by construction of the schedules driving them, matching 300-900s horizons. Level died in iter-002 (slow-state level = no edge); the delta is the meta-lesson-compliant object.",
+    "columns_used": ["large_trade_share_60s"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "regime_vol_x_flow",
+    "family": "etf_regime",
+    "hypothesis": "Flow impact is regime-dependent: one-sided aggressive imbalance moves price more in high-vol regimes (thinner effective depth, faster repricing); z(rv_300s) x z(trade_imbalance_60s) up-weights flow signals when marginal impact is largest. Nearly orthogonal to the ti_ewm/ti_accum/dd_flow accumulator cluster because the vol-z multiplier is symmetric in flow sign.",
+    "columns_used": ["rv_300s", "trade_imbalance_60s"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "session_u_x_mom",
+    "family": "etf_regime",
+    "hypothesis": "Momentum is time-of-day conditioned: +momentum in the first/last 30 min of continuous trading (positioning/information flows -> continuation) and -momentum midday (noise-dominated -> reversal). Non-monotonic U-shape gate x fast state is a different object from the monotonic session_clock (weak 60s pass, pure clock); seasonality enters as conditioning, the only viable route its post-mortem flagged.",
+    "columns_used": ["ts_ms", "mid_px"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "prem_x_cancel",
+    "family": "etf_regime",
+    "hypothesis": "When the premium stretches, market makers pull quotes (cancel ratio rises) to avoid being picked off by AP arbitrage; the joint episode stretched-premium + defensive-cancels marks the moment just before re-quoting, when the next move closes the premium. Predicts returns opposite to the premium sign (negative IC under reversion). Cancel dynamics is a partner dimension the dead iter-001 premium interactions never used.",
+    "columns_used": ["iopv_premium", "cancel_ratio_60s"],
+    "target_horizons": [30, 60, 300]
+  }
+]

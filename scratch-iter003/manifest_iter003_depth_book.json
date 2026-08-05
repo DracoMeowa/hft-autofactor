@@ -1,0 +1,107 @@
+[
+  {
+    "name": "depth5_delta_30s",
+    "family": "depth_book",
+    "hypothesis": "Fast variant (30s window) of the eval-v2 PASS depth5_delta_60s: the trailing-30s change in 5-level depth imbalance isolates rapid bid/ask depth reallocation seconds before execution; shorter window targets the 15-60s horizons where the parent showed strong OOS t but failed IS-retention.",
+    "columns_used": ["depth_bid5", "depth_ask5"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "depth5_delta_120s",
+    "family": "depth_book",
+    "hypothesis": "Slow variant (120s window) of the eval-v2 PASS depth5_delta_60s: integrates a full multi-minute accumulation step of the deep book (meta-order slicing, creation/redemption positioning), improving horizon alignment with the 300-900s drift where depth momentum passed.",
+    "columns_used": ["depth_bid5", "depth_ask5"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "top_book_delta_30s",
+    "family": "depth_book",
+    "hypothesis": "30s delta of top-of-book quantity imbalance: level 1 is the only queue that executes, so its fast rebuild/depletion after trades is the fastest book event and carries queue-reactive information at 15-30s distinct from the slower deep-book deltas.",
+    "columns_used": ["bid1_qty", "ask1_qty"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "top_book_delta_120s",
+    "family": "depth_book",
+    "hypothesis": "120s delta of top-of-book quantity imbalance: integrates repeated touch-queue refill attempts (iceberg-style replenishment, passive meta-order leg), a sustained strategic queue-positioning trend distinct from single-event 30s rebuilds and from deep-book deltas.",
+    "columns_used": ["bid1_qty", "ask1_qty"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "wdi_mom_30s",
+    "family": "depth_book",
+    "hypothesis": "Fast window variant of the eval-v2 PASS wdi_mom_90s: 30s change of weighted depth imbalance captures abrupt near-touch one-sided build-ups before the 90s window smooths them away, targeting the short horizons where the parent's OOS t was strong but retention failed.",
+    "columns_used": ["wdi"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "wdi_mom_180s",
+    "family": "depth_book",
+    "hypothesis": "Slow window variant of the eval-v2 PASS wdi_mom_90s: 180s change of weighted depth imbalance integrates over intra-minute noise to measure the multi-minute accumulation regime, aligning book-state momentum with the 300-900s horizon where it passed.",
+    "columns_used": ["wdi"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "wdi_accel_90s",
+    "family": "depth_book",
+    "hypothesis": "Second derivative of book state: delta-of-delta of wdi (90s momentum window). Acceleration separates intensifying one-sided accumulation (fresh episode, continuation) from exhausting build-up (stall/reversion); near-orthogonal to both wdi level and wdi momentum by construction.",
+    "columns_used": ["wdi"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "oir_mom_60s",
+    "family": "depth_book",
+    "hypothesis": "60s momentum of top-of-book order imbalance ratio: the touch queue can turn independently of the deeper weighted book (sweeps and refill bursts hit level 1 first), giving a touch-level book-state derivative distinct from wdi momentum; rising oir momentum predicts upward queue-reactive impact.",
+    "columns_used": ["oir"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "book_slope_z_300s",
+    "family": "depth_book",
+    "hypothesis": "Book-shape regime state: book_slope z-scored vs its trailing-300s distribution flags unusually steep one-sided depth profiles - sustained directional positioning by limit-order traders that decays slower than touch imbalances; z-vs-regime rather than the dead raw level.",
+    "columns_used": ["book_slope"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "book_slope_delta_60s",
+    "family": "depth_book",
+    "hypothesis": "Book-shape dynamics: 60s change of book_slope measures active steepening (fresh one-sided limit-order positioning, continuation) vs flattening (commitment withdrawn); shape can migrate between levels without changing total imbalance, making this orthogonal to the wdi/depth5 deltas.",
+    "columns_used": ["book_slope"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "depth_thickness_z_300s",
+    "family": "depth_book",
+    "hypothesis": "Liquidity-supply regime: z-score of log total 5-level size (bid+ask) vs trailing 300s. Unusually thick book = competitive quoting / absorption regime (small impact, reversion favored); unusually thin = withdrawn liquidity (high impact, continuation favored). Quantity-dimension companion of spread_z_300s.",
+    "columns_used": ["depth_bid5", "depth_ask5"],
+    "target_horizons": [300, 900]
+  },
+  {
+    "name": "microprice_dev_mom_60s",
+    "family": "depth_book",
+    "hypothesis": "60s momentum of microprice deviation: separates sustained drift of touch queue-position pressure (one-sided interest queued but not yet executed) from tick noise; rising deviation momentum = bid queue gaining weight, predicting upward next moves.",
+    "columns_used": ["microprice_dev"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "microprice_dev_z_300s",
+    "family": "depth_book",
+    "hypothesis": "Queue-pressure regime: microprice_dev z-scored vs its trailing-300s distribution flags persistently skewed touch queue weighting relative to recent variability - a sustained queue-positioning regime rather than a transient event.",
+    "columns_used": ["microprice_dev"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "queue_pressure_x_slope",
+    "family": "depth_book",
+    "hypothesis": "Interaction: product of regime-adjusted 60s top-book imbalance delta and regime-adjusted book_slope. A touch-queue rebuild in signed agreement with the deep book's shape gradient is backed by committed structure (continuation); rebuild against the gradient is unsupported and fades.",
+    "columns_used": ["bid1_qty", "ask1_qty", "book_slope"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "depth_ratio_5to1_z",
+    "family": "depth_book",
+    "hypothesis": "Hidden layering behind the touch: z-score of (5-level total size)/(top-of-book size) vs trailing 300s. High ratio = iceberg-style reserves behind the displayed queue (absorption regime, low impact); low ratio = top-heavy fragile book (high impact, consumption continues). Scale-free layering dimension distinct from thickness z.",
+    "columns_used": ["depth_bid5", "depth_ask5", "bid1_qty", "ask1_qty"],
+    "target_horizons": [300, 900]
+  }
+]

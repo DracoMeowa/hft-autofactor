@@ -1,0 +1,114 @@
+[
+  {
+    "name": "ti_z_x_large_share",
+    "family": "flow_interaction",
+    "hypothesis": "Net aggressive imbalance assembled from large prints is informed/institutional flow; z(trade_imbalance_60s, 180s) weighted by the concurrent large-trade volume share up-weights the informed variant and predicts 15-60s continuation. Signed repair of the dead direction-free large_trade_share_level.",
+    "columns_used": ["trade_imbalance_60s", "large_trade_share_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ti_z_x_spread_z",
+    "family": "flow_interaction",
+    "hypothesis": "Aggressive flow arriving while quoted spreads are stressed wide hits a thin, fearful book and carries outsized information per unit volume; z(trade_imbalance_60s, 180s) x z(quoted_spread_ticks, 300s) isolates stress-conditioned directional flow for 15-60s horizons.",
+    "columns_used": ["trade_imbalance_60s", "quoted_spread_ticks"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_z_x_spread_z",
+    "family": "flow_interaction",
+    "hypothesis": "Book building during stressed quoting is stealth activity: whoever still accumulates the passive side while makers widen up is likely informed (CKS limit-flow dominance). z(ofi_60s, 180s) x z(quoted_spread_ticks, 300s); passive-channel counterpart of ti_z_x_spread_z.",
+    "columns_used": ["ofi_60s", "quoted_spread_ticks"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_ti_agree_60s",
+    "family": "flow_interaction",
+    "hypothesis": "Rolling 60s share of snapshots where sign(ofi_60s) == sign(trade_imbalance_60s), centered at 0.5: passive and aggressive channels agreeing is high-conviction informed flow (continuation); persistent disagreement is absorption (stall/reversion). Sign-dimension complement to the magnitude-based flow_divergence champion.",
+    "columns_used": ["ofi_60s", "trade_imbalance_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "flow_divergence_60s",
+    "family": "flow_interaction",
+    "hypothesis": "Horizon-matched variant of the champion flow_divergence_300s: z(ofi_60s, 60s) - z(trade_imbalance_60s, 60s) keeps stealth/absorption divergence fresh for 15-30s prediction instead of smoothing it over 300s.",
+    "columns_used": ["ofi_60s", "trade_imbalance_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "flow_divergence_120s",
+    "family": "flow_interaction",
+    "hypothesis": "Medium-bandwidth variant of the champion: z(ofi_60s, 120s) - z(trade_imbalance_60s, 120s) captures absorption episodes 1-2 minutes old, triangulating the 60s and 300s windows to find each horizon's best divergence bandwidth.",
+    "columns_used": ["ofi_60s", "trade_imbalance_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "flow_divergence_x_spread_z",
+    "family": "flow_interaction",
+    "hypothesis": "Stress-gated absorption: (z(ofi_60s,120s) - z(trade_imbalance_60s,120s)) x z(quoted_spread_ticks, 300s). Divergence under wide spreads is almost certainly informed stealth flow; the same divergence under tight comfortable spreads may be queue noise.",
+    "columns_used": ["ofi_60s", "trade_imbalance_60s", "quoted_spread_ticks"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "signed_arrival_z",
+    "family": "flow_interaction",
+    "hypothesis": "Direction-conditioned arrival intensity: z(n_trades_60s, 180s) x sign(trade_imbalance_60s). Clustered arrivals with one-sided imbalance = informed/herd arrival episode pointing that way; the direction-free trade_arrival_burst had IC ~ 0 in iter-002.",
+    "columns_used": ["n_trades_60s", "trade_imbalance_60s"],
+    "target_horizons": [15, 30, 60, 300]
+  },
+  {
+    "name": "size_x_direction",
+    "family": "flow_interaction",
+    "hypothesis": "Directional size surge: z(avg_trade_size_60s, 180s) x sign(trade_imbalance_60s). Rising average print size plus directional aggression = institutional footprint; meta-order persistence gives 15-60s continuation.",
+    "columns_used": ["avg_trade_size_60s", "trade_imbalance_60s"],
+    "target_horizons": [15, 30, 60, 300]
+  },
+  {
+    "name": "gap_x_direction",
+    "family": "flow_interaction",
+    "hypothesis": "Quiet-tape state conditioned on flow direction: z(trade_gap_ms, 180s) x sign(trade_imbalance_60s). Silence after one-sided aggression distinguishes digestion (continuation) from exhaustion (reversal); the IC sign resolves which for 588000.",
+    "columns_used": ["trade_gap_ms", "trade_imbalance_60s"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "cancel_x_ofi",
+    "family": "flow_interaction",
+    "hypothesis": "Quote-pull signature: z(cancel_ratio_60s, 180s) x sign(ofi_60s). Heavy cancelling while the book builds one side = quotes being pulled ahead of an expected move in the OFI direction; direction-free churn is noise. Reads the message-traffic channel no other prototype uses.",
+    "columns_used": ["cancel_ratio_60s", "ofi_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ti_accum_120s",
+    "family": "flow_interaction",
+    "hypothesis": "Short-window signed-flow accumulation: trailing 120s mean of trade_imbalance_60s tracks meta-order pressure on a bandwidth matched to 15-60s horizons, deliberately away from the crowded 300s ti cluster (ti_ewm_state/ti_accum/dd_flow, mutual corr 0.86-0.95).",
+    "columns_used": ["trade_imbalance_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_mom_60s",
+    "family": "flow_interaction",
+    "hypothesis": "Book-flow acceleration: z(ofi_60s, 180s) minus its own value 60s ago. Rising z-OFI = passive pressure actively strengthening (continuation); falling = pull/withdrawal preceding down-moves. Delta-over-level meta-lesson on the flow channel.",
+    "columns_used": ["ofi_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_fast_slow",
+    "family": "flow_interaction",
+    "hypothesis": "Book-flow regime shift: rolling_mean(ofi_60s, 30s) minus rolling_mean(ofi_60s, 180s) crossover flags fresh limit-flow regime turns, near-orthogonal to flow levels. OFI channel chosen because the trade channel already owns ti_ewm_accel_120s and the crowded 300s cluster. (Seed proposed EWMA kernels; fixed windows used because polars ewm_mean contaminates to NaN on leading warm-up nulls.)",
+    "columns_used": ["ofi_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ofi_x_premium_sign",
+    "family": "flow_interaction",
+    "hypothesis": "Arb-aligned book building: z(ofi_60s, 180s) x sign(iopv_premium). Book flow aligned with the creation/redemption arb direction flags AP mechanistic flow resolving the mispricing (30-300s mean-reversion path). Sign-gate repair of the dead level-x-level prem_x_ofi.",
+    "columns_used": ["ofi_60s", "iopv_premium"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "flow_accel_signed",
+    "family": "flow_interaction",
+    "hypothesis": "Signed flow-change magnitude: z(|diff(trade_imbalance_60s)|, 180s) x sign(trade_imbalance_60s). Large fast swings in imbalance while a direction prevails mark sweep/cascade episodes with 15-60s continuation. Rectified-magnitude form stays orthogonal to the linear fast-slow crossovers.",
+    "columns_used": ["trade_imbalance_60s"],
+    "target_horizons": [15, 30, 60]
+  }
+]

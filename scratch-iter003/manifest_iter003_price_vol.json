@@ -1,0 +1,107 @@
+[
+  {
+    "name": "log_mid_ret_15s",
+    "family": "price_vol",
+    "hypothesis": "Fastest-window (15s) signed mid momentum isolates the most recent directional impulse before averaging; tests continuation vs bid-ask-bounce reversion at 15-60s.",
+    "columns_used": ["mid_px"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "log_mid_ret_30s",
+    "family": "price_vol",
+    "hypothesis": "30s signed mid momentum sits between the 15s impulse and built-in 60s drift, long enough to drop single-snapshot bounce yet still one directional episode.",
+    "columns_used": ["mid_px"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "log_mid_ret_120s",
+    "family": "price_vol",
+    "hypothesis": "Two-minute signed momentum reflects a multi-minute order program (rebalance/accumulation) that persists until filled, bridging fast 60s drift and slow state.",
+    "columns_used": ["mid_px"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "price_accel_60_180",
+    "family": "price_vol",
+    "hypothesis": "Momentum acceleration (60s minus 180s log-mid momentum): positive = move speeding up (fresh info, continuation), negative = exhaustion (reversal risk); isolates persistence from direction.",
+    "columns_used": ["mid_px"],
+    "target_horizons": [15, 30, 60, 300]
+  },
+  {
+    "name": "rv_ratio_60_300",
+    "family": "price_vol",
+    "hypothesis": "Vol acceleration ratio rv_60s/rv_300s: ratio >> 1 flags a variance burst (info arrival) that clusters and carries drift; a RELATIVE vol form, not the unsigned level that is library noise.",
+    "columns_used": ["rv_60s", "rv_300s"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "rv_ratio_z_300s",
+    "family": "price_vol",
+    "hypothesis": "Trailing-300s z-score of the vol-acceleration ratio: flags variance accelerating far beyond this day's own recent regime (a clean regime-shift trigger), removing baseline and range.",
+    "columns_used": ["rv_60s", "rv_300s"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "signed_rv_60s",
+    "family": "price_vol",
+    "hypothesis": "Trailing-60s net signed realized variance (sum sign(ret)*ret^2): which side the quadratic variation lives on; fast unnormalized cousin of the PASSed 900s rv_asym_300s.",
+    "columns_used": ["mid_px"],
+    "target_horizons": [15, 30, 60, 300]
+  },
+  {
+    "name": "last_mid_gap_ticks",
+    "family": "price_vol",
+    "hypothesis": "Instantaneous aggressor side (last-mid)/tick: last>mid = buyer lifted ask, last<mid = seller hit bid; the fastest directional microstructure signal predicts 15-60s continuation.",
+    "columns_used": ["last_px", "mid_px"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "last_mid_gap_ma_30s",
+    "family": "price_vol",
+    "hypothesis": "Sustained aggressor direction: trailing-30s mean of the signed gap aggregates consistent buyer/seller aggression (magnitude-weighted), flagging informed flow not yet absorbed.",
+    "columns_used": ["last_px", "mid_px"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "aggressor_share_60s",
+    "family": "price_vol",
+    "hypothesis": "Aggressor consistency: trailing-60s net frequency of buyer- vs seller-initiated snapshots (sign-only, robust to size); repeated same-side aggression is the footprint of informed accumulation.",
+    "columns_used": ["last_px", "mid_px"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "spread_z_60s",
+    "family": "price_vol",
+    "hypothesis": "Fast liquidity-state shift: quoted spread wide vs its own trailing-60s distribution flags immediate quoting stress/adverse selection, reacting faster than the built-in 300s z.",
+    "columns_used": ["quoted_spread_ticks"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "spread_z_120s",
+    "family": "price_vol",
+    "hypothesis": "Mid-horizon liquidity state: trailing-120s spread z flags widening sustained beyond one burst but not yet absorbed into the 300s baseline, a persistent adverse-selection regime.",
+    "columns_used": ["quoted_spread_ticks"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "mid_day_range_pos",
+    "family": "price_vol",
+    "hypothesis": "Position within the intraday high-low range (causal cum_max/cum_min): proximity to day extremes encodes anchoring and resting stop clusters, predicting breakout/rejection at those zones.",
+    "columns_used": ["mid_px"],
+    "target_horizons": [60, 300, 900]
+  },
+  {
+    "name": "vol_adj_mom_60s",
+    "family": "price_vol",
+    "hypothesis": "Momentum quality: 60s log-mid momentum divided by sqrt(rv_60s) is a per-minute Sharpe; steady low-var drift = persistent informed flow (continues), choppy same-size move = noise (reverts).",
+    "columns_used": ["mid_px", "rv_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "rv_z_300s",
+    "family": "price_vol",
+    "hypothesis": "Vol regime-shift trigger: trailing-300s z of rv_300s measures how far current five-minute variance sits vs its own recent distribution (relative form), which clusters and carries drift.",
+    "columns_used": ["rv_300s"],
+    "target_horizons": [60, 300, 900]
+  }
+]
