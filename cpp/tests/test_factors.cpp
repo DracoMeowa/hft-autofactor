@@ -514,10 +514,15 @@ static void test_short_window_flow_factors() {
   for (auto& f : reg) f->on_snapshot(s0, book);
   for (auto& f : reg) CHECK(!f->value(inst, v));
 
-  // Deep order (no quote change => OFI contrib 0) + one buy and one sell print.
+  // Deep order (no quote change => OFI contrib 0) + one buy and one sell
+  // print. Print prices MUST hit real book levels (buy consumes ask1, sell
+  // consumes bid1): an off-book print price would desync the book and OFI
+  // would drop those events.
   TickEvent e1 = order(t0 + 1000, inst, Side::Buy, 3988, 100);
   TickEvent e2 = trade(t0 + 2000, inst, 300, 'B');
+  e2.price = 4002;                                     // eats ask1: 1000 -> 700
   TickEvent e3 = trade(t0 + 4000, inst, 100, 'S');
+  e3.price = 3998;                                     // eats bid1: 2000 -> 1900
   TickEvent evs1[] = {e1, e2, e3};
   for (auto& e : evs1) {
     if (e.is_trade) book.apply_trade(e); else book.apply_order(e);
@@ -530,14 +535,15 @@ static void test_short_window_flow_factors() {
   for (auto& f : reg) f->on_snapshot(s1, book);
   for (auto& f : reg) CHECK(!f->value(inst, v));
 
-  // t0+17s: ofi_15s warm (16s >= 15s) and exactly zero (no quote changes);
+  // t0+17s: ofi_15s warm (16s >= 15s); e1 pruned (ts < 2s), e2/e3 kept with
+  // contribs +300 (ask1 eaten) and -100 (bid1 eaten) at depths 2700/2600.
   // trade_imbalance_15s warm (15s >= 15s): (300-100)/(300+100) = 0.5.
   // Longer windows and the 60s family still warming.
   Snapshot s2 = make_snap(inst, t0 + 17000);
   book.apply_snapshot(s2);
   for (auto& f : reg) f->on_snapshot(s2, book);
   CHECK(ofi15->value(inst, v));
-  CHECK_NEAR(v, 0.0, 1e-12);
+  CHECK_NEAR(v, 200.0 / 5300.0, 1e-12);
   CHECK(!ofi30->value(inst, v));
   CHECK(!ofi60->value(inst, v));
   CHECK(ti15->value(inst, v));
@@ -546,20 +552,16 @@ static void test_short_window_flow_factors() {
   CHECK(!lns->value(inst, v));
   CHECK(!bei->value(inst, v));
 
-  // Later events: deep ask order, whale buy print, one '-' print.
+  // One more deep order; nothing else yet (timeline stays ordered).
   TickEvent e4 = order(t0 + 61000, inst, Side::Sell, 4012, 100);
-  TickEvent e5 = trade(t0 + 64000, inst, 1000, 'B');
-  TickEvent e6 = trade(t0 + 64500, inst, 500, '-');   // excluded from signed family
-  TickEvent evs2[] = {e4, e5, e6};
-  for (auto& e : evs2) {
-    if (e.is_trade) book.apply_trade(e); else book.apply_order(e);
-    for (auto& f : reg) f->on_tick(e, book);
-  }
+  book.apply_order(e4);
+  for (auto& f : reg) f->on_tick(e4, book);
 
-  // t0+63s: 60s family warm (62s >= 60s). The early prints are pruned out of
-  // the 60s window (ts < 3s), so buy/sell volumes are a legitimate 0.0 while
-  // the ratio-style columns go NaN (no attributable flow left).
-  Snapshot s3 = make_snap(inst, t0 + 63000);
+  // t0+64.5s: 60s family warm (62.5s+ since first tick/trade/event). The
+  // early prints are pruned out of the 60s window (ts < 4.5s), so buy/sell
+  // volumes are a legitimate 0.0 while the ratio-style columns go NaN (no
+  // attributable flow left); intensity keeps only e4.
+  Snapshot s3 = make_snap(inst, t0 + 64500);
   book.apply_snapshot(s3);
   for (auto& f : reg) f->on_snapshot(s3, book);
   CHECK(bvol->value(inst, v));
@@ -569,15 +571,31 @@ static void test_short_window_flow_factors() {
   CHECK(!ti15->value(inst, v));                       // window has no signed trade
   CHECK(!lns->value(inst, v));
   CHECK(bei->value(inst, v));
-  CHECK_NEAR(v, 2.0 / 60.0, 1e-12);                   // e3 (4s) + e4 (61s)
+  CHECK_NEAR(v, 1.0 / 60.0, 1e-12);                   // only e4 (61s)
+  CHECK(ofi15->value(inst, v));
+  CHECK_NEAR(v, 0.0, 1e-12);                          // deep order: zero contrib
+  CHECK(ofi30->value(inst, v));
+  CHECK_NEAR(v, 0.0, 1e-12);
+  CHECK(ofi60->value(inst, v));
+  CHECK_NEAR(v, 0.0, 1e-12);
 
-  // t0+65s: whale buy in the window; '-' print never counts for signed stats
-  // but does count for event intensity.
-  Snapshot s4 = make_snap(inst, t0 + 65000);
+  // Whale buy at ask1 (contrib +200, depth 2800) and one '-' print, which is
+  // excluded from the signed family but still an event for intensity.
+  TickEvent e5 = trade(t0 + 65000, inst, 200, 'B');
+  e5.price = 4002;                                     // eats ask1: 1000 -> 800
+  TickEvent e6 = trade(t0 + 65500, inst, 500, '-');
+  TickEvent evs2[] = {e5, e6};
+  for (auto& e : evs2) {
+    book.apply_trade(e);
+    for (auto& f : reg) f->on_tick(e, book);
+  }
+
+  // t0+66s: whale in the window; '-' print never counts for signed stats.
+  Snapshot s4 = make_snap(inst, t0 + 66000);
   book.apply_snapshot(s4);
   for (auto& f : reg) f->on_snapshot(s4, book);
   CHECK(bvol->value(inst, v));
-  CHECK_NEAR(v, 1000.0, 1e-12);
+  CHECK_NEAR(v, 200.0, 1e-12);
   CHECK(svol->value(inst, v));
   CHECK_NEAR(v, 0.0, 1e-12);
   CHECK(ti15->value(inst, v));
@@ -586,8 +604,10 @@ static void test_short_window_flow_factors() {
   CHECK_NEAR(v, 1.0, 1e-12);                          // n=1: top-1 = the whale
   CHECK(bei->value(inst, v));
   CHECK_NEAR(v, 3.0 / 60.0, 1e-12);                   // e4 + e5 + e6
+  CHECK(ofi15->value(inst, v));
+  CHECK_NEAR(v, 200.0 / 5600.0, 1e-12);               // whale contrib vs e6 zero
   CHECK(ofi60->value(inst, v));
-  CHECK_NEAR(v, 0.0, 1e-12);                          // deep events: zero contrib
+  CHECK_NEAR(v, 200.0 / 8600.0, 1e-12);               // e4+e5+e6, depths 3000/2800/2800
 }
 
 static void test_registry() {
