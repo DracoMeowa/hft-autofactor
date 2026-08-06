@@ -1,0 +1,100 @@
+[
+  {
+    "name": "wdi_z_cross_vel_15s",
+    "family": "R4C",
+    "hypothesis": "Depth-weighted book regime FLIP events: z_300(wdi) crossed zero within the last 15s (current z vs lagged z sign test); value = z-velocity at crossings, exactly 0 elsewhere. The whole visible bid/ask stack rebuilding against a minutes-old imbalance tilt in seconds is costly and typically informed; fast decisive flips continue in the new direction at 15-60s, slow drifts across zero score weak. Event-sparse, unlike library raw-delta wdi_mom_30s/90s/180s + wdi_accel_90s (unnormalized deltas active every row) and the dead bare wdi level-z: only the flip EVENT is scored. Direct generalization of the admitted ofi_z_cross_vel_15s.",
+    "columns_used": ["wdi"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "wdi_zvel_extreme_15s",
+    "family": "R4C",
+    "hypothesis": "PRODUCT form of the z-vs-velocity template, made direction-carrying: 15s z-velocity of the wdi regime (z_now - z_15s_ago) weighted by |z|. Fast motion OF an already extreme depth-imbalance regime is a crowded multi-level queue state being decisively rebuilt or abandoned -- the motion direction continues 15-60s; the same velocity around a neutral regime is routine churn and scores ~0 via the |z| weight. Level-x-velocity interaction (odd under sign flip, direction from velocity), not a level (round-1 lesson: slow levels dead) and not raw momentum (library wdi_mom_* are unnormalized deltas).",
+    "columns_used": ["wdi"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "oir_z_cross_vel_15s",
+    "family": "R4C",
+    "hypothesis": "Touch-queue regime FLIP events: z_300(oir) crossed zero within 15s; value = crossing z-velocity, 0 elsewhere. OIR is the fastest book state; a minutes-old touch regime dying inside 15s is an abrupt queue pull-and-refill at the best quotes -- the cheapest place to signal urgency and the one informed traders touch first. Decisive hand-offs continue in the new direction at 15-60s. Event-sparse, so the economic input differs from library oir_mom_60s (raw 60s delta, active every row): only sign-reversal EVENTS are scored.",
+    "columns_used": ["oir"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "oir_zvel_div_15s",
+    "family": "R4C",
+    "hypothesis": "SIGNED-DIVERGENCE form: z_300(oir) minus the trailing-300s z of its own 15s z-velocity. When the slow touch regime reads extreme but the fast edge moves the other way (positive gap), the tilt is stretched against fresh quoting flow and drifts back toward the velocity-implied direction at 15-60s; when normalized velocity leads level (negative gap) the regime is still building. Both terms regime-normalized, so the object is relative stretch, not raw momentum -- distinct from library oir_mom_60s (raw delta) and the dead bare oir level-z.",
+    "columns_used": ["oir"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "fullbook_imb_z_cross_vel_15s",
+    "family": "R4C",
+    "hypothesis": "Broad-book liquidity regime FLIP events: z_300((total_bid_vol-total_ask_vol)/(sum)) crossed zero within 15s; value = crossing z-velocity, 0 elsewhere. Full-book tilt aggregates patient deep-queue positioning that normally moves slowly; a sign reversal inside 15s = broad liquidity actively relocating right now, likely informed, continuing in the new direction at 15-60s (patient repositioning may also project to 300s). DEDUP FLAG: different object from library fullbook_imb_z_300s (pure LEVEL z = regime STATE, active every row); here only transition EVENTS score -- but the shared base means elevated sibling-correlation risk, check at dedup. Also distinct from library fullbook_imb_mom_60s (raw unnormalized delta).",
+    "columns_used": ["total_bid_vol", "total_ask_vol"],
+    "target_horizons": [15, 30, 300]
+  },
+  {
+    "name": "fullbook_imb_zvel_div_15s",
+    "family": "R4C",
+    "hypothesis": "SIGNED-DIVERGENCE form on broad-book pressure: z_300(fullbook imbalance) minus the trailing-300s z of its own 15s z-velocity. Deep-book tilt builds slowly (creation/redemption, institutional queue placement); when the slow z is extreme but the fast edge already moves the other way, the patient tilt is being withdrawn/overrun right now and price drifts against the level direction; when velocity leads, the regime continues. DEDUP FLAG: same base as library fullbook_imb_z_300s (level only) and library fullbook_imb_mom_60s (raw delta) -- the relative-stretch question is different, but flag sibling-correlation risk at dedup.",
+    "columns_used": ["total_bid_vol", "total_ask_vol"],
+    "target_horizons": [30, 60, 300]
+  },
+  {
+    "name": "depth5_imb_zvel_extreme_15s",
+    "family": "R4C",
+    "hypothesis": "PRODUCT form on the FLAT-weighted top-5 depth imbalance (depth_bid5-depth_ask5)/(sum): 15s z-velocity of its 300s regime weighted by |z|. Base deliberately differs from engine wdi (exp(-k/2) level weights): flat weighting is proportionally more sensitive to level 3-5 fills/pulls -- the outer visible stack where larger resting orders sit. Fast motion of an extreme visible-depth state = decisive rebuild/abandonment of a crowded stack, continuing 15-60s; neutral-regime velocity scores ~0. DEDUP: not library top5_book_div_z_300s (top-5 CONCENTRATION ratio vs full book -- different ratio), not library depth5_delta_60s (raw qty delta), not a wdi re-skin (weighting scheme is the input change).",
+    "columns_used": ["depth_bid5", "depth_ask5"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "spread_z_cross_vel_15s",
+    "family": "R4C",
+    "hypothesis": "Quoting-cost regime FLIP events: z_300(quoted_spread_ticks) crossed zero within 15s; value = crossing z-velocity, 0 elsewhere. The spread regime is makers' risk gauge and its fast flips are asymmetric in price impact: decisive widening flips (positive velocity) mark quotes pulled ahead of adverse information -- fear arriving in seconds -- followed by further downside pressure at 15-60s; decisive tightening flips mark liquidity restoration/stabilization. Different from built-in spread_z_300s level (IS-dead bare in round 1) and the dead spread_z_60s/120s window swaps: the TRANSITION event, not the state, is scored.",
+    "columns_used": ["quoted_spread_ticks"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "spread_zvel_extreme_15s",
+    "family": "R4C",
+    "hypothesis": "PRODUCT form on quoting cost: 15s z-velocity of z_300(spread) weighted by |z|. Spread motion out of an ALREADY EXTREME quoting regime is the informative kind: fast widening off an extreme-wide state = makers capitulating to adverse selection, preceding continued downside pressure at 15-60s; fast tightening off an extreme = liquidity restored, preceding stabilization/upside. Neutral-regime velocity is routine tick oscillation and scores ~0 via the |z| weight. Derivative/conditioned spread form -- the live dimension per rounds 1/3 (bare spread level is IS-dead).",
+    "columns_used": ["quoted_spread_ticks"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "microprice_dev_zvel_extreme_15s",
+    "family": "R4C",
+    "hypothesis": "PRODUCT form on the queue-weighted fair-value lead: 15s z-velocity of z_300(microprice_dev) weighted by |z|. microprice_dev > 0 means the heavy side is the BID queue (micro > mid, upward pressure priced in before mid moves); an already-extreme deviation regime accelerating further = the queue-pressure edge being pushed decisively, mid follows the deviation direction at 15-60s; neutral-regime velocity scores ~0. Not the dead microprice_dev_z_300s level-z form, not the dead microprice_dev_mom_60s raw momentum: the question is how hard an ALREADY-STRETCHED micro-imbalance is moving.",
+    "columns_used": ["microprice_dev"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "microprice_dev_z_fade_pos_15s",
+    "family": "R4C",
+    "hypothesis": "ONE-SIDED fading-upside quadrant: active only when z_300(microprice_dev) > 0 (bid queue heavier, fair-value lead up) but the 15s z-velocity has turned negative; value = the level magnitude z there, exactly 0 elsewhere. The upward queue pressure that pushed the deviation extreme is measurably dissipating; microprice leads mid by construction, so a contracting deviation means the temporary upside pressure is spent and mid drifts back down at 15-60s. One-sided by design so the rank mass cannot degenerate into the dead bare level-z or raw-momentum forms. Upside quadrant chosen because ETF buy-side micro-extensions are typically demand-shock driven and snap back.",
+    "columns_used": ["microprice_dev"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ti60_z_cross_vel_15s",
+    "family": "R4C",
+    "hypothesis": "Aggressive-flow regime FLIP events: z_300(trade_imbalance_60s) crossed zero within 15s; value = crossing z-velocity, 0 elsewhere. The trade channel reveals urgency: a minutes-old aggression regime switching sign inside 15s = the side HITTING the book has changed (informed re-direction of executable flow, not queue churn). Decisive flips continue in the new direction at 15-60s (fresh marketable-flow impact is front-loaded). Event-sparse, unlike library ti_accum_300s / ti_ewm_state_300s (slow state built every row) and the dead bare ti z-levels. Cross-channel twin of the admitted ofi_z_cross_vel_15s.",
+    "columns_used": ["trade_imbalance_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "ti60_z_fade_neg_15s",
+    "family": "R4C",
+    "hypothesis": "ONE-SIDED sell-exhaustion quadrant: active only when z_300(trade_imbalance_60s) < 0 (sustained sell aggression) but the 15s z-velocity has turned positive; value = the level magnitude z (negative) there, exactly 0 elsewhere. Sell cascades exhaust: marketable sell bursts are typically stop-driven/program-sliced, and once the imbalance itself starts recovering the forced supply is spent while the cascade's price impact is largely temporary (book rebuilds absorb it) -> bounce up at 15-60s. Sell quadrant chosen because sell-side cascades have sharper exhaustion mechanics than buy-side buildups (more often informed accumulation). Cannot degenerate into the dead bare ti level-z or raw momentum forms.",
+    "columns_used": ["trade_imbalance_60s"],
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "book_slope_zvel_div_15s",
+    "family": "R4C",
+    "hypothesis": "SIGNED-DIVERGENCE form on book shape: z_300(book_slope) minus the trailing-300s z of its own 15s z-velocity. book_slope (mean ln-cum-depth vs distance slope, both sides averaged) is a shape, not a signed imbalance, so information must live in its DYNAMICS: high shape-z with the fast edge already moving down (positive divergence) = deep-book liquidity structure being pulled right now -- hollowing of the depth curve precedes the move it was cushioning, price drifts against the level direction at 15-60s; velocity-leading-level (negative divergence) = structure still accumulating. Different object from the dead book_slope_z_300s (bare level z) and book_slope_delta_60s (raw delta); no library factor touches book_slope.",
+    "columns_used": ["book_slope"],
+    "target_horizons": [15, 30, 60]
+  }
+]

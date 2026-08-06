@@ -1,0 +1,211 @@
+[
+ {
+  "name": "gap_ofi_conflict_60s",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [
+   "ofi_60s"
+  ],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ },
+ {
+  "name": "micro_gap_confirm_300s",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [
+   "microprice_dev"
+  ],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ },
+ {
+  "name": "gap_slope_thinwalk_300s",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [
+   "book_slope"
+  ],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ },
+ {
+  "name": "gap_x_ti_align_300s",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [
+   "trade_imbalance_60s"
+  ],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ },
+ {
+  "name": "gap_pin_persist_300s",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ },
+ {
+  "name": "gap_accel_60_180",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ },
+ {
+  "name": "gap_vel_60s",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ },
+ {
+  "name": "slope_gated_ofi_300s",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [
+   "book_slope",
+   "ofi_60s"
+  ],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ },
+ {
+  "name": "slope_x_ti_absorb_300s",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [
+   "book_slope",
+   "trade_imbalance_60s"
+  ],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ },
+ {
+  "name": "slope_vel_z_120s",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [
+   "book_slope"
+  ],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ },
+ {
+  "name": "slope_z_cross_vel_15s",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [
+   "book_slope"
+  ],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ },
+ {
+  "name": "micro_slope_unsupported_300s",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [
+   "book_slope",
+   "microprice_dev"
+  ],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ },
+ {
+  "name": "micro_ofi_absorb_60s",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [
+   "microprice_dev",
+   "ofi_60s"
+  ],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ },
+ {
+  "name": "micro_ti_absorb_300s",
+  "family": "R4D",
+  "hypothesis": "",
+  "columns_used": [
+   "microprice_dev",
+   "trade_imbalance_60s"
+  ],
+  "target_horizons": [
+   15,
+   30,
+   60,
+   300,
+   900
+  ]
+ }
+]

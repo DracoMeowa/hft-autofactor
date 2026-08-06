@@ -1,0 +1,100 @@
+[
+ {
+  "name": "hidden_bid_support_z_vel_60s",
+  "family": "R4B",
+  "hypothesis": "60s velocity of the admitted hidden_bid_support_z_300s regime: hidden bid liquidity actively ARRIVING (patient demand migrating into the deep book before it shows at the touch) vs WITHDRAWING (the reservoir hollowing out). Derivative of the winning R3-B z-state -- a high-but-draining reservoir and a low-but-filling one are opposite regimes at identical z-extremes; the velocity distinguishes them and should carry 15-60s drift.",
+  "columns_used": ["total_bid_vol", "depth_bid5"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_ask_supply_z_vel_60s",
+  "family": "R4B",
+  "hypothesis": "60s velocity of the admitted hidden_ask_supply_z_300s regime: hidden ask overhang freshly STACKED (distribution intent queuing above the touch, capping rallies / preceding drift down) vs DRAINING (latent supply thinning so the offer walks). Supply-side twin of the bid-support velocity; the two rotate independently.",
+  "columns_used": ["total_ask_vol", "depth_ask5"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_bid_support_z_vel_15s",
+  "family": "R4B",
+  "hypothesis": "Fast 15s velocity of the hidden-bid-support z: discrete large-order stack/pull events of patient bid depth. Hidden depth migrates in jumps, so the fastest detectable arrival marks a decisive, likely informed demand commitment whose information decays within 15-30s.",
+  "columns_used": ["total_bid_vol", "depth_bid5"],
+  "target_horizons": [15, 30]
+ },
+ {
+  "name": "hidden_ask_supply_z_vel_15s",
+  "family": "R4B",
+  "hypothesis": "Fast 15s velocity of the hidden-ask-supply z: abrupt overhang placement (informed sellers pre-positioning a ceiling) or collapse (supply conviction evaporating). Event-fresh signal for the 15-30s horizons; not a sign-flip of the bid twin since both sides can move together.",
+  "columns_used": ["total_ask_vol", "depth_ask5"],
+  "target_horizons": [15, 30]
+ },
+ {
+  "name": "hidden_side_gap_vel_60s",
+  "family": "R4B",
+  "hypothesis": "60s velocity of the support-minus-supply z-gap (z of bid hidden share minus z of ask hidden share): hidden liquidity actively ROTATING toward one side. Positive = patient depth rebalancing toward demand. A flow-between-states quantity no level captures; deliberately NOT the dead net hidden imbalance (level of (hb-ha)/(hb+ha) on absolute qty) -- side-normalized shares, velocity operator.",
+  "columns_used": ["total_bid_vol", "total_ask_vol", "depth_bid5", "depth_ask5"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_rot_pos_frac_300s",
+  "family": "R4B",
+  "hypothesis": "Trailing-300s occupancy of bid-directed rotation: fraction of snapshots where the 60s side-gap velocity pointed toward the bid side. Duration of the rotation regime (occupancy-vs-magnitude decomposition that won round 3): persistently bid-directed rotation is entrenched structural rebalancing that decays slowly, aimed at 300-900s. Base is the sign of a VELOCITY, distinct from hidden_imb_pos_frac (occupancy of level sign).",
+  "columns_used": ["total_bid_vol", "total_ask_vol", "depth_bid5", "depth_ask5"],
+  "target_horizons": [300, 900]
+ },
+ {
+  "name": "hidden_bid_x_buyvol_z",
+  "family": "R4B",
+  "hypothesis": "Demand-regime confirmation: z(bid hidden share) x z(buy_vol_60s). Aggressive buying co-occurring with an unusually deep patient-bid reservoir = visible aggression backed by hidden demand (iceberg replenishment) -> persistence at 15-60s. Side-attributed GROSS buy volume is the fresh input: round-3's TI-based hidden interactions (bid_absorb_x_sell, hidden_imb_x_ti) died and are structurally blind to heavy two-sided states where net TI is ~0.",
+  "columns_used": ["total_bid_vol", "depth_bid5", "buy_vol_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_ask_x_sellvol_z",
+  "family": "R4B",
+  "hypothesis": "Supply-regime confirmation: z(ask hidden share) x z(sell_vol_60s). Aggressive selling backed by a deep hidden overhang = queued distribution refilling the offer -> downside persistence / capped rallies at 15-60s. One-sided gross sell volume distinguishes two-sided heavy trading from the dead net-TI operand.",
+  "columns_used": ["total_ask_vol", "depth_ask5", "sell_vol_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_flow_align_net",
+  "family": "R4B",
+  "hypothesis": "Signed net of the two hidden-flow confirmations: (bid-support z x buy-vol z) - (ask-supply z x sell-vol z). Positive = demand hidden-flow regime dominates, negative = supply. The difference cancels the common mode where both sides are deep and both gross volumes heavy (general activity state), isolating the DIRECTIONAL asymmetry of hidden-backed flow.",
+  "columns_used": ["total_bid_vol", "total_ask_vol", "depth_bid5", "depth_ask5", "buy_vol_60s", "sell_vol_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_bid_arrival_x_buyvol",
+  "family": "R4B",
+  "hypothesis": "Arrival-confirmed demand: 60s VELOCITY of the hidden-bid-support z times z(buy_vol_60s). Fires when hidden bid depth is actively BUILDING while buy aggression is elevated -- demand committing on both displayed (trade) and undisplayed (queue) channels simultaneously; sharper than the level interaction because a merely high reservoir may be stale. Doubly dynamic: derivative of hidden state gated by flow regime.",
+  "columns_used": ["total_bid_vol", "depth_bid5", "buy_vol_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "vis_share_vel_60s",
+  "family": "R4B",
+  "hypothesis": "Liquidity migration between layers: 60s change of the top-5 share of total book depth. Rising = depth surfacing to the executable touch (competitive urgency, imminent resolution); falling = liquidity retreating into hidden layers (passive absorbing posture). Level z of this share died in round 3 -- consistent with the deltas-live/levels-dead meta-lesson; migration direction is the unmined question.",
+  "columns_used": ["depth_bid5", "depth_ask5", "total_bid_vol", "total_ask_vol"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "vis_share_vel_15s",
+  "family": "R4B",
+  "hypothesis": "Touch-concentration bursts: 15s change of the top-5 share of total depth. Fast upward jumps = pulses of orders arriving at the touch (queue-jumping ahead of expected action); fast drops = the executable book being pulled/emptied. Event detector of the same migration process as the 60s sibling, on the fast clock that rewarded book state in round 1.",
+  "columns_used": ["depth_bid5", "depth_ask5", "total_bid_vol", "total_ask_vol"],
+  "target_horizons": [15, 30]
+ },
+ {
+  "name": "div_pos_frac_vel_60s",
+  "family": "R4B",
+  "hypothesis": "Consolidation vs erosion of the touch-leading-queue regime: 60s change of the admitted div_pos_frac_300s occupancy. Rising occupancy = the structural posture still forming; falling = the entrenched regime started to erode within the last minute, preceding reversal of what it conditions. Momentum of an OCCUPANCY (live facet), deliberately not momentum of divergence magnitude (top5_book_div_mom_60s died).",
+  "columns_used": ["wdi", "total_bid_vol", "total_ask_vol"],
+  "target_horizons": [60, 300, 900]
+ },
+ {
+  "name": "hidden_imb_pos_frac_vel_60s",
+  "family": "R4B",
+  "hypothesis": "Consolidation vs erosion of the hidden-bid-skew regime: 60s change of the admitted hidden_imb_pos_frac_300s occupancy. Strengthening persistence = accumulation posture deepening; fading persistence = patient demand quietly lifting and the slow-horizon support it provides starting to decay. Momentum of occupancy (live), not raw hidden-imbalance momentum (hidden_imb_mom_60s/300s died IS-dead).",
+  "columns_used": ["total_bid_vol", "total_ask_vol", "depth_bid5", "depth_ask5"],
+  "target_horizons": [60, 300, 900]
+ }
+]

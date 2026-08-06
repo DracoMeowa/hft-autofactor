@@ -1,0 +1,100 @@
+[
+ {
+  "name": "ofi_concord_x_spread_z",
+  "family": "R4A",
+  "hypothesis": "Cross-window OFI conviction (sign(ofi_15s) x min(|ofi_15s|,|ofi_60s|), recomputed ofi_concord_15_60) x z(quoted_spread_ticks, 300s): same-sign flow across both windows under WIDE stressed spreads is informed queue investment persisting despite adverse-selection fear -> continuation at 15-60s; under unusually tight comfortable quoting the same conviction is cheap routine churn whose direction flips to no-edge/fade in the product. Distinct from ofi_z_x_spread_z (single-window surprise, not cross-window agreement). Round-3 products ran 0.22-0.42 panel corr vs their bases, so dedup vs the base is not the risk; sibling corr with the other ofi_concord gates and with the ofi_persist gates (bases rho 0.723) needs screening.",
+  "columns_used": ["ofi_15s", "ofi_60s", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "ofi_concord_wide_gate",
+  "family": "R4A",
+  "hypothesis": "Conviction flow scored ONLY while the spread state is unusually wide (base x clip(sp_z, 0, inf)), exactly zero outside: the one-sided claim that informed positioning reveals itself exclusively in stressed quoting, with NO tight-regime fade assertion (the product form carries that stronger claim). Nonzero support is a strict subset of the product's -> different cross-sectional structure (episode detector). Dedup risk note: on its nonzero rows the value is monotone in base x positive weight, so sibling corr with ofi_concord_x_spread_z may be material; the zero-mass regime selection is the distinct input.",
+  "columns_used": ["ofi_15s", "ofi_60s", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "ofi_concord_flip_gate",
+  "family": "R4A",
+  "hypothesis": "Conviction base x SIGN(z(spread,300s)): regime KIND, not stress intensity, carries the information. Any wide-stress episode (z>0) makes persistent same-sign flow an informed-continuation read; any tight-comfort episode (z<0) makes it churn to fade; neutral quoting (z=0, long constant-spread stretches) gets zero weight. Unlike the product this does not null near-neutral rows nor overweight extreme stress bursts; |value| == |base| so the magnitude distribution is identical to the base's and only the regime-conditional SIGN changes -- a genuinely different economic question, not a rescaling. Dedup risk note: sign-modulated base is not a monotone reskin (tight half is sign-flipped) so panel/base corr should stay low.",
+  "columns_used": ["ofi_15s", "ofi_60s", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "fbi_mom_x_spread_z",
+  "family": "R4A",
+  "hypothesis": "60s momentum of full-book imbalance (diff(20) of (total_bid_vol-total_ask_vol)/(sum), recomputed fullbook_imb_mom_60s) x z(quoted_spread_ticks, 300s): a decisive whole-book pressure shift under WIDE fearful quoting is deliberate informed pre-positioning (posting depth bears adverse-selection cost there) -> continuation at 15-60s; the same shift under comfortable quoting is routine quote maintenance (product flips it). Book-MOMENTUM channel under stress gating, distinct from div_z_x_spread_z (structural level divergence, not a 60s pressure change).",
+  "columns_used": ["total_bid_vol", "total_ask_vol", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "fbi_mom_wide_gate",
+  "family": "R4A",
+  "hypothesis": "Full-book pressure momentum active ONLY under unusually wide quoting (base x clip(sp_z, 0, inf)), zero otherwise: makers withdraw in stress, so a whole-book lean that still moves decisively one way in that state marks committed positioning preceding impact; outside stress the momentum is assumed noise and switched off with no fade claim. Dedup risk note: nonzero rows monotone in base x positive weight -> sibling corr with fbi_mom_x_spread_z may be material; regime selection (zero mass) is the distinct economic input.",
+  "columns_used": ["total_bid_vol", "total_ask_vol", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "ti_accel_x_spread_z",
+  "family": "R4A",
+  "hypothesis": "Aggressor-flow acceleration (trade_imbalance_15s - trade_imbalance_60s, recomputed ti_accel_15_60) x z(quoted_spread_ticks, 300s): urgency intensifying while spreads are WIDE means sweeping a thin, fearful stack -- makers already stepped back yet aggression escalates, the informed-sweeping state -> continuation at 15-60s; acceleration under tight comfortable quoting is benign noise (product flips it). Gates the ACTIVE trade channel, distinct from ofi_z_x_spread_z (passive book-flow).",
+  "columns_used": ["trade_imbalance_15s", "trade_imbalance_60s", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "ti_accel_wide_gate",
+  "family": "R4A",
+  "hypothesis": "Fast-minus-slow trade-imbalance gap active ONLY under unusually wide quoting (base x clip(sp_z, 0, inf)), zero otherwise: aggressive-flow acceleration is informative exclusively in stressed regimes where it marks informed sweeping against withdrawn liquidity; in normal/tight regimes it is switched off with no fade claim. Episode detector for urgency-in-stress. Dedup risk note: nonzero rows monotone in base x positive weight -> sibling corr with ti_accel_x_spread_z may be material; regime SELECTION is the distinct input.",
+  "columns_used": ["trade_imbalance_15s", "trade_imbalance_60s", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "ofi_persist_x_spread_z",
+  "family": "R4A",
+  "hypothesis": "Sign-run commitment of ofi_15s (recomputed ofi_sign_persist_60s: (same-sign-pair share over 60s - 0.5) x 2 x sign(ofi_15s)) x z(quoted_spread_ticks, 300s): the COST of commitment is what makes it informative -- sustained same-sign runs under WIDE spreads bear full adverse-selection cost -> deliberate informed accumulation, continuation at 15-60s; runs under tight comfort are zero-cost churn (product flips). The base is magnitude-blind run STRUCTURE, so this tests whether pure second-order flow texture carries the stress-informed signal. Dedup risk note: base sits on the round-3 watchlist (panel rho 0.782, rho 0.723 vs ofi_concord_15_60); sibling corr with the ofi_concord gates needs screening -- no more persist/concord stacking if both pass.",
+  "columns_used": ["ofi_15s", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "ofi_persist_wide_gate",
+  "family": "R4A",
+  "hypothesis": "Flow sign-run commitment active ONLY under unusually wide quoting (base x clip(sp_z, 0, inf)), zero otherwise: committed one-sided runs are informative only in stressed regimes where sustaining them bears adverse-selection cost; in comfortable regimes runs are costless churn, switched off with no fade claim. Episode detector for informed accumulation via run structure. Dedup risk note: nonzero rows monotone in base x positive weight -> sibling corr with ofi_persist_x_spread_z may be material; watchlist proximity to ofi_concord gates applies.",
+  "columns_used": ["ofi_15s", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "iopv_velz_x_spread_z",
+  "family": "R4A",
+  "hypothesis": "IOPV-velocity z surprise (recomputed iopv_vel_z_300s) x z(quoted_spread_ticks, 300s): arbitrage-LATENCY mechanism -- when a NAV-velocity spike lands while spreads are WIDE, creation/redemption and basket hedging are most expensive exactly when the anchor moves, so the ETF tracking gap persists -> continuation in the velocity direction; the same spike under TIGHT comfortable quoting is arbitraged closed within seconds and is largely priced in (product flips toward snap-back). Encodes execution cost, not generic state interaction. Dedup note: base was round-2 watchlist (panel rho 0.847) -- gating should pull corr down as in round 3, verify at screen.",
+  "columns_used": ["iopv_velocity", "quoted_spread_ticks"],
+  "target_horizons": [15, 60, 300]
+ },
+ {
+  "name": "iopv_velz_wide_gate",
+  "family": "R4A",
+  "hypothesis": "IOPV-velocity z surprise active ONLY under unusually wide quoting (base x clip(sp_z, 0, inf)), zero otherwise: NAV-velocity shocks continue only when quoting stress makes the closing arbitrage expensive and the tracking gap stays open; shocks in comfortable regimes are arbitraged away too fast to trade, switched off with no mean-reversion claim. Episode detector for 'fundamental move + trapped arb'. Dedup risk note: nonzero rows monotone in base x positive weight -> sibling corr with iopv_velz_x_spread_z may be material; regime selection is the distinct input.",
+  "columns_used": ["iopv_velocity", "quoted_spread_ticks"],
+  "target_horizons": [15, 60, 300]
+ },
+ {
+  "name": "iopv_drift_x_spread_z",
+  "family": "R4A",
+  "hypothesis": "Sustained 300s NAV drift (rolling mean of iopv_velocity, recomputed iopv_vel_drift_300s) x z(quoted_spread_ticks, 300s): slow fundamental regime x slow quoting stress -- makers reluctant to refresh against a moving anchor + costly arb => the ETF lags the drifting basket for many minutes -> continuation at 300-900s where the base itself lived (round-2 900s pass); sustained drift under comfortable quoting is worked off by cheap arb (product flips). The only R4-A pairing of two SLOW 300s states, aimed at long horizons; distinct from iopv_velz_x_spread_z (transient shock onset, not persistent trend).",
+  "columns_used": ["iopv_velocity", "quoted_spread_ticks"],
+  "target_horizons": [300, 900]
+ },
+ {
+  "name": "iopv_drift_wide_gate",
+  "family": "R4A",
+  "hypothesis": "Sustained NAV drift active ONLY under unusually wide quoting (base x clip(sp_z, 0, inf)), zero otherwise: a persistent anchor trend keeps dragging the ETF at 300-900s precisely when stressed quoting slows the arbitrage that would close the gap; drift episodes in comfortable regimes are arbitraged away continuously, switched off with no fade claim. Episode detector for 'fundamental trend + slow arb' co-occurrence. Dedup risk note: nonzero rows monotone in base x positive weight -> sibling corr with iopv_drift_x_spread_z may be material; regime selection is the distinct input.",
+  "columns_used": ["iopv_velocity", "quoted_spread_ticks"],
+  "target_horizons": [300, 900]
+ },
+ {
+  "name": "iopv_drift_asym_gate",
+  "family": "R4A",
+  "hypothesis": "Sign-ASYMMETRIC cost gate: drift x (wide_depth + 0.5 x tight_depth) with wide_depth=clip(sp_z,0,inf), tight_depth=clip(-sp_z,0,inf) -- the drift keeps its own sign in BOTH regimes, wide stress weighted double tight comfort. Claim: arb execution cost is monotone in spread width, so drift continuation is strong under stress and attenuated-but-still-positive under tight comfort -- no sign flip anywhere, unlike the product which additionally asserts a tight-regime fade. Dedup risk note: algebraically gate = 0.75|sp_z| + 0.25 sp_z, intermediate between the product (sp_z) and a symmetric |sp_z| gate; if tight-regime variance is small, sibling corr with iopv_drift_x_spread_z can run high -- screen pairwise; the no-flip assertion is the distinct economic input, not a base reskin (zero-regime rows stay ~0 and both regimes modulate by stress depth).",
+  "columns_used": ["iopv_velocity", "quoted_spread_ticks"],
+  "target_horizons": [300, 900]
+ }
+]
