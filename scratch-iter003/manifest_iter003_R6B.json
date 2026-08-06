@@ -1,0 +1,100 @@
+[
+  {
+    "name": "oir_zvel_x_zaccel_15s",
+    "family": "R6B",
+    "hypothesis": "Velocity-acceleration AGREEMENT product at the touch: z(15s z-velocity of oir) crossed with z(15s z-acceleration). Co-extreme same-direction derivatives (product large positive) = touch repositioning with curvature fuel -> continuation at 15-60s; opposite signs = turning point. Both derivatives regime-normalized against their own 300s distributions, distinct from level-weighted velocity/accel products.",
+    "columns_used": "oir",
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "wdi_zvel_x_zaccel_15s",
+    "family": "R6B",
+    "hypothesis": "Multi-level queue rebuild co-intensification: z(15s z-velocity of wdi) x z(15s z-acceleration). Both derivatives co-extreme same direction = committed multi-level rebuild speeding up -> continuation; deceleration disagreement = turn. Derivative-on-derivative co-movement, not derivative-vs-level.",
+    "columns_used": "wdi",
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "fullbook_imb_zvel_x_zaccel_15s",
+    "family": "R6B",
+    "hypothesis": "Deep-book positioning co-intensification: z(15s z-velocity of fullbook_imb) x z(15s z-acceleration). Slow-build broad positioning accelerating at co-extreme strength = committed institutional build -> continuation. Distinct from fullbook_imb_zvel_div_15s (level-minus-velocity) and the level-weighted velocity product.",
+    "columns_used": "total_bid_vol, total_ask_vol",
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "lastgap_zvel_x_zaccel_15s",
+    "family": "R6B",
+    "hypothesis": "Accelerating informed aggression: z(15s z-velocity of last-mid gap) x z(15s z-acceleration). Fastest directional signal; co-firing velocity+acceleration = aggressor intensity accelerating (urgency/program execution) -> impact continuation at 15-60s; deceleration = exhaustion. Pure aggressor-flow curvature co-movement.",
+    "columns_used": "last_px, mid_px",
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "oir_vel_accel_div_15s",
+    "family": "R6B",
+    "hypothesis": "Touch-rebuild OVEREXTENSION: z(15s z-velocity of oir) / (1 + |z(15s z-accel)|). Velocity extreme but acceleration faded (denominator ~1) = motion running ahead of its curvature fuel -> exhaustion/reversion; strong acceleration shrinks the ratio (still fueled). Acceleration in the DENOMINATOR = the dual of the agreement product.",
+    "columns_used": "oir",
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "wdi_vel_accel_div_15s",
+    "family": "R6B",
+    "hypothesis": "Depth-rebuild overextension: z(15s z-velocity of wdi) / (1 + |z(15s z-accel)|). Extreme velocity with faded acceleration on a committed multi-level queue tilt = overextended thrust spending its momentum -> revert; still-fueled acceleration demoted. Exhaustion question, dual of co-intensification.",
+    "columns_used": "wdi",
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "fullbook_imb_vel_accel_div_15s",
+    "family": "R6B",
+    "hypothesis": "Broad-book build overextension: z(15s z-velocity of fullbook_imb) / (1 + |z(15s z-accel)|). Slow patient build whose driving curvature has gone = stall/revert; still-fueled acceleration demoted. Distinct from fullbook_imb_zvel_div_15s (involves level, not two derivatives).",
+    "columns_used": "total_bid_vol, total_ask_vol",
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "lastgap_vel_accel_div_15s",
+    "family": "R6B",
+    "hypothesis": "Aggressor-burst overextension: z(15s z-velocity of last-mid gap) / (1 + |z(15s z-accel)|). One-sided aggressor burst that lost its intensification (acceleration faded) = exhausting impact thrust -> reversion; still-intensifying demoted. Opposite regime of the agreement product (continuation).",
+    "columns_used": "last_px, mid_px",
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "oir_zjerk_extreme_15s",
+    "family": "R6B",
+    "hypothesis": "JERK (3rd derivative) at the touch: d3z of z_300(oir) weighted by |z|. One derivative above oir_zaccel_extreme_15s (2nd); captures abrupt CHANGE in the acceleration of queue repositioning. Steady extreme acceleration reads ~0 (constant d2z->d3z~0); only curvature BREAKS fire.",
+    "columns_used": "oir",
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "wdi_zjerk_extreme_15s",
+    "family": "R6B",
+    "hypothesis": "JERK on multi-level depth: d3z of z_300(wdi) weighted by |z|. Abrupt curvature break in a committed queue rebuild = informed repositioning reversing course. Distinct from wdi_zaccel_extreme_15s (intensification); jerk = CHANGE in intensification.",
+    "columns_used": "wdi",
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "fullbook_imb_zjerk_extreme_15s",
+    "family": "R6B",
+    "hypothesis": "JERK on broad-book positioning: d3z of z_300(fullbook_imb) weighted by |z|. Abrupt curvature reversal of a slow committed institutional build = regime change in the deepest positioning layer. 3rd derivative captures breaks the lower derivatives smooth over.",
+    "columns_used": "total_bid_vol, total_ask_vol",
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "lastgap_zjerk_extreme_15s",
+    "family": "R6B",
+    "hypothesis": "JERK on aggressor flow: d3z of z_300(last-mid gap) weighted by |z|. Abrupt curvature break in aggressor intensity (a burst snapping from intensifying to decelerating) on a stretched aggressor regime = decisive regime change at the fastest signal.",
+    "columns_used": "last_px, mid_px",
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "oir_zvel_zaccel_disagree_extreme_15s",
+    "family": "R6B",
+    "hypothesis": "Opposite-sign-gated turning-point detector at the touch: z(vel) x z(accel) kept ONLY when signs oppose (product<0, large only when both co-extreme), zero on agreement. Disagreement twin of oir_zvel_x_zaccel_15s (disjoint support). Velocity-vs-acceleration disagreement = deceleration turning point -> reversion at 15-60s.",
+    "columns_used": "oir",
+    "target_horizons": [15, 30, 60]
+  },
+  {
+    "name": "wdi_zvel_zaccel_disagree_extreme_15s",
+    "family": "R6B",
+    "hypothesis": "Opposite-sign-gated turning-point detector on depth: z(vel) x z(accel) kept ONLY when signs oppose (product<0, large only when both co-extreme), zero on agreement. Disagreement twin of wdi_zvel_x_zaccel_15s. Committed queue rebuild being braked by opposing curvature = high-conviction turning point.",
+    "columns_used": "wdi",
+    "target_horizons": [15, 30, 60]
+  }
+]

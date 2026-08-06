@@ -1,0 +1,100 @@
+[
+  {
+    "name": "oir_zaccel_15s_x_60s",
+    "family": "R6D",
+    "hypothesis": "Cross-timescale acceleration agreement on top-of-book imbalance: when the 15s and 60s z-acceleration of z_300(oir) point the same way, intensification is confirmed across horizons; extremeness-weighted by |z|.",
+    "columns_used": "oir",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "oir_zaccel_ts_agree",
+    "family": "R6D",
+    "hypothesis": "Timescale-confirmation gate: fast 15s z-accel amplified by slow 60s z-accel magnitude, only when both point same direction (strict consensus); zero on disagreement; weighted by |z|.",
+    "columns_used": "oir",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "wdi_zaccel_15s_x_60s",
+    "family": "R6D",
+    "hypothesis": "Cross-timescale acceleration agreement on 5-level depth imbalance: 15s z-accel signed by 60s z-accel direction, weighted by |z|; tests multi-horizon curvature alignment of depth rebuild.",
+    "columns_used": "wdi",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "wdi_zaccel_ts_agree",
+    "family": "R6D",
+    "hypothesis": "Timescale-confirmation gate on wdi: fast 15s z-accel amplified by slow 60s magnitude, only when signs agree; zero on conflict; weighted by |z|.",
+    "columns_used": "wdi",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "fullbook_imb_zaccel_15s_x_60s",
+    "family": "R6D",
+    "hypothesis": "Cross-timescale acceleration agreement on full-book imbalance (total_bid/ask_vol, all levels): 15s z-accel signed by 60s z-accel direction, weighted by |z|; tests outer-queue multi-horizon intensification.",
+    "columns_used": "total_bid_vol, total_ask_vol",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "fullbook_imb_zaccel_ts_agree",
+    "family": "R6D",
+    "hypothesis": "Timescale-confirmation gate on full-book imbalance: fast 15s z-accel amplified by slow 60s magnitude, only when signs agree; zero on conflict; weighted by |z|.",
+    "columns_used": "total_bid_vol, total_ask_vol",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "ofi_15s_zvel_extreme_15s",
+    "family": "R6D",
+    "hypothesis": "Extremity-weighted z-velocity on the fastest OFI substrate (ofi_15s): 15s change rate of z_300(ofi_15s) weighted by |z|; tests whether quarter-minute book-flow surges of already-stretched regimes carry continuation signal.",
+    "columns_used": "ofi_15s",
+    "target_horizons": "15s, 30s"
+  },
+  {
+    "name": "ofi_15s_zaccel_extreme_15s",
+    "family": "R6D",
+    "hypothesis": "Extremity-weighted z-acceleration on ofi_15s: 15s 2nd difference of z_300(ofi_15s) weighted by |z|; tests whether the curvature of the fastest book-flow burst carries signal beyond velocity.",
+    "columns_used": "ofi_15s",
+    "target_horizons": "15s, 30s"
+  },
+  {
+    "name": "ofi_30s_zvel_extreme_15s",
+    "family": "R6D",
+    "hypothesis": "Extremity-weighted z-velocity on intermediate-window OFI (ofi_30s): 15s change rate of z_300(ofi_30s) weighted by |z|; isolates multi-snapshot persistent flow dynamics.",
+    "columns_used": "ofi_30s",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "ofi_30s_zaccel_extreme_15s",
+    "family": "R6D",
+    "hypothesis": "Extremity-weighted z-acceleration on ofi_30s: 15s 2nd difference of z_300(ofi_30s) weighted by |z|; tests curvature intensification at the half-minute resolution scale.",
+    "columns_used": "ofi_30s",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "ofi_60s_zvel_extreme_15s",
+    "family": "R6D",
+    "hypothesis": "Extremity-weighted z-velocity on the primary OFI (ofi_60s): 15s change rate of z_300(ofi_60s) weighted by |z|; always-on extremity-weighted velocity (vs event-sparse ofi_z_cross_vel_15s).",
+    "columns_used": "ofi_60s",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "ofi_60s_zaccel_extreme_15s",
+    "family": "R6D",
+    "hypothesis": "Extremity-weighted z-acceleration on ofi_60s: 15s 2nd difference of z_300(ofi_60s) weighted by |z|; tests whether minute-flow curvature intensification carries continuation signal.",
+    "columns_used": "ofi_60s",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "n_trades_60s_zvel_extreme_15s",
+    "family": "R6D",
+    "hypothesis": "Extremity-weighted z-velocity on trade-arrival rate (n_trades_60s): 15s change rate of z_300(n_trades_60s) weighted by |z|; tests whether surging/exhausting trade intensity of an abnormal regime predicts directional moves. Distinct from dead level-z of trade count.",
+    "columns_used": "n_trades_60s",
+    "target_horizons": "15s, 30s"
+  },
+  {
+    "name": "n_trades_60s_zaccel_extreme_15s",
+    "family": "R6D",
+    "hypothesis": "Extremity-weighted z-acceleration on trade-arrival rate: 15s 2nd difference of z_300(n_trades_60s) weighted by |z|; tests whether the curvature of trading urgency (escalating vs fading burst) carries directional signal.",
+    "columns_used": "n_trades_60s",
+    "target_horizons": "15s, 30s"
+  }
+]

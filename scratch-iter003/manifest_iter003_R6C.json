@@ -1,0 +1,100 @@
+[
+  {
+    "name": "oir_zvel_1p5sig_extreme_15s",
+    "family": "R6C",
+    "hypothesis": "Looser 1.5sigma gate on touch-imbalance velocity-extremity product (dz*|z| when |z|>1.5) tests whether signal accumulates below the proven 2sigma boundary",
+    "columns_used": "oir",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "wdi_zvel_3sig_extreme_15s",
+    "family": "R6C",
+    "hypothesis": "Tighter 3sigma gate on depth-imbalance velocity-extremity product (dz*|z| when |z|>3) tests signal concentration in the rare extreme tail; brackets admitted wdi_zvel_2sig from above",
+    "columns_used": "wdi",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "fullbook_imb_zvel_2p5sig_extreme_15s",
+    "family": "R6C",
+    "hypothesis": "2.5sigma gate on full-book imbalance velocity-extremity product tests intermediate threshold on the wide book (hidden depth beyond level 5)",
+    "columns_used": "total_bid_vol, total_ask_vol",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "wdi_zvel_1p5sig_extreme_15s",
+    "family": "R6C",
+    "hypothesis": "Loose 1.5sigma gate on wdi velocity-extremity product; pairs with wdi_zvel_3sig to bracket the admitted 2sigma from both sides on the same base, isolating the threshold effect",
+    "columns_used": "wdi",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "wdi_zaccel_3sig_extreme_15s",
+    "family": "R6C",
+    "hypothesis": "Tight 3sigma gate on depth-imbalance z-acceleration-extremity (d2z*|z| when |z|>3) tests concentration of the intensifying-rebuild signal in rare institutional-crowding regime",
+    "columns_used": "wdi",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "fullbook_imb_zaccel_2p5sig_extreme_15s",
+    "family": "R6C",
+    "hypothesis": "2.5sigma gate on full-book z-acceleration-extremity tests tail concentration of hidden-depth intensifying repositioning; wide-book acceleration may need tighter gate due to structural noise",
+    "columns_used": "total_bid_vol, total_ask_vol",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "oir_zaccel_2p5sig_extreme_15s",
+    "family": "R6C",
+    "hypothesis": "2.5sigma gate on touch z-acceleration-extremity (oir was round-5 strongest |t| base at +27.74); tests whether ungated acceleration signal concentrates in the stretched tail",
+    "columns_used": "oir",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "oir_zvel_pos_extreme_15s",
+    "family": "R6C",
+    "hypothesis": "Signed-long-stretch gate (dz*z when z>+2) isolates bid-heavy touch velocity; tests directional asymmetry vs symmetric |z| form",
+    "columns_used": "oir",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "wdi_zvel_pos_extreme_15s",
+    "family": "R6C",
+    "hypothesis": "Signed-long-stretch gate on depth imbalance (dz*z when z>+2) isolates bid-crowded multi-level velocity; tests directional asymmetry across depth",
+    "columns_used": "wdi",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "wdi_zvel_neg_extreme_15s",
+    "family": "R6C",
+    "hypothesis": "Signed-short-stretch gate on depth imbalance (dz*z when z<-2) isolates ask-crowded velocity; pairs with wdi_zvel_pos_extreme for a clean directional asymmetry test on the same base",
+    "columns_used": "wdi",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "fullbook_imb_zvel_neg_extreme_15s",
+    "family": "R6C",
+    "hypothesis": "Signed-short-stretch gate on full-book imbalance isolates hidden-depth ask-crowding where redemption-flow passive selling pressure resides",
+    "columns_used": "total_bid_vol, total_ask_vol",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "wdi_zvel_extreme_decay_15s",
+    "family": "R6C",
+    "hypothesis": "Recency-decayed |z| weighting (20-row linear WMA) on wdi velocity tests whether sustained-recent extremeness outperforms instantaneous |z| as the velocity amplifier",
+    "columns_used": "wdi",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "oir_zvel_extreme_decay_15s",
+    "family": "R6C",
+    "hypothesis": "Recency-decayed |z| on touch velocity; 60s linear decay kernel filters quote flicker so only committed-recent touch extremes amplify velocity",
+    "columns_used": "oir",
+    "target_horizons": "15s, 30s, 60s"
+  },
+  {
+    "name": "fullbook_imb_zvel_extreme_decay_15s",
+    "family": "R6C",
+    "hypothesis": "Recency-decayed |z| on broad-book velocity; decay kernel matches the slow institutional build-time of hidden-depth positioning, where commitment is expressed through persistence not spike",
+    "columns_used": "total_bid_vol, total_ask_vol",
+    "target_horizons": "15s, 30s, 60s"
+  }
+]

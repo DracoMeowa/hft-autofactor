@@ -1,0 +1,100 @@
+[
+  {
+    "name": "fullbook_imb_zaccel_extreme_15s",
+    "family": "R6A",
+    "hypothesis": "z-acceleration-extremeness product (d2z*|z|) on full-book imbalance: 15s acceleration of the 300s z-regime of the broad-book (incl. depth beyond L5) imbalance weighted by regime stretch; passive institutional repositioning at scale whose rate of change is intensifying continues at 15-60s.",
+    "columns_used": "total_bid_vol, total_ask_vol",
+    "target_horizons": "15,30,60,300,900"
+  },
+  {
+    "name": "fullbook_imb_zaccel_x_15s",
+    "family": "R6A",
+    "hypothesis": "broad-book imbalance z-level gated by acceleration DIRECTION (z*sign(d2z)): when the full-book tilt z and its curvature agree the broad regime is still building -> continuation; when curvature opposes level the overextended tilt reverts. Binary gate isolates inflection timing.",
+    "columns_used": "total_bid_vol, total_ask_vol",
+    "target_horizons": "15,30,60,300,900"
+  },
+  {
+    "name": "depth5_imb_zaccel_extreme_15s",
+    "family": "R6A",
+    "hypothesis": "z-acceleration-extremeness product (d2z*|z|) on flat-weighted top-5 depth imbalance: 15s acceleration of the 300s z-regime of the outer-visible-stack (L3-5 emphasized vs exp-weighted wdi) imbalance weighted by stretch; second-derivative intensification of crowded visible-stack repositioning continues at 15-60s.",
+    "columns_used": "depth_bid5, depth_ask5",
+    "target_horizons": "15,30,60,300,900"
+  },
+  {
+    "name": "depth5_imb_zaccel_2sig_extreme_15s",
+    "family": "R6A",
+    "hypothesis": "strict-extreme gated (|z|>2) z-acceleration-extremeness product on top-5 imbalance: tests whether the visible-stack acceleration signal CONCENTRATES in the 2-sigma tail (genuinely crowded outer stack) vs being diluted by bulk-regime curvature noise.",
+    "columns_used": "depth_bid5, depth_ask5",
+    "target_horizons": "15,30,60,300,900"
+  },
+  {
+    "name": "microprice_dev_zaccel_extreme_15s",
+    "family": "R6A",
+    "hypothesis": "z-acceleration-extremeness PRODUCT form (d2z*|z|) on microprice_dev: 15s acceleration of the 300s z-regime of the queue-weighted fair-value lead weighted by stretch. Retains acceleration magnitude (vs existing sign-only variant); curvature of the informed-value lead at extreme stretch drags mid at 15-60s.",
+    "columns_used": "microprice_dev",
+    "target_horizons": "15,30,60,300,900"
+  },
+  {
+    "name": "microprice_dev_zaccel_2sig_extreme_15s",
+    "family": "R6A",
+    "hypothesis": "strict-extreme gated (|z|>2) z-acceleration-extremeness product on microprice_dev: tests whether the fair-value-lead acceleration signal CONCENTRATES in the 2-sigma tail (genuine queue-pressure divergence) vs being diluted by neutral-regime curvature.",
+    "columns_used": "microprice_dev",
+    "target_horizons": "15,30,60,300,900"
+  },
+  {
+    "name": "ti60_zaccel_extreme_15s",
+    "family": "R6A",
+    "hypothesis": "z-acceleration-extremeness product (d2z*|z|) on trade_imbalance_60s: 15s acceleration of the 300s z-regime of the taker-flow imbalance weighted by stretch; second-derivative intensification of an aggressive-flow program (rate of new marketable flow itself increasing) continues at 15-60s.",
+    "columns_used": "trade_imbalance_60s",
+    "target_horizons": "15,30,60,300,900"
+  },
+  {
+    "name": "ti60_zaccel_x_15s",
+    "family": "R6A",
+    "hypothesis": "aggressive-flow z-level gated by acceleration DIRECTION (z*sign(d2z)): when taker-imbalance z and its curvature agree the program is still ramping -> continuation; when curvature opposes the aggression peaked and reverts. Binary gate isolates build-vs-exhaust phase timing.",
+    "columns_used": "trade_imbalance_60s",
+    "target_horizons": "15,30,60,300,900"
+  },
+  {
+    "name": "ti60_zaccel_2sig_extreme_15s",
+    "family": "R6A",
+    "hypothesis": "strict-extreme gated (|z|>2) z-acceleration-extremeness product on trade_imbalance_60s: tests whether the aggressive-flow acceleration signal CONCENTRATES in the 2-sigma tail (committed one-sided aggression regime) vs being diluted by two-sided flow noise.",
+    "columns_used": "trade_imbalance_60s",
+    "target_horizons": "15,30,60,300,900"
+  },
+  {
+    "name": "lastgap_zaccel_extreme_15s",
+    "family": "R6A",
+    "hypothesis": "z-acceleration-extremeness product (d2z*|z|) on last-mid gap (ticks): 15s acceleration of the 300s z-regime of the aggressor-side trade-through gap weighted by stretch; second-derivative intensification of informed trade-through pressure (rate of new marketable aggression itself increasing) continues at 15-60s.",
+    "columns_used": "last_px, mid_px",
+    "target_horizons": "15,30,60,300,900"
+  },
+  {
+    "name": "lastgap_zaccel_x_15s",
+    "family": "R6A",
+    "hypothesis": "aggressor-side gap z-level gated by acceleration DIRECTION (z*sign(d2z)): when the trade-through regime z and its curvature agree buyer/seller aggression is still intensifying -> continuation; when curvature opposes the aggression peaked and the overextended gap reverts. Binary gate isolates inflection timing.",
+    "columns_used": "last_px, mid_px",
+    "target_horizons": "15,30,60,300,900"
+  },
+  {
+    "name": "ltns_zaccel_extreme_15s",
+    "family": "R6A",
+    "hypothesis": "z-acceleration-extremeness product (d2z*|z|) on large_trade_net_share_60s: 15s acceleration of the 300s z-regime of the signed whale footprint weighted by stretch; second-derivative intensification of an institutional execution program (child-order tempo itself ramping) continues at 15-60s until the program completes.",
+    "columns_used": "large_trade_net_share_60s",
+    "target_horizons": "15,30,60,300,900"
+  },
+  {
+    "name": "ltns_zaccel_x_15s",
+    "family": "R6A",
+    "hypothesis": "institutional-footprint z-level gated by acceleration DIRECTION (z*sign(d2z)): when the whale regime z and its curvature agree the program is still building (child-order tempo ramping) -> continuation; when curvature opposes the program is completing and the overextended footprint reverts. Binary gate isolates execution-program phase.",
+    "columns_used": "large_trade_net_share_60s",
+    "target_horizons": "15,30,60,300,900"
+  },
+  {
+    "name": "ltns_zaccel_2sig_extreme_15s",
+    "family": "R6A",
+    "hypothesis": "strict-extreme gated (|z|>2) z-acceleration-extremeness product on large_trade_net_share_60s: tests whether the institutional-footprint acceleration signal CONCENTRATES in the 2-sigma whale tail (genuine sustained one-sided large-print execution) vs being diluted by routine block noise.",
+    "columns_used": "large_trade_net_share_60s",
+    "target_horizons": "15,30,60,300,900"
+  }
+]
