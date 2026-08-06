@@ -101,7 +101,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="comma list of prototype names (default: all registered)",
     )
     p_run.add_argument("--chunk-days", type=int, default=5)
-    p_run.add_argument("--k", type=int, default=4, help="truncation cutoffs per chunk")
+    p_run.add_argument("--k", type=int, default=8, help="truncation cutoffs per chunk")
     p_run.add_argument("--overwrite", action="store_true")
 
     p_scr = sub.add_parser(
