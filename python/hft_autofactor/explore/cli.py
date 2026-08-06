@@ -126,6 +126,28 @@ def build_parser() -> argparse.ArgumentParser:
     p_scr.add_argument("--embargo-days", type=int, default=1)
     p_scr.add_argument("--n-test-days", type=int, default=5)
 
+    p_round = sub.add_parser(
+        "round",
+        help="run a full iter round deterministically: add -> parallel run "
+        "-> screen -> extract -> dedup -> archive (candidates.json merge) "
+        "-> bundle. No git.",
+    )
+    p_round.add_argument("--round", required=True, help="round key, e.g. iter003_round6")
+    p_round.add_argument(
+        "--spec-dir", required=True,
+        help="dir of source spec .py files to add (e.g. explore-specs-iter003)",
+    )
+    p_round.add_argument("--repo", default=".", help="repo root (default cwd)")
+    p_round.add_argument("--workers", type=int, default=4, help="parallel run chunks")
+    p_round.add_argument("--k", type=int, default=8, help="causality truncation cutoffs")
+    p_round.add_argument("--chunk-days", type=int, default=5)
+    p_round.add_argument(
+        "--stage", default="all",
+        choices=["all", "run", "archive", "render"],
+        help="all=add+run+screen+archive+bundle; run=add+run+screen; "
+        "archive=extract+dedup+archive+bundle; render=report from candidates.json",
+    )
+
     return parser
 
 
@@ -189,6 +211,17 @@ def main(argv: Sequence[str] | None = None) -> int:
             encoding="utf-8",
         )
         print(f"added {proto.name} -> {dst}")
+        return 0
+
+    # --------------------------- round ------------------------------ #
+    if args.command == "round":
+        from .round_runner import run_round
+
+        run_round(
+            args.config, args.repo, args.round, args.spec_dir,
+            workers=args.workers, k=args.k, chunk_days=args.chunk_days,
+            stage=args.stage,
+        )
         return 0
 
     # ------------------------- run / screen -------------------------- #

@@ -56,16 +56,16 @@ def render(round_key: str) -> str:
         letter = key.split("_")[0]
         fam_info[letter] = [key, cnt]
     fam_admit = {L: 0 for L in fam_info}
-    fam_pass = {L: 0 for L in fam_info}
+    fam_killed = {L: set() for L in fam_info}
     for e in b["admitted"]:
         L = fmap.get(e["name"])
         if L in fam_admit:
             fam_admit[L] += 1
-            fam_pass[L] += 1
     for k in b["dedup"]["killed"]:
         L = fmap.get(k["name"])
-        if L in fam_pass:
-            fam_pass[L] += 1
+        if L in fam_killed:
+            fam_killed[L].add(k["name"])
+    fam_pass = {L: fam_admit[L] + len(fam_killed[L]) for L in fam_info}
 
     out = []
     out.append(f"# iter-003 第{n_round}轮评估报告（588000，59 列宽表持续迭代）\n")
