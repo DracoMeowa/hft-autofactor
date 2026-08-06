@@ -1,0 +1,100 @@
+[
+  {
+    "name": "iopv_prem_z_cross_vel_15s",
+    "family": "R5A",
+    "hypothesis": "Premium-arbitrage regime reversal events: 300s z of iopv_premium crosses zero within 15s. Crossing velocity scores how fast AP pressure reverses; decisive crossings continue at 15-60s. Event-sparse, unlike library level-z.",
+    "columns_used": "iopv_premium",
+    "target_horizons": "15,30,60"
+  },
+  {
+    "name": "iopv_prem_zvel_extreme_60s",
+    "family": "R5A",
+    "hypothesis": "Extremity-weighted premium-regime velocity: 60s z-velocity of iopv_premium weighted by |z|. Stretched premium still accelerating means mispricing widening beyond AP response; 60s matches AP timescale.",
+    "columns_used": "iopv_premium",
+    "target_horizons": "60,300"
+  },
+  {
+    "name": "iopv_prem_zvel_div_60s",
+    "family": "R5A",
+    "hypothesis": "Premium level-vs-velocity disagreement: z(premium) minus z(its 60s velocity). Stretched level with fading velocity means AP arb closing; velocity leading means still building.",
+    "columns_used": "iopv_premium",
+    "target_horizons": "60,300"
+  },
+  {
+    "name": "rv60_logz_cross_vel_15s",
+    "family": "R5A",
+    "hypothesis": "Short-vol regime acceleration events: 300s z of log(rv_60s) crosses zero within 15s. Crossing velocity captures vol shock intensity; signed velocity carries directional info via leverage effect.",
+    "columns_used": "rv_60s",
+    "target_horizons": "15,30,60"
+  },
+  {
+    "name": "rv60_logzvel_extreme_15s",
+    "family": "R5A",
+    "hypothesis": "Extremity-weighted vol-regime velocity: 15s z-velocity of log(rv_60s) weighted by |z|. Extreme vol regime still accelerating = decisive vol cascade; signed velocity distinguishes rising vs falling.",
+    "columns_used": "rv_60s",
+    "target_horizons": "15,30"
+  },
+  {
+    "name": "rv60_logzvel_div_60s",
+    "family": "R5A",
+    "hypothesis": "Vol level-vs-velocity overextension: z(log rv_60s) minus z(its 60s velocity). Level stretched with velocity fading = spike exhausting; velocity leading = spike building.",
+    "columns_used": "rv_60s",
+    "target_horizons": "60,300"
+  },
+  {
+    "name": "rv300_logz_cross_vel_60s",
+    "family": "R5A",
+    "hypothesis": "Slow-vol regime reversal events: 300s z of log(rv_300s) crosses zero within 60s. Slow-vol transitions persist via vol clustering; 60s crossing velocity targets 300-900s horizon.",
+    "columns_used": "rv_300s",
+    "target_horizons": "300,900"
+  },
+  {
+    "name": "rv300_logzvel_div_15s",
+    "family": "R5A",
+    "hypothesis": "Fast-edge disagreement with slow-vol level: z(log rv_300s) minus z(its 15s velocity). Widest slow-base/fast-edge separation maximizes level-velocity tension; build-vs-exhaust of 5min vol regime.",
+    "columns_used": "rv_300s",
+    "target_horizons": "15,60"
+  },
+  {
+    "name": "lastgap_z_cross_vel_15s",
+    "family": "R5A",
+    "hypothesis": "Aggressor-side regime reversal events: 300s z of last-mid gap (ticks) crosses zero within 15s. Z crossing = smoothed aggressor bias changed regime (vs raw gap sign flip = noise); velocity scores decisiveness.",
+    "columns_used": "last_px, mid_px",
+    "target_horizons": "15,30,60"
+  },
+  {
+    "name": "lastgap_zvel_extreme_15s",
+    "family": "R5A",
+    "hypothesis": "Extremity-weighted aggressor-side velocity: 15s z-velocity of last-mid gap weighted by |z|. Stretched aggressor regime still accelerating = informed flow intensifying; impact is front-loaded at 15-60s.",
+    "columns_used": "last_px, mid_px",
+    "target_horizons": "15,30"
+  },
+  {
+    "name": "ltns_z_cross_vel_15s",
+    "family": "R5A",
+    "hypothesis": "Large-trade direction regime reversal events: 300s z of signed large-trade net share crosses zero within 15s. Institutional big-ticket flow changed direction; crossing velocity scores program decisiveness.",
+    "columns_used": "large_trade_net_share_60s",
+    "target_horizons": "15,30,60"
+  },
+  {
+    "name": "ltns_zvel_div_60s",
+    "family": "R5A",
+    "hypothesis": "Institutional flow overextension vs its own fast edge: z(ltns) minus z(its 60s velocity). Stretched level with fading velocity = program completing; velocity leading = program igniting.",
+    "columns_used": "large_trade_net_share_60s",
+    "target_horizons": "60,300"
+  },
+  {
+    "name": "event_int_z_cross_vel_15s",
+    "family": "R5A",
+    "hypothesis": "Information-arrival regime transition events: 300s z of book_event_intensity crosses zero within 15s. Level z died (round-2) but the transition EVENT is a different question: tape onset/offset marks Hawkes cluster boundaries.",
+    "columns_used": "book_event_intensity_60s",
+    "target_horizons": "15,30,60"
+  },
+  {
+    "name": "event_int_zvel_extreme_60s",
+    "family": "R5A",
+    "hypothesis": "Extremity-weighted information-arrival velocity: 60s z-velocity of event intensity weighted by |z|. Extreme tape regime still accelerating = self-exciting cluster intensifying; 60s matches cluster buildup timescale.",
+    "columns_used": "book_event_intensity_60s",
+    "target_horizons": "60,300"
+  }
+]

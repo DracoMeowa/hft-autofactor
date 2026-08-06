@@ -1,0 +1,100 @@
+[
+ {
+  "name": "ofi_15sz_spread_wide_gate",
+  "family": "R5D",
+  "hypothesis": "Fast book-flow surprise (z of ofi_15s over 120s) multiplied by RAW quoted_spread_ticks level. Same burst of book-building flow is a stronger continuation signal when quoting is expensive in absolute terms -- informed participants paying the conviction toll. Raw level is near-orthogonal to the base (round-4 finding: panel rho 0.02-0.10), so product does not reduce to a re-scaled base. Distinct from ofi_z_x_spread_z on two axes: 15s base (not 60s) and raw-level weight (not z-z).",
+  "columns_used": ["ofi_15s", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "top5div_spread_wide_gate",
+  "family": "R5D",
+  "hypothesis": "Structural touch-vs-queue mismatch (z of wdi minus full-book imbalance, 300s) multiplied by RAW spread level. Thin-backed displayed strength is more fragile when the spread is wider in absolute terms -- the cost to defend the posture or fade it is larger, so the drift is faster. Raw level carries absolute-cost info the z-gate discards; near-orthogonal to the base. Distinct from top5div_x_spread_z (z-gated): absolute-cost weighting, not regime-normalized.",
+  "columns_used": ["wdi", "total_bid_vol", "total_ask_vol", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60, 300]
+ },
+ {
+  "name": "lastgap_spread_wide_gate",
+  "family": "R5D",
+  "hypothesis": "Aggressor-side gap (last_px minus mid_px in ticks) multiplied by RAW spread level. The product captures the JOINT cost of the sweep: the aggressor crossed the half-spread AND did so when the full spread was elevated -- paying both the visible toll and the stress premium. last_mid_gap_ticks (round-1 admitted, all 5 horizons) has no spread interaction yet; raw-level product expected panel rho 0.02-0.10 vs the base.",
+  "columns_used": ["last_px", "mid_px", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "oir_mom_spread_wide_gate",
+  "family": "R5D",
+  "hypothesis": "60s momentum of the top-of-book imbalance ratio (oir) multiplied by RAW spread level. When the touch queue turns while the spread is wide, makers are repositioning under explicit cost -- doubly-informed (widening in fear + rebuilding in a new direction). Under tight 1-tick quoting the same momentum is cheap routine rotation. oir_mom_60s (round-1 admitted) has no spread interaction yet.",
+  "columns_used": ["oir", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "ofi_pdepth_wide_walk",
+  "family": "R5D",
+  "hypothesis": "OFI strain per unit depth (ofi_60s normalized by 5-level depth stock, z over 300s) active ONLY when raw spread exceeds its rolling mean (binary gate). Book-strain matters exclusively in the wide-quoting subset: when the spread is above mean, makers have stepped back, so strain registers against an already-withdrawn book and the pressured side gives way; under comfortable sub-mean spreads the same strain is absorbed and switched off. ofi_per_depth_z_300s (round-2 admitted) has no spread interaction. Binary on/off = episode detector, structurally different from both the base and continuous raw-spread weight.",
+  "columns_used": ["ofi_60s", "depth_bid5", "depth_ask5", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60, 300]
+ },
+ {
+  "name": "div_vis_wide_walk",
+  "family": "R5D",
+  "hypothesis": "Admitted div_x_vis_share interaction (z of touch-vs-queue divergence x z of touch-concentration) active ONLY when raw spread exceeds rolling mean (binary gate). The fragile structural conflict (large mismatch while depth concentrates at touch, hidden reserves thin) resolves faster under expensive quoting -- the cost to defend the dislocation is higher and arbitrageurs face a wider toll. div_x_vis_share (round-3 admitted, panel rho 0.074) has no spread interaction. Binary gate = episode detector.",
+  "columns_used": ["wdi", "total_bid_vol", "total_ask_vol", "depth_bid5", "depth_ask5", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "ofi_zvel_thin_gate",
+  "family": "R5D",
+  "hypothesis": "OFI regime-crossing events (ofi_z_cross_vel_15s: velocity of the moment the 300s z of ofi_60s crosses zero) active ONLY when raw spread is BELOW its rolling mean (binary THIN gate). OPPOSITE of the wide-gate hypothesis: a book-flow regime switch is MORE informative when the spread is thin because the arbitrage that closes the gap is cheapest there -- informed participants can act at minimum cost and the new direction asserts fastest. First thin-gate spec in the library. Nonzero support is a strict subset of ofi_z_cross_vel_15s (round-3 admitted); the thin-regime selection is the distinct input.",
+  "columns_used": ["ofi_60s", "quoted_spread_ticks"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_bid_x_buyvel_15s",
+  "family": "R5D",
+  "hypothesis": "Hidden bid-support LEVEL (z of hidden bid share, 300s) x 15s VELOCITY of z-scored buy volume. Fires when deep patient bids sit WHILE buy aggression is actively RISING -- demand committing on both hidden (queued) and visible (aggressor) channels simultaneously. Mirror operator of round-4's hidden_bid_arrival_x_buyvol (velocity on hidden side x level on trade side): here the level is on the hidden side and velocity on the trade side -- fires at different moments. Side-attributed GROSS buy volume carries info even when net TI nets to zero.",
+  "columns_used": ["total_bid_vol", "depth_bid5", "buy_vol_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_ask_x_sellvel_15s",
+  "family": "R5D",
+  "hypothesis": "Hidden ask-supply LEVEL (z of hidden ask share, 300s) x 15s VELOCITY of z-scored sell volume. Fires when deep patient ask overhang sits WHILE sell aggression is actively RISING -- queued supply refilling the offer while sellers step in aggressively, doubly-confirmed distribution regime. Supply-side twin of hidden_bid_x_buyvel_15s (not a sign-flip: sides rotate independently). Distinct from round-4 hidden_ask_x_sellvol_z (level x level): velocity on trade side detects arrival episodes the level interaction misses.",
+  "columns_used": ["total_ask_vol", "depth_ask5", "sell_vol_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_imb_x_ti_agree_60s",
+  "family": "R5D",
+  "hypothesis": "Hidden-layer imbalance x trade_imbalance_60s, ZEROED when signs disagree. The CONFIRMATION regime: patient queued depth and aggressive flow point the same way -> the move has a resting hidden reservoir behind it -> continuation at 15-60s. Round-3 raw product (hidden_imb_x_ti) died because agreement (continue) and disagreement (fade) have OPPOSITE signs and cancel in the IC; isolating the agreement half removes the cancellation. Episode detector: fires only on confirmation rows, exactly zero during disagreement.",
+  "columns_used": ["total_bid_vol", "total_ask_vol", "depth_bid5", "depth_ask5", "trade_imbalance_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_imb_x_ti_disagree_60s",
+  "family": "R5D",
+  "hypothesis": "Hidden-layer imbalance x trade_imbalance_60s, ZEROED when signs agree. The ABSORPTION regime: patient queued depth sits OPPOSITE the aggressive flow -> hidden reservoir absorbing the blows -> exhaustion/reversal of the aggressive side. Negative product (e.g. hidden bids absorbing selling) marks a sell-off running into patient support, prone to stall/revert. NOT a sign-flip of the agreement twin: each fires on a disjoint subset of rows and is exactly zero on the other, so cross-sectional distributions have different support. The raw product (round-3 dead) blended both regimes and they cancelled.",
+  "columns_used": ["total_bid_vol", "total_ask_vol", "depth_bid5", "depth_ask5", "trade_imbalance_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_bid_x_ltns_15s",
+  "family": "R5D",
+  "hypothesis": "Hidden bid-support z x large_trade_net_share_60s. Fires when large traders net buy AND a deep hidden bid reservoir sits below the touch -- demand committing on the INFORMED channel (large orders = institutional proxy) AND the PATIENT channel (queued iceberg) simultaneously. Distinct from round-4 hidden_bid_x_buyvol_z (hidden bid x ALL buy volume): large-trade net share isolates the informed-size component, ignoring retail-size noise. Not a sign-flip of hidden_ask_x_ltns_15s: independent hidden parents.",
+  "columns_used": ["total_bid_vol", "depth_bid5", "large_trade_net_share_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "hidden_ask_x_ltns_15s",
+  "family": "R5D",
+  "hypothesis": "Hidden ask-supply z x large_trade_net_share_60s. Fires when large traders net sell AND a deep hidden ask overhang sits above the touch -- supply committing on the INFORMED channel AND the PATIENT channel simultaneously. Product signed by large-trade direction: net selling with deep hidden ask = confirmed supply pressure. Distinct from hidden_bid_x_ltns_15s (bid-side twin): independent hidden parents, fire during different regime combinations. Distinct from round-4 hidden_ask_x_sellvol_z: large-trade share isolates informed-size, not broad volume.",
+  "columns_used": ["total_ask_vol", "depth_ask5", "large_trade_net_share_60s"],
+  "target_horizons": [15, 30, 60]
+ },
+ {
+  "name": "vis_hid_share_x_ofi_60s",
+  "family": "R5D",
+  "hypothesis": "Touch-concentration z (visible_share = top-5 depth / total depth, z over 300s) x raw ofi_60s (passive book-building flow). When depth concentrates at the touch (visible share high), hidden buffer is thin, so passive OFI carries through more forcefully -- the visible layer is the only thing absorbing with no deep reserve to dampen. Distinct from dead vis_share_x_ti (round-3, used ACTIVE trade channel TI): OFI is the leading microstructure flow variable per CKS 2014, and the passive-channel interaction tests whether LIMIT-ORDER flow is what the concentrated touch amplifies.",
+  "columns_used": ["depth_bid5", "depth_ask5", "total_bid_vol", "total_ask_vol", "ofi_60s"],
+  "target_horizons": [15, 30, 60]
+ }
+]

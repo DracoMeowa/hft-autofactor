@@ -1,0 +1,100 @@
+[
+  {
+    "name": "wdi_zaccel_extreme_15s",
+    "family": "R5B",
+    "hypothesis": "Acceleration-extremity product: d2z * |z| on wdi. Tests whether the 2nd derivative (intensification vs steady motion) of an already-stretched depth-imbalance regime predicts 15-60s continuation. Distinct from round-4 velocity-extremity (dz * |z|) which measures first-derivative motion only.",
+    "columns_used": "wdi",
+    "target_horizons": "15, 30, 60"
+  },
+  {
+    "name": "oir_zaccel_extreme_15s",
+    "family": "R5B",
+    "hypothesis": "Acceleration-extremity product: d2z * |z| on oir. Tests whether acceleration (curvature) of the touch-imbalance z-regime predicts continuation. Steady high velocity scores ~0 (d2z~0); only changing-velocity regimes fire.",
+    "columns_used": "oir",
+    "target_horizons": "15, 30, 60"
+  },
+  {
+    "name": "microprice_dev_z_accel_sign_15s",
+    "family": "R5B",
+    "hypothesis": "Level signed by acceleration direction: z * sign(d2z) on microprice_dev. Tests whether acceleration DIRECTION (not velocity) gates the micro-deviation level. Binary sign isolates inflection timing that velocity misses.",
+    "columns_used": "microprice_dev",
+    "target_horizons": "15, 30, 60"
+  },
+  {
+    "name": "ofi_z_accel_sign_15s",
+    "family": "R5B",
+    "hypothesis": "Level signed by acceleration direction: z * sign(d2z) on ofi_60s. Tests whether the 2nd-derivative direction of OFI regime gates the level's predictive content for continuation vs reversion.",
+    "columns_used": "ofi_60s",
+    "target_horizons": "15, 30, 60"
+  },
+  {
+    "name": "wdi_vel15_x_vel60",
+    "family": "R5B",
+    "hypothesis": "Cross-timescale velocity confirmation: dz15 * sign(dz60) on wdi. Tests whether 15s and 60s z-velocities agreeing in direction (multi-horizon quoting-flow alignment) predicts continuation. Disagreement rows flip sign.",
+    "columns_used": "wdi",
+    "target_horizons": "15, 30, 60, 300"
+  },
+  {
+    "name": "fullbook_imb_vel15_x_vel60",
+    "family": "R5B",
+    "hypothesis": "Cross-timescale velocity confirmation on the full-book imbalance: dz15 * sign(dz60). Broad-book positioning is inherently slow; 15s/60s velocity agreement isolates sustained multi-horizon institutional repositioning.",
+    "columns_used": "total_bid_vol, total_ask_vol",
+    "target_horizons": "15, 30, 60, 300"
+  },
+  {
+    "name": "ti60_vel15_x_vel60",
+    "family": "R5B",
+    "hypothesis": "Cross-timescale velocity confirmation on taker flow: dz15 * sign(dz60) on trade_imbalance_60s. Tests whether 15s/60s taker-imbalance velocity agreement isolates sustained informed aggression.",
+    "columns_used": "trade_imbalance_60s",
+    "target_horizons": "15, 30, 60"
+  },
+  {
+    "name": "oir_z_velpos_gate_15s",
+    "family": "R5B",
+    "hypothesis": "Build-up-isolated level: z when dz > 0, else 0 on oir. One-sided claim that the touch-imbalance level predicts continuation ONLY during active build-up; zeroed during decay/stagnation. Binary velocity-sign gate.",
+    "columns_used": "oir",
+    "target_horizons": "15, 30, 60"
+  },
+  {
+    "name": "depth5_imb_z_velneg_gate_15s",
+    "family": "R5B",
+    "hypothesis": "Decay-isolated level: z when dz < 0, else 0 on flat-weighted top-5 depth imbalance. Tests whether stretched visible-depth level mean-reverts specifically during active abandonment (queue pulled across multiple levels).",
+    "columns_used": "depth_bid5, depth_ask5",
+    "target_horizons": "15, 30, 60"
+  },
+  {
+    "name": "wdi_zvel_2sig_extreme_15s",
+    "family": "R5B",
+    "hypothesis": "Strict-extreme gated velocity: dz * |z| only when |z| > 2.0, else 0 on wdi. Tests whether the round-4 velocity-extremity signal CONCENTRATES in the 2-sigma tail (top ~5% regime stretch), with bulk-regime velocity being noise.",
+    "columns_used": "wdi",
+    "target_horizons": "15, 30, 60"
+  },
+  {
+    "name": "microprice_dev_zvel_2sig_extreme_15s",
+    "family": "R5B",
+    "hypothesis": "Strict-extreme gated velocity on microprice_dev: dz * |z| when |z| > 2.0, else 0. Tests whether the microprice-deviation velocity product lives entirely in the extreme tail of the deviation regime.",
+    "columns_used": "microprice_dev",
+    "target_horizons": "15, 30, 60"
+  },
+  {
+    "name": "oir_z_x_velfrac_15s",
+    "family": "R5B",
+    "hypothesis": "Level x velocity-direction persistence: z * (2*pos_frac(dz) - 1) on oir. pos_frac is the trailing fraction of snapshots with positive z-velocity. Tests whether SUSTAINED velocity direction (windowed persistence) isolates informed build-up better than instantaneous sign.",
+    "columns_used": "oir",
+    "target_horizons": "15, 30, 60, 300"
+  },
+  {
+    "name": "ofi_z_x_vel_15s",
+    "family": "R5B",
+    "hypothesis": "Level-velocity sign-alignment product: z * dz on ofi_60s. Positive when level and velocity have same sign (momentum confirmation), negative when they oppose (reversal). Unlike zvel_extreme (dz*|z|), sign comes from BOTH level and velocity.",
+    "columns_used": "ofi_60s",
+    "target_horizons": "15, 30, 60"
+  },
+  {
+    "name": "fullbook_imb_z_x_vel_15s",
+    "family": "R5B",
+    "hypothesis": "Level-velocity sign-alignment product: z * dz on fullbook_imb. Tests whether broad-book momentum confirmation (level and velocity signs aligned) carries continuation signal across the full visible book.",
+    "columns_used": "total_bid_vol, total_ask_vol",
+    "target_horizons": "15, 30, 60, 300"
+  }
+]

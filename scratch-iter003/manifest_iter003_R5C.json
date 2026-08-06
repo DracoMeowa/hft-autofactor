@@ -1,0 +1,100 @@
+[
+  {
+    "name": "wdi_zvel_x_spread_z",
+    "family": "R5C",
+    "hypothesis": "Depth-imbalance extreme velocity (wdi_zvel_extreme_15s) survives at 300-900s only under wide-spread stress: routine churn in tight spreads carries no long-horizon info, but velocity under adverse-selection stress is informed queue rebuilding whose direction continues.",
+    "columns_used": "wdi, quoted_spread_ticks",
+    "target_horizons": "300, 900"
+  },
+  {
+    "name": "oir_zcross_x_spread_z",
+    "family": "R5C",
+    "hypothesis": "Touch-queue regime flips (oir_z_cross_vel_15s) predict longer-horizon returns only when spreads are wide: pulling/refilling at the best quotes is costly under stress, so only informed traders pay it; under tight spreads the same flip is cheap routine competition.",
+    "columns_used": "oir, quoted_spread_ticks",
+    "target_horizons": "300, 900"
+  },
+  {
+    "name": "wdi_zcross_x_spread_z",
+    "family": "R5C",
+    "hypothesis": "Whole 5-level depth-stack rebuild crossings (wdi_z_cross_vel_15s) survive at 300-900s only under spread stress: the costly multi-level pull-and-refill is worth it only when informed, and spread stress is the marker of that cost.",
+    "columns_used": "wdi, quoted_spread_ticks",
+    "target_horizons": "300, 900"
+  },
+  {
+    "name": "fullbook_imb_zcross_x_spread_z",
+    "family": "R5C",
+    "hypothesis": "Broad-book full-volume ratio crossings (fullbook_imb_z_cross_vel_15s) survive at 300-900s only under spread stress: the most costly book event (entire patient book relocating) is credible as informed only when the spread tax is high.",
+    "columns_used": "total_bid_vol, total_ask_vol, quoted_spread_ticks",
+    "target_horizons": "300, 900"
+  },
+  {
+    "name": "wdi_zvel_x_rv_regime",
+    "family": "R5C",
+    "hypothesis": "Depth-imbalance extreme velocity direction-meaning FLIPS between volatility regimes: in turbulence (rv above mean) extreme depth velocity is informed urgency (continuation); in calm it is mean-reverting queue churn (reversal). Signed +1/-1 regime captures both in one coefficient.",
+    "columns_used": "wdi, rv_60s",
+    "target_horizons": "300, 900"
+  },
+  {
+    "name": "oir_zcross_x_rvhi",
+    "family": "R5C",
+    "hypothesis": "Touch-queue hand-offs carry long-horizon signal ONLY during turbulence (rv above mean): calm-regime flips are routine touch rotation with no directional content; turbulent flips are aggressive informed queue takeovers.",
+    "columns_used": "oir, rv_60s",
+    "target_horizons": "300, 900"
+  },
+  {
+    "name": "wdi_zcross_x_rvlo",
+    "family": "R5C",
+    "hypothesis": "Full 5-level depth-stack rebuild crossings carry signal ONLY when calm (rv at/below mean): in calm the book trades off queue structure and deliberate rebuilds are informed; in turbulence exogenous shocks override queue positioning and the same rebuild is reactive panic.",
+    "columns_used": "wdi, rv_60s",
+    "target_horizons": "300, 900"
+  },
+  {
+    "name": "fullbook_imb_zcross_x_rv_regime",
+    "family": "R5C",
+    "hypothesis": "Broad-book relocation direction-meaning flips between volatility regimes: in calm a deliberate broad relocation is informed repositioning (continues); in turbulence it is forced liquidation that overshoots (mean-reverts). Signed regime captures both.",
+    "columns_used": "total_bid_vol, total_ask_vol, rv_60s",
+    "target_horizons": "300, 900"
+  },
+  {
+    "name": "wdi_zvel_x_ofi_sign",
+    "family": "R5C",
+    "hypothesis": "Depth-velocity concordance with OFI direction: when resting depth imbalance velocity AGREES with active order-flow imbalance sign, both book channels of a meta-order are aligned (continuation); divergence predicts reversal. Product form encodes both.",
+    "columns_used": "wdi, ofi_60s",
+    "target_horizons": "300, 900"
+  },
+  {
+    "name": "oir_zcross_x_ti_sign",
+    "family": "R5C",
+    "hypothesis": "Touch-queue flips are only credible when aggressive trade flow confirms the new direction (agreement gate): unconfirmed flips are passive quote rotation, scored exactly zero. Confirmation by executed trade flow is the necessary condition for long-horizon signal.",
+    "columns_used": "oir, trade_imbalance_60s",
+    "target_horizons": "300, 900"
+  },
+  {
+    "name": "fullbook_imb_zcross_x_ti_sign",
+    "family": "R5C",
+    "hypothesis": "Broad-book patient repositioning concordance with aggressive trade direction: when the full book relocates in the same direction as executed trade imbalance, the institution is both parking inventory and executing aggressively (maximum conviction, continues); divergence = liquidity provision against own interest (reversal).",
+    "columns_used": "total_bid_vol, total_ask_vol, trade_imbalance_60s",
+    "target_horizons": "300, 900"
+  },
+  {
+    "name": "wdi_zvel_x_oir_zvel",
+    "family": "R5C",
+    "hypothesis": "Cross-surface velocity concordance: when both oir (touch, 1-level) and wdi (5-level depth) exhibit extreme velocity in the same direction within 15s, the entire visible book surface is coordinated -- a single informed meta-order, not idiosyncratic queue churn at one level. Product scores co-movement magnitude.",
+    "columns_used": "wdi, oir",
+    "target_horizons": "300, 900"
+  },
+  {
+    "name": "fullbook_imb_zcross_x_wdi_zvel",
+    "family": "R5C",
+    "hypothesis": "Broad-book crossing events weighted by top-5 depth velocity intensity: crossings backed by concurrent extreme 5-level momentum are synchronized full-market repositioning (patient broad inventory + visible depth both relocating), the highest-conviction event that survives at 300-900s; quiescent-depth crossings are deep-tail noise.",
+    "columns_used": "total_bid_vol, total_ask_vol, wdi",
+    "target_horizons": "300, 900"
+  },
+  {
+    "name": "oir_zcross_x_fullbook_imb_zvel",
+    "family": "R5C",
+    "hypothesis": "Touch crossing events weighted by broad-book velocity intensity: a touch hand-off backed by the full book (all levels) moving at extreme speed in the new direction is a genuine whole-market regime change (touch to tail), surviving at 300-900s; a touch flip with quiescent full book is just the tip reshuffling.",
+    "columns_used": "oir, total_bid_vol, total_ask_vol",
+    "target_horizons": "300, 900"
+  }
+]
