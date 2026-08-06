@@ -1,0 +1,37 @@
+{
+ "by_family_dominant_mode": {
+  "R6A/is_dead": [
+   "ti60_zaccel_x_15s",
+   "lastgap_zaccel_x_15s",
+   "ltns_zaccel_x_15s"
+  ],
+  "R6A/oos_collapse": [
+   "fullbook_imb_zaccel_x_15s",
+   "ltns_zaccel_2sig_extreme_15s"
+  ],
+  "R6B/is_dead": [
+   "fullbook_imb_zvel_x_zaccel_15s",
+   "lastgap_zvel_x_zaccel_15s"
+  ],
+  "R6B/oos_collapse": [
+   "oir_zvel_x_zaccel_15s",
+   "wdi_zvel_x_zaccel_15s",
+   "oir_zvel_zaccel_disagree_extreme_15s",
+   "wdi_zvel_zaccel_disagree_extreme_15s"
+  ],
+  "R6C/retention_or_sign": [
+   "wdi_zaccel_3sig_extreme_15s",
+   "oir_zvel_pos_extreme_15s"
+  ],
+  "R6D/is_dead": [
+   "oir_zaccel_15s_x_60s",
+   "fullbook_imb_zaccel_15s_x_60s",
+   "n_trades_60s_zvel_extreme_15s",
+   "n_trades_60s_zaccel_extreme_15s"
+  ],
+  "R6D/oos_collapse": [
+   "wdi_zaccel_15s_x_60s"
+  ]
+ },
+ "notes": []
+}
