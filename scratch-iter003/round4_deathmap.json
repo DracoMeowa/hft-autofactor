@@ -1,0 +1,466 @@
+{
+ "book_slope_zvel_div_15s": {
+  "family": "R4C_z_vs_velocity_divergence",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.3566484868645567
+ },
+ "div_pos_frac_vel_60s": {
+  "family": "R4B_hidden_depth_dynamics",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 4,
+   "is_dead": 1
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "is_dead",
+   "900": "oos_collapse"
+  },
+  "max_abs_corr_vs_panel": 0.2546269126914999
+ },
+ "fullbook_imb_zvel_div_15s": {
+  "family": "R4C_z_vs_velocity_divergence",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 4,
+   "is_dead": 1
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "oos_collapse",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.4948282300780936
+ },
+ "gap_accel_60_180": {
+  "family": "R4D_quote_shape_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.0524163572147641
+ },
+ "gap_ofi_conflict_60s": {
+  "family": "R4D_quote_shape_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.04111026980896142
+ },
+ "gap_pin_persist_300s": {
+  "family": "R4D_quote_shape_dynamics",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 5
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "oos_collapse",
+   "900": "oos_collapse"
+  },
+  "max_abs_corr_vs_panel": 0.21198494878026666
+ },
+ "gap_vel_60s": {
+  "family": "R4D_quote_shape_dynamics",
+  "dominant": "retention_or_sign",
+  "counts": {
+   "retention_or_sign": 3,
+   "oos_collapse": 2
+  },
+  "horizons": {
+   "15": "retention_or_sign",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "retention_or_sign",
+   "900": "retention_or_sign"
+  },
+  "max_abs_corr_vs_panel": 0.23230043166193584
+ },
+ "gap_x_ti_align_300s": {
+  "family": "R4D_quote_shape_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.04632495184907958
+ },
+ "hidden_ask_supply_z_vel_15s": {
+  "family": "R4B_hidden_depth_dynamics",
+  "dominant": "retention_or_sign",
+  "counts": {
+   "retention_or_sign": 5
+  },
+  "horizons": {
+   "15": "retention_or_sign",
+   "30": "retention_or_sign",
+   "60": "retention_or_sign",
+   "300": "retention_or_sign",
+   "900": "retention_or_sign"
+  },
+  "max_abs_corr_vs_panel": 0.2510600201157569
+ },
+ "hidden_bid_support_z_vel_60s": {
+  "family": "R4B_hidden_depth_dynamics",
+  "dominant": "retention_or_sign",
+  "counts": {
+   "retention_or_sign": 4,
+   "oos_collapse": 1
+  },
+  "horizons": {
+   "15": "retention_or_sign",
+   "30": "retention_or_sign",
+   "60": "retention_or_sign",
+   "300": "oos_collapse",
+   "900": "retention_or_sign"
+  },
+  "max_abs_corr_vs_panel": 0.29051718736982834
+ },
+ "hidden_bid_x_buyvol_z": {
+  "family": "R4B_hidden_depth_dynamics",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 4,
+   "is_dead": 1
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "oos_collapse",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.05247230341052108
+ },
+ "hidden_flow_align_net": {
+  "family": "R4B_hidden_depth_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.09037577626226023
+ },
+ "hidden_imb_pos_frac_vel_60s": {
+  "family": "R4B_hidden_depth_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 4,
+   "oos_collapse": 1
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "oos_collapse",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.15492249674778338
+ },
+ "hidden_rot_pos_frac_300s": {
+  "family": "R4B_hidden_depth_dynamics",
+  "dominant": "oos_collapse",
+  "counts": {
+   "oos_collapse": 3,
+   "is_dead": 2
+  },
+  "horizons": {
+   "15": "oos_collapse",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.06372909983957821
+ },
+ "hidden_side_gap_vel_60s": {
+  "family": "R4B_hidden_depth_dynamics",
+  "dominant": "retention_or_sign",
+  "counts": {
+   "retention_or_sign": 5
+  },
+  "horizons": {
+   "15": "retention_or_sign",
+   "30": "retention_or_sign",
+   "60": "retention_or_sign",
+   "300": "retention_or_sign",
+   "900": "retention_or_sign"
+  },
+  "max_abs_corr_vs_panel": 0.34890009601712096
+ },
+ "iopv_drift_asym_gate": {
+  "family": "R4A_spread_z_gates",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.1444552850455541
+ },
+ "iopv_drift_x_spread_z": {
+  "family": "R4A_spread_z_gates",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.13988040162916215
+ },
+ "iopv_velz_wide_gate": {
+  "family": "R4A_spread_z_gates",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.06921836525997072
+ },
+ "micro_gap_confirm_300s": {
+  "family": "R4D_quote_shape_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.14169486564230027
+ },
+ "micro_ofi_absorb_60s": {
+  "family": "R4D_quote_shape_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.1377104568935082
+ },
+ "micro_slope_unsupported_300s": {
+  "family": "R4D_quote_shape_dynamics",
+  "dominant": "oos_collapse",
+  "counts": {
+   "retention_or_sign": 1,
+   "oos_collapse": 3,
+   "is_dead": 1
+  },
+  "horizons": {
+   "15": "retention_or_sign",
+   "30": "oos_collapse",
+   "60": "oos_collapse",
+   "300": "oos_collapse",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.2769273264925706
+ },
+ "micro_ti_absorb_300s": {
+  "family": "R4D_quote_shape_dynamics",
+  "dominant": "panel_duplicate",
+  "detail": "max|corr|=0.9 vs oir",
+  "horizons": {},
+  "max_abs_corr_vs_panel": 0.8998098449244413
+ },
+ "microprice_dev_zvel_extreme_15s": {
+  "family": "R4C_z_vs_velocity_divergence",
+  "dominant": "dedup_killed",
+  "detail": "rho=0.851 vs batch-sibling wdi_zvel_extreme_15s -- both are the 'z-velocity extreme' construction on correlated book-shape bases (microprice deviation vs 5-level depth imbalance); keep wdi_zvel_extreme_15s (passes all 5 horizons vs 4, lower panel corr 0.466 vs 0.523)",
+  "horizons": {}
+ },
+ "ofi_concord_flip_gate": {
+  "family": "R4A_spread_z_gates",
+  "dominant": "dedup_killed",
+  "detail": "rho=1.000 vs batch-sibling ofi_concord_x_spread_z -- the sign-flip gate and the spread-z product of OFI concordance carry the IDENTICAL series; keep ofi_concord_x_spread_z (the spread-z-gated construction, the productive direction from round 3)",
+  "horizons": {}
+ },
+ "slope_vel_z_120s": {
+  "family": "R4D_quote_shape_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.2400238936414758
+ },
+ "slope_x_ti_absorb_300s": {
+  "family": "R4D_quote_shape_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.11293905868526419
+ },
+ "slope_z_cross_vel_15s": {
+  "family": "R4D_quote_shape_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.22679149219788527
+ },
+ "spread_z_cross_vel_15s": {
+  "family": "R4C_z_vs_velocity_divergence",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.5291936381392003
+ },
+ "spread_zvel_extreme_15s": {
+  "family": "R4C_z_vs_velocity_divergence",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.2140979147108895
+ },
+ "ti60_z_fade_neg_15s": {
+  "family": "R4C_z_vs_velocity_divergence",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.4383853704990289
+ },
+ "ti_accel_wide_gate": {
+  "family": "R4A_spread_z_gates",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 4,
+   "oos_collapse": 1
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "oos_collapse",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.06076719450533686
+ },
+ "vis_share_vel_60s": {
+  "family": "R4B_hidden_depth_dynamics",
+  "dominant": "is_dead",
+  "counts": {
+   "is_dead": 5
+  },
+  "horizons": {
+   "15": "is_dead",
+   "30": "is_dead",
+   "60": "is_dead",
+   "300": "is_dead",
+   "900": "is_dead"
+  },
+  "max_abs_corr_vs_panel": 0.08502509073473803
+ }
+}
