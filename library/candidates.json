@@ -17017,5 +17017,4018 @@
       "deathmap": "scratch-iter003/round4_deathmap.json",
       "chinese_report": "scratch-iter003/iter003_round4_report.md (server copy: /data/factor_lzt/iterations/)"
     }
+  },
+  "iter003_round5": {
+    "trigger": "iter-003 round-5: extend round-4 z-vs-velocity goldmine (z-acceleration, new state cols, conditioning), per user 'continue mining'.",
+    "generated_at": "2026-08-06",
+    "batch": {
+      "n_specs": 56,
+      "families": {
+        "R5A_z_vs_velocity_new_states": 14,
+        "R5B_velocity_construction_variants": 14,
+        "R5C_conditioned_interactions": 14,
+        "R5D_wide_gate_hidden_trade": 14
+      }
+    },
+    "gate": {
+      "criteria": "RankIC-primary: per horizon IS+OOS Newey-West |t|>=2.0, retention>=0.5 same sign; panel |Spearman|<=0.85; pooled dedup |Spearman|<=0.85.",
+      "horizons_s": [
+        15,
+        30,
+        60,
+        300,
+        900
+      ],
+      "cost_per_side_bps": 3,
+      "head_long_short": "descriptive only (tau 1/5/10%)"
+    },
+    "split": "train 60d / OOS 5d + 1d embargo, purged day-blocked walk-forward",
+    "pipeline_run": "305 prototypes in prod registry (249 prior + 56 new); run 56 x 66d; causality probe all green; started 10:02:18, screen done 10:10:35 CST.",
+    "summary": {
+      "screen_pass": 23,
+      "screen_fail": 33,
+      "dedup_killed": 6,
+      "admitted_new": 17,
+      "library_total": 86
+    },
+    "dedup": {
+      "rule": "NEW (round-5): in |rho|>=0.85 pairs keep higher max|OOS NW t| (not auto-library); tiebreak n_passed_horizons then panel orthogonality. rho>=0.999 treated as identical series -> library precedence unless >20% stronger.",
+      "killed": [
+        {
+          "name": "lastgap_spread_wide_gate",
+          "against": "last_mid_gap_ticks",
+          "rho": 0.9999978562865138,
+          "kill_oos_t": 5.44,
+          "kill_n_h": 1,
+          "killed_reason": "rho>=0.999 clone of library factor (spread multiplier ~constant on 588000 tight market -> same series); library precedence; kill |OOS t|=5.44 (1h)"
+        },
+        {
+          "name": "ofi_15sz_spread_wide_gate",
+          "against": "ofi_15s_z_120s",
+          "rho": 0.9996323896215538,
+          "kill_oos_t": 5.2,
+          "kill_n_h": 5,
+          "killed_reason": "rho>=0.999 clone of library factor (spread multiplier ~constant on 588000 tight market -> same series); library precedence; kill |OOS t|=5.20 (5h)"
+        },
+        {
+          "name": "oir_mom_spread_wide_gate",
+          "against": "oir_mom_60s",
+          "rho": 0.9995999444036598,
+          "kill_oos_t": 14.34,
+          "kill_n_h": 2,
+          "killed_reason": "rho>=0.999 clone of library factor (spread multiplier ~constant on 588000 tight market -> same series); library precedence; kill |OOS t|=14.34 (2h)"
+        },
+        {
+          "name": "top5div_spread_wide_gate",
+          "against": "top5_book_div_z_300s",
+          "rho": 0.9994169399097524,
+          "kill_oos_t": 14.0,
+          "kill_n_h": 4,
+          "killed_reason": "rho>=0.999 clone of library factor (spread multiplier ~constant on 588000 tight market -> same series); library precedence; kill |OOS t|=14.00 (4h)"
+        },
+        {
+          "name": "lastgap_z_cross_vel_15s",
+          "against": "lastgap_zvel_extreme_15s",
+          "rho": 0.8957021093065604,
+          "kill_oos_t": 9.95,
+          "kill_n_h": 3,
+          "killed_reason": "keep higher |OOS t| (new dedup rule; rho in [0.85,0.999)); kill |OOS t|=9.95 (3h)"
+        },
+        {
+          "name": "wdi_zaccel_extreme_15s",
+          "against": "oir_zaccel_extreme_15s",
+          "rho": 0.860819964390673,
+          "kill_oos_t": 13.15,
+          "kill_n_h": 5,
+          "killed_reason": "keep higher |OOS t| (new dedup rule; rho in [0.85,0.999)); kill |OOS t|=13.15 (5h)"
+        }
+      ],
+      "watchlist_subthreshold": [
+        "ofi_concord_x_spread_z x ofi_persist_x_spread_z rho=+0.826",
+        "rv_asym_300s x mid_roll_range_pos_300s rho=+0.794",
+        "conc_imb_z_300s x hidden_bid_support_z_300s rho=-0.792",
+        "ofi_concord_wide_gate x ofi_persist_wide_gate rho=+0.791",
+        "rv_asym_300s x iopv_vel_drift_300s rho=+0.784",
+        "flow_divergence_120s x flow_divergence_300s rho=+0.783",
+        "conc_imb_z_300s x top5_book_div_z_300s rho=+0.778",
+        "wdi_mom_30s x depth5_delta_30s rho=+0.767",
+        "mid_day_range_pos x dev_from_open_bps rho=+0.767",
+        "oir_zcross_x_rvhi x oir_z_cross_vel_15s rho=+0.763",
+        "flow_divergence_120s x flow_divergence_60s rho=+0.763",
+        "wdi_z_cross_vel_15s x oir_z_cross_vel_15s rho=+0.740",
+        "wdi_zvel_extreme_15s x depth5_imb_zvel_extreme_15s rho=+0.738",
+        "div_pos_frac_300s x hidden_imb_pos_frac_300s rho=-0.733",
+        "range_pos_x_spread_z x dev_open_x_spread_z rho=+0.728",
+        "wdi_mom_180s x top5_book_div_z_300s rho=+0.726",
+        "ofi_concord_15_60 x ofi_sign_persist_60s rho=+0.723",
+        "ofi_per_depth_z_300s x iopv_vel_z_300s rho=+0.721",
+        "ltns_z_cross_vel_15s x ti60_z_cross_vel_15s rho=+0.721",
+        "ofi_per_depth_z_300s x slope_gated_ofi_300s rho=+0.713",
+        "log_mid_ret_120s x mid_roll_range_pos_300s rho=+0.710",
+        "mid_day_range_pos x div_pos_frac_300s rho=-0.703"
+      ]
+    },
+    "admitted": [
+      {
+        "name": "oir_zaccel_extreme_15s",
+        "family": "R5B",
+        "mechanism": "Acceleration-weighted touch-regime stretch: the 15s acceleration of z_300(oir) weighted by |z|. The top-of-book imbalance (best bid/ask qty ratio) is the most actively managed quote slot -- its z-acceleration (d2z, the curvature of the regime's z-trajectory) isolates INTENSIFYING one-sided posting from steady-state tilt. When the touch regime is already stretched (high |z|) and its rebuild is accelerating further, market makers are pulling and reposting the best quote at increasing speed -- an urgency signal that the queue tilt will continue at 15-60s. Distinct from oir_zvel_extreme_15s (round-4, velocity-weighted): acceleration is the second derivative, measuring whether the velocity itself is growing. A steady high velocity scores ~0 here (constant dz -> d2z~0); only changing-velocity regimes fire.",
+        "max_abs_corr_vs_panel": 0.254,
+        "panel_corr_factor": "oir",
+        "best_horizon_s": "30",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.111658961736706,
+            "is_t": 18.297511435193208,
+            "oos_mean_ic": 0.0996312263287807,
+            "oos_t": 18.504069633930268,
+            "retention": 0.8922815041367934,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.5093617021276584,
+                "long_net_bps": -3.4906382978723416,
+                "short_gross_bps": 3.230340425531914,
+                "short_net_bps": -2.769659574468086,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.8886604095563142,
+                "long_net_bps": -4.111339590443686,
+                "short_gross_bps": 2.42589590443686,
+                "short_net_bps": -3.57410409556314,
+                "n_long": 1172,
+                "n_short": 1172,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.448795386586929,
+                "long_net_bps": -4.551204613413071,
+                "short_gross_bps": 1.6085006407518156,
+                "short_net_bps": -4.391499359248185,
+                "n_long": 2341,
+                "n_short": 2341,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.08711879506281273,
+            "is_t": 24.70977688292925,
+            "oos_mean_ic": 0.06693719622016607,
+            "oos_t": 27.74016267452978,
+            "retention": 0.7683439167392558,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.8908936170212767,
+                "long_net_bps": -4.109106382978723,
+                "short_gross_bps": 3.5666808510638295,
+                "short_net_bps": -2.4333191489361705,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.6539093242087255,
+                "long_net_bps": -4.346090675791275,
+                "short_gross_bps": 2.2835500427715996,
+                "short_net_bps": -3.7164499572284004,
+                "n_long": 1169,
+                "n_short": 1169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.507975171232877,
+                "long_net_bps": -4.492024828767123,
+                "short_gross_bps": 1.528214897260274,
+                "short_net_bps": -4.471785102739726,
+                "n_long": 2336,
+                "n_short": 2336,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": 0.0706267718665932,
+            "is_t": 15.827266201010383,
+            "oos_mean_ic": 0.049551626050011385,
+            "oos_t": 15.418686098282283,
+            "retention": 0.7015983421075703,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.4262553191489362,
+                "long_net_bps": -4.573744680851064,
+                "short_gross_bps": 3.030893617021277,
+                "short_net_bps": -2.969106382978723,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.5696477663230242,
+                "long_net_bps": -4.430352233676976,
+                "short_gross_bps": 2.139252577319588,
+                "short_net_bps": -3.860747422680412,
+                "n_long": 1164,
+                "n_short": 1164,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.7361263972484953,
+                "long_net_bps": -4.263873602751505,
+                "short_gross_bps": 1.2943594153052451,
+                "short_net_bps": -4.705640584694755,
+                "n_long": 2326,
+                "n_short": 2326,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": 0.03495112523599005,
+            "is_t": 8.976028560967908,
+            "oos_mean_ic": 0.024341049189787155,
+            "oos_t": 8.3377413077751,
+            "retention": 0.6964310598138501,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.0214222222222222,
+                "long_net_bps": -2.9785777777777778,
+                "short_gross_bps": 2.432177777777778,
+                "short_net_bps": -3.567822222222222,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 3.961548042704627,
+                "long_net_bps": -2.038451957295373,
+                "short_gross_bps": 0.30122775800711715,
+                "short_net_bps": -5.698772241992883,
+                "n_long": 1124,
+                "n_short": 1124,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 3.545249332146038,
+                "long_net_bps": -2.454750667853962,
+                "short_gross_bps": 0.016763134461264553,
+                "short_net_bps": -5.983236865538736,
+                "n_long": 2246,
+                "n_short": 2246,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": 0.024873961147432757,
+            "is_t": 6.2321620812082115,
+            "oos_mean_ic": 0.016931408260813633,
+            "oos_t": 4.264368674696572,
+            "retention": 0.6806880560944,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 7.753268292682927,
+                "long_net_bps": 1.753268292682927,
+                "short_gross_bps": -3.2623902439024386,
+                "short_net_bps": -9.262390243902438,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 7.22541015625,
+                "long_net_bps": 1.2254101562499997,
+                "short_gross_bps": -2.2228027343749996,
+                "short_net_bps": -8.222802734375,
+                "n_long": 1024,
+                "n_short": 1024,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 6.747302052785924,
+                "long_net_bps": 0.7473020527859244,
+                "short_gross_bps": -2.091989247311827,
+                "short_net_bps": -8.091989247311826,
+                "n_long": 2046,
+                "n_short": 2046,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "wdi_zvel_x_spread_z",
+        "family": "R5C",
+        "mechanism": "Spread-stress-gated depth-imbalance velocity: wdi_zvel_extreme_15s is the strongest 15s IC signal in the library (extremity-weighted 15s change rate of z_300(wdi)) but fades by 300-900s because much of that velocity is cheap routine queue churn in comfortable, tight-spread regimes that carries no long-horizon content. Hypothesis: when the SAME extreme-regime velocity occurs under WIDE, stressed spreads -- where market makers are fearful and adverse-selection risk is high -- rebuilding a crowded multi-level depth-imbalance queue is costly and likely informed, so the velocity direction continues at 300-900s. Multiplying by z(quoted_spread_ticks, 300s) gates magnitude AND flips sign across spread regimes: the product isolates the informed-stress component of the velocity, the part that survives at long horizons, and suppresses the routine-churn component. Different economic object from the bare zvel (averages over all spread regimes) and from div_z_x_spread_z (round-3: gated the hidden-depth divergence z-LEVEL, not a velocity of any book state).",
+        "max_abs_corr_vs_panel": 0.271,
+        "panel_corr_factor": "oir",
+        "best_horizon_s": "15",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": -0.09047678917699033,
+            "is_t": -6.5316751573638525,
+            "oos_mean_ic": -0.14837537373856022,
+            "oos_t": -21.12843495819259,
+            "retention": 1.6399274895609848,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -1.678808510638298,
+                "long_net_bps": -7.678808510638298,
+                "short_gross_bps": 0.251191489361702,
+                "short_net_bps": -5.748808510638298,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -2.21701873935264,
+                "long_net_bps": -8.217018739352639,
+                "short_gross_bps": -1.7734327086882453,
+                "short_net_bps": -7.7734327086882455,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.9445795988049508,
+                "long_net_bps": -7.944579598804951,
+                "short_gross_bps": -1.927541613316261,
+                "short_net_bps": -7.9275416133162615,
+                "n_long": 2343,
+                "n_short": 2343,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": -0.07185063548163734,
+            "is_t": -6.293434933552773,
+            "oos_mean_ic": -0.09232689528417531,
+            "oos_t": -11.295715510929302,
+            "retention": 1.2849836979906883,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.6300851063829789,
+                "long_net_bps": -6.630085106382979,
+                "short_gross_bps": -0.02442553191489376,
+                "short_net_bps": -6.024425531914893,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.9353635585970914,
+                "long_net_bps": -7.935363558597091,
+                "short_gross_bps": -1.8841488451668091,
+                "short_net_bps": -7.884148845166809,
+                "n_long": 1169,
+                "n_short": 1169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.5958383233532936,
+                "long_net_bps": -7.595838323353293,
+                "short_gross_bps": -1.8193284858853718,
+                "short_net_bps": -7.8193284858853715,
+                "n_long": 2338,
+                "n_short": 2338,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": -0.05341192596805719,
+            "is_t": -4.582919110036801,
+            "oos_mean_ic": -0.07291206807093678,
+            "oos_t": -9.63974516527253,
+            "retention": 1.3650896639552295,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.5137872340425531,
+                "long_net_bps": -6.513787234042553,
+                "short_gross_bps": -1.2816595744680848,
+                "short_net_bps": -7.281659574468085,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.992044673539519,
+                "long_net_bps": -7.992044673539519,
+                "short_gross_bps": -2.5012199312714776,
+                "short_net_bps": -8.501219931271478,
+                "n_long": 1164,
+                "n_short": 1164,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.5321692439862546,
+                "long_net_bps": -7.532169243986255,
+                "short_gross_bps": -2.4597981099656354,
+                "short_net_bps": -8.459798109965636,
+                "n_long": 2328,
+                "n_short": 2328,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": -0.01912506156396203,
+            "is_t": -3.5704823562872496,
+            "oos_mean_ic": -0.0406881631542017,
+            "oos_t": -5.897483936391869,
+            "retention": 2.127478806702077,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 5.109066666666665,
+                "long_net_bps": -0.8909333333333347,
+                "short_gross_bps": -6.946444444444444,
+                "short_net_bps": -12.946444444444445,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.3103558718861209,
+                "long_net_bps": -5.689644128113879,
+                "short_gross_bps": -6.2212722419928825,
+                "short_net_bps": -12.221272241992882,
+                "n_long": 1124,
+                "n_short": 1124,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.06051601423487523,
+                "long_net_bps": -6.060516014234875,
+                "short_gross_bps": -5.091494661921708,
+                "short_net_bps": -11.091494661921708,
+                "n_long": 2248,
+                "n_short": 2248,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": -0.015538423371223095,
+            "is_t": -4.162328303575594,
+            "oos_mean_ic": -0.03571269945356846,
+            "oos_t": -10.77526656400149,
+            "retention": 2.2983476894900288,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.2249756097560986,
+                "long_net_bps": -3.7750243902439014,
+                "short_gross_bps": 0.42570731707317033,
+                "short_net_bps": -5.57429268292683,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.7894921875000003,
+                "long_net_bps": -7.7894921875000005,
+                "short_gross_bps": -4.864599609375,
+                "short_net_bps": -10.864599609375,
+                "n_long": 1024,
+                "n_short": 1024,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.1342285156250005,
+                "long_net_bps": -7.134228515625001,
+                "short_gross_bps": -6.117148437500001,
+                "short_net_bps": -12.117148437500001,
+                "n_long": 2048,
+                "n_short": 2048,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "oir_z_velpos_gate_15s",
+        "family": "R5B",
+        "mechanism": "Build-up-isolated touch-imbalance level: z_300(oir) scored only when its own 15s z-velocity is positive (regime actively increasing), zeroed otherwise. The economic claim is strictly one-sided: during active build-up (dz > 0), the top-of-book imbalance level carries directional information because posting into a building queue tilt is an informed act -- the level continues in its direction at 15-60s. During decay or stagnation (dz <= 0), the same level is ambiguous noise and NO claim is made (output is exactly zero, not a reversal claim). This structurally isolates the informed-positioning episodes from the mass of routine quote churn, making the nonzero support a strict subset of the level distribution. Distinct from the dead bare oir level-z (round-1) and from library oir_zvel_extreme_15s (round-4 product form dz*|z|): the gate uses instantaneous velocity SIGN as a binary filter on the level, not as a magnitude weight.",
+        "max_abs_corr_vs_panel": 0.644,
+        "panel_corr_factor": "oir",
+        "best_horizon_s": "30",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.24032520706228996,
+            "is_t": 19.733596140885037,
+            "oos_mean_ic": 0.1782558603825199,
+            "oos_t": 16.05315802104983,
+            "retention": 0.7417276887493441,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.591999999999999,
+                "long_net_bps": -3.408000000000001,
+                "short_gross_bps": 2.336255319148936,
+                "short_net_bps": -3.663744680851064,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.3661499148211242,
+                "long_net_bps": -3.6338500851788758,
+                "short_gross_bps": 1.558373083475298,
+                "short_net_bps": -4.441626916524702,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.132488262910798,
+                "long_net_bps": -3.867511737089202,
+                "short_gross_bps": 1.0292488262910797,
+                "short_net_bps": -4.97075117370892,
+                "n_long": 2343,
+                "n_short": 2343,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.22397997358510977,
+            "is_t": 9.536739860552272,
+            "oos_mean_ic": 0.12919321881595663,
+            "oos_t": 18.95764184141342,
+            "retention": 0.5768070097877064,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.540340425531914,
+                "long_net_bps": -2.459659574468086,
+                "short_gross_bps": 3.6205957446808514,
+                "short_net_bps": -2.3794042553191486,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.6092814371257482,
+                "long_net_bps": -3.3907185628742518,
+                "short_gross_bps": 2.0991616766467067,
+                "short_net_bps": -3.9008383233532933,
+                "n_long": 1169,
+                "n_short": 1169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.324982891360137,
+                "long_net_bps": -3.675017108639863,
+                "short_gross_bps": 1.2659195893926432,
+                "short_net_bps": -4.734080410607357,
+                "n_long": 2338,
+                "n_short": 2338,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.19258493545601008,
+            "is_t": 5.810748831439833,
+            "oos_mean_ic": 0.08805542209291886,
+            "oos_t": 56.21726665227835,
+            "retention": 0.45722902408964555,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 4.449702127659574,
+                "long_net_bps": -1.5502978723404262,
+                "short_gross_bps": 4.791574468085106,
+                "short_net_bps": -1.2084255319148944,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.9903092783505154,
+                "long_net_bps": -3.0096907216494846,
+                "short_gross_bps": 2.346056701030928,
+                "short_net_bps": -3.653943298969072,
+                "n_long": 1164,
+                "n_short": 1164,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.2740463917525777,
+                "long_net_bps": -3.7259536082474223,
+                "short_gross_bps": 1.1787628865979383,
+                "short_net_bps": -4.821237113402062,
+                "n_long": 2328,
+                "n_short": 2328,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.11471659026245401,
+            "is_t": 5.0304702131732535,
+            "oos_mean_ic": 0.029832389670430965,
+            "oos_t": 5.124280699023387,
+            "retention": 0.2600529670745881,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 5.994844444444446,
+                "long_net_bps": -0.0051555555555538035,
+                "short_gross_bps": -0.685244444444445,
+                "short_net_bps": -6.685244444444445,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 4.877419928825622,
+                "long_net_bps": -1.1225800711743776,
+                "short_gross_bps": -0.6232829181494657,
+                "short_net_bps": -6.6232829181494655,
+                "n_long": 1124,
+                "n_short": 1124,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 4.196405693950179,
+                "long_net_bps": -1.8035943060498214,
+                "short_gross_bps": -0.6815258007117437,
+                "short_net_bps": -6.681525800711744,
+                "n_long": 2248,
+                "n_short": 2248,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.0688499160173934,
+            "is_t": 5.733235243989943,
+            "oos_mean_ic": 0.022696959486777576,
+            "oos_t": 2.1916422015571286,
+            "retention": 0.32965849197323194,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 8.592341463414634,
+                "long_net_bps": 2.592341463414634,
+                "short_gross_bps": -5.9546829268292685,
+                "short_net_bps": -11.954682926829268,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 8.879990234375,
+                "long_net_bps": 2.8799902343750006,
+                "short_gross_bps": -4.008906250000001,
+                "short_net_bps": -10.00890625,
+                "n_long": 1024,
+                "n_short": 1024,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 6.490981445312501,
+                "long_net_bps": 0.4909814453125012,
+                "short_gross_bps": -4.5462402343749995,
+                "short_net_bps": -10.546240234374999,
+                "n_long": 2048,
+                "n_short": 2048,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "oir_zcross_x_spread_z",
+        "family": "R5C",
+        "mechanism": "Spread-stress-gated touch-queue regime flips: oir_z_cross_vel_15s (the admitted crossing template on best-bid/best-ask imbalance) scores sign-reversal events of the touch regime -- moments the touch queue changes hands -- but these flips are a mix of informed hand-offs and routine touch rotation. Hypothesis: a touch-queue hand-off under WIDE, stressed spreads is far more credible as informed: pulling and refilling at the best quotes is costly when the spread is wide (the adverse-selection tax is high), so only informed traders pay it; under tight, comfortable spreads the same flip is cheap routine competition. Multiplying the crossing velocity by z(spread, 300s) retains the crossing event-sparse structure but re-weights each flip by the contemporaneous spread stress, isolating the informed hand-offs whose direction survives at 300-900s. Distinct from ofi_z_x_spread_z (round-1: z-SURPRISE of single-window OFI x spread, continuous) -- here the gated input is a CROSSING EVENT (event-sparse, regime-transition not surprise).",
+        "max_abs_corr_vs_panel": 0.343,
+        "panel_corr_factor": "oir",
+        "best_horizon_s": "15",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": -0.08997039017064054,
+            "is_t": -8.46693083522064,
+            "oos_mean_ic": -0.13576300058588714,
+            "oos_t": -15.522009648527074,
+            "retention": 1.50897423394958,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.4911063829787232,
+                "long_net_bps": -6.491106382978723,
+                "short_gross_bps": 0.8849787234042554,
+                "short_net_bps": -5.115021276595744,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.5922657580919934,
+                "long_net_bps": -7.592265758091994,
+                "short_gross_bps": -1.037725724020443,
+                "short_net_bps": -7.037725724020443,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.5692018779342722,
+                "long_net_bps": -7.5692018779342725,
+                "short_gross_bps": -1.5183098591549296,
+                "short_net_bps": -7.51830985915493,
+                "n_long": 2343,
+                "n_short": 2343,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": -0.07132359440693695,
+            "is_t": -13.803859793661731,
+            "oos_mean_ic": -0.08881783124181587,
+            "oos_t": -13.722318726922023,
+            "retention": 1.245279798085687,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.4542553191489359,
+                "long_net_bps": -5.545744680851064,
+                "short_gross_bps": 1.5630212765957445,
+                "short_net_bps": -4.4369787234042555,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.3868434559452523,
+                "long_net_bps": -7.386843455945252,
+                "short_gross_bps": -0.844114627887083,
+                "short_net_bps": -6.844114627887083,
+                "n_long": 1169,
+                "n_short": 1169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.2743840889649272,
+                "long_net_bps": -7.274384088964927,
+                "short_gross_bps": -1.4457014542343885,
+                "short_net_bps": -7.4457014542343885,
+                "n_long": 2338,
+                "n_short": 2338,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": -0.05668615408257336,
+            "is_t": -17.39190828319717,
+            "oos_mean_ic": -0.06482425830653696,
+            "oos_t": -13.459323540357316,
+            "retention": 1.1435642328479194,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.11706382978723394,
+                "long_net_bps": -5.8829361702127665,
+                "short_gross_bps": 1.1311914893617017,
+                "short_net_bps": -4.868808510638298,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.086632302405498,
+                "long_net_bps": -7.086632302405498,
+                "short_gross_bps": -1.362491408934708,
+                "short_net_bps": -7.362491408934708,
+                "n_long": 1164,
+                "n_short": 1164,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.0564819587628864,
+                "long_net_bps": -7.056481958762887,
+                "short_gross_bps": -1.8724226804123711,
+                "short_net_bps": -7.872422680412371,
+                "n_long": 2328,
+                "n_short": 2328,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": -0.027254600290965124,
+            "is_t": -13.078808251671463,
+            "oos_mean_ic": -0.029091871511635163,
+            "oos_t": -7.061301126660905,
+            "retention": 1.0674114168270923,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.496266666666667,
+                "long_net_bps": -4.503733333333333,
+                "short_gross_bps": -1.8804888888888902,
+                "short_net_bps": -7.88048888888889,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.7379359430604984,
+                "long_net_bps": -4.262064056939502,
+                "short_gross_bps": -3.6676067615658363,
+                "short_net_bps": -9.667606761565835,
+                "n_long": 1124,
+                "n_short": 1124,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.5847464412811387,
+                "long_net_bps": -5.415253558718861,
+                "short_gross_bps": -3.38036921708185,
+                "short_net_bps": -9.38036921708185,
+                "n_long": 2248,
+                "n_short": 2248,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": -0.017375524327892685,
+            "is_t": -11.277417124953415,
+            "oos_mean_ic": -0.023663478910918613,
+            "oos_t": -3.2995698487598784,
+            "retention": 1.36188574597038,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -8.754146341463414,
+                "long_net_bps": -14.754146341463414,
+                "short_gross_bps": 2.9721463414634153,
+                "short_net_bps": -3.0278536585365847,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -3.337587890625,
+                "long_net_bps": -9.337587890625,
+                "short_gross_bps": 0.8232324218750006,
+                "short_net_bps": -5.176767578124999,
+                "n_long": 1024,
+                "n_short": 1024,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.4722412109375005,
+                "long_net_bps": -7.472241210937501,
+                "short_gross_bps": -1.4138525390625,
+                "short_net_bps": -7.4138525390625,
+                "n_long": 2048,
+                "n_short": 2048,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "fullbook_imb_zcross_x_spread_z",
+        "family": "R5C",
+        "mechanism": "Spread-stress-gated broad-book regime flips: fullbook_imb_z_cross_vel_15s (the admitted crossing template on the full-book imbalance) scores sign-reversal events where the ENTIRE book's bid/ask volume ratio -- including patient deeper-queue institutional positioning and ETF creation/redemption inventory -- relocates within 15s. Such a broad relocation is the most costly book event in the family and hypothesis: under WIDE, stressed spreads this kind of patient repositioning is credible as informed broad redeployment (the institutional book does not move the whole stack unless the view changed); under tight comfortable spreads the same flip can be routine liquidity rebalancing. Multiplying by z(spread, 300s) isolates the informed broad relocations from routine ones, extending the signal to 300-900s where patient positioning matters most. The broadest base in the spread-z cluster: wdi covers 5 levels, oir covers 1 level, this covers the whole book -- each tests the spread-stress hypothesis on a different scale of the order book, and only the full-book version addresses institutional patient repositioning.",
+        "max_abs_corr_vs_panel": 0.202,
+        "panel_corr_factor": "ofi_15s",
+        "best_horizon_s": "30",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": -0.03366225569342705,
+            "is_t": -5.267017541396928,
+            "oos_mean_ic": -0.05842915133480695,
+            "oos_t": -11.406102041448023,
+            "retention": 1.7357467623958407,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -1.0077872340425533,
+                "long_net_bps": -7.007787234042553,
+                "short_gross_bps": -0.9408936170212765,
+                "short_net_bps": -6.940893617021277,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.0065928449744463,
+                "long_net_bps": -7.006592844974446,
+                "short_gross_bps": -1.379642248722317,
+                "short_net_bps": -7.379642248722317,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.02372684107624989,
+                "long_net_bps": -6.0237268410762494,
+                "short_gross_bps": -0.1615139405204461,
+                "short_net_bps": -6.161513940520446,
+                "n_long": 21482,
+                "n_short": 21520,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": -0.031338026250443046,
+            "is_t": -4.337973943028223,
+            "oos_mean_ic": -0.052316322334176824,
+            "oos_t": -14.814668368296026,
+            "retention": 1.6694198261269628,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -2.0491489361702135,
+                "long_net_bps": -8.049148936170214,
+                "short_gross_bps": -1.7433617021276593,
+                "short_net_bps": -7.743361702127659,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.6749187339606502,
+                "long_net_bps": -7.67491873396065,
+                "short_gross_bps": -1.7388280581693756,
+                "short_net_bps": -7.738828058169376,
+                "n_long": 1169,
+                "n_short": 1169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.02541221480893951,
+                "long_net_bps": -5.97458778519106,
+                "short_gross_bps": -0.26110153702841177,
+                "short_net_bps": -6.261101537028412,
+                "n_long": 21433,
+                "n_short": 21470,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": -0.022521303366576647,
+            "is_t": -2.525083880286582,
+            "oos_mean_ic": -0.03332854956364452,
+            "oos_t": -3.643434785452254,
+            "retention": 1.479867706640223,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.7753617021276595,
+                "long_net_bps": -6.775361702127659,
+                "short_gross_bps": -3.631276595744681,
+                "short_net_bps": -9.63127659574468,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.0620704467353954,
+                "long_net_bps": -7.062070446735396,
+                "short_gross_bps": -2.304037800687285,
+                "short_net_bps": -8.304037800687285,
+                "n_long": 1164,
+                "n_short": 1164,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.19602643419572555,
+                "long_net_bps": -5.803973565804275,
+                "short_gross_bps": -0.42253824203583285,
+                "short_net_bps": -6.422538242035833,
+                "n_long": 21336,
+                "n_short": 21377,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": -0.008261511859200927,
+            "is_t": -3.0351000330104743,
+            "oos_mean_ic": -0.014238116006550195,
+            "oos_t": -2.2295982865747233,
+            "retention": 1.7234274124648343,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -3.58128888888889,
+                "long_net_bps": -9.58128888888889,
+                "short_gross_bps": -2.805511111111111,
+                "short_net_bps": -8.80551111111111,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.940338078291815,
+                "long_net_bps": -5.059661921708185,
+                "short_gross_bps": -4.559065836298933,
+                "short_net_bps": -10.559065836298933,
+                "n_long": 1124,
+                "n_short": 1124,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.3352766308835673,
+                "long_net_bps": -4.664723369116433,
+                "short_gross_bps": -1.5179892384507252,
+                "short_net_bps": -7.517989238450725,
+                "n_long": 20587,
+                "n_short": 20629,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": -0.006175097770700909,
+            "is_t": -3.446261648215379,
+            "oos_mean_ic": -0.012536526180827911,
+            "oos_t": -7.247337140465328,
+            "retention": 2.0301745245735505,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -4.359170731707315,
+                "long_net_bps": -10.359170731707316,
+                "short_gross_bps": 0.5210243902439021,
+                "short_net_bps": -5.478975609756098,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.2274999999999998,
+                "long_net_bps": -4.7725,
+                "short_gross_bps": -3.881484375,
+                "short_net_bps": -9.881484375,
+                "n_long": 1024,
+                "n_short": 1024,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 4.460774320934948,
+                "long_net_bps": -1.5392256790650523,
+                "short_gross_bps": -4.718106726314108,
+                "short_net_bps": -10.718106726314108,
+                "n_long": 18739,
+                "n_short": 18777,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "lastgap_zvel_extreme_15s",
+        "family": "R5A",
+        "mechanism": "Extremity-weighted aggressor-side velocity: the 15s change rate of z_300(last-mid gap in ticks), weighted by |z|. The gap is the fastest directional microstructure signal: positive = buyer lifted ask, negative = seller hit bid. When the aggressor bias is already extreme versus its 300s norm (high |z|: sustained one-sided aggression -- a program executing persistently into one side) AND still accelerating in the same direction over 15s, the informed flow is intensifying, not just persisting. Impact of freshly committed marketable flow is front-loaded: decisive acceleration of an already-stretched aggressor regime continues in its direction at 15-60s before the book absorbs and re-equilibrates. The extremity weight zeroes out routine aggressor noise around the norm. DEDUP: library last_mid_gap_ticks is the RAW instantaneous gap (single-row, no rolling context, no velocity); here the gap is z-scored over 300s and the z-velocity is weighted by the level extremity. The library last_mid_gap_ma_30s is a moving-average smooth of the raw gap (a level-smoothing, not a z-vs-velocity construction). This is the only spec combining the gap's level extremity with its own z-velocity in regime-normalized form.",
+        "max_abs_corr_vs_panel": 0.188,
+        "panel_corr_factor": "iopv_premium",
+        "best_horizon_s": "15",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.03029049233258389,
+            "is_t": 6.692500419366981,
+            "oos_mean_ic": 0.03498771039728242,
+            "oos_t": 12.699373545151253,
+            "retention": 1.1550723577921402,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.4716170212765956,
+                "long_net_bps": -6.471617021276596,
+                "short_gross_bps": 1.1558297872340424,
+                "short_net_bps": -4.844170212765958,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.0420102214650767,
+                "long_net_bps": -5.957989778534923,
+                "short_gross_bps": 0.6621361702127658,
+                "short_net_bps": -5.337863829787234,
+                "n_long": 1174,
+                "n_short": 1175,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.1339393939393939,
+                "long_net_bps": -5.866060606060606,
+                "short_gross_bps": 0.37772513871105423,
+                "short_net_bps": -5.622274861288946,
+                "n_long": 2343,
+                "n_short": 2343,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.02101021444878685,
+            "is_t": 8.395573110637987,
+            "oos_mean_ic": 0.02517712822630428,
+            "oos_t": 2.8682662143293216,
+            "retention": 1.1983279983968955,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.1395319148936172,
+                "long_net_bps": -4.860468085106383,
+                "short_gross_bps": 0.6267659574468084,
+                "short_net_bps": -5.373234042553191,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.24693162393162393,
+                "long_net_bps": -5.753068376068376,
+                "short_gross_bps": 0.26675791274593663,
+                "short_net_bps": -5.733242087254063,
+                "n_long": 1170,
+                "n_short": 1169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.38676218990590255,
+                "long_net_bps": -5.613237810094097,
+                "short_gross_bps": 0.12422155688622753,
+                "short_net_bps": -5.875778443113773,
+                "n_long": 2338,
+                "n_short": 2338,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": 0.015005942481885744,
+            "is_t": 4.645592479651092,
+            "oos_mean_ic": 0.012849632246597626,
+            "oos_t": 2.785927017743998,
+            "retention": 0.8563029121369028,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.868382978723404,
+                "long_net_bps": -5.131617021276596,
+                "short_gross_bps": -1.3202127659574467,
+                "short_net_bps": -7.3202127659574465,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.08133905579399149,
+                "long_net_bps": -6.0813390557939915,
+                "short_gross_bps": -0.4066408934707904,
+                "short_net_bps": -6.40664089347079,
+                "n_long": 1165,
+                "n_short": 1164,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.22044673539518894,
+                "long_net_bps": -5.779553264604811,
+                "short_gross_bps": -0.4378780068728522,
+                "short_net_bps": -6.437878006872852,
+                "n_long": 2328,
+                "n_short": 2328,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.0002822329376728711,
+            "is_t": 0.0769532820385038,
+            "oos_mean_ic": -8.693044444027208e-05,
+            "oos_t": -0.012637671221476028,
+            "retention": 0.30800956527983603,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.2271999999999998,
+                "long_net_bps": -4.7728,
+                "short_gross_bps": -1.8233333333333324,
+                "short_net_bps": -7.823333333333332,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.563460854092527,
+                "long_net_bps": -7.563460854092527,
+                "short_gross_bps": -2.5532562277580073,
+                "short_net_bps": -8.553256227758007,
+                "n_long": 1124,
+                "n_short": 1124,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.07927046263345172,
+                "long_net_bps": -6.079270462633452,
+                "short_gross_bps": -3.1195153401511786,
+                "short_net_bps": -9.119515340151178,
+                "n_long": 2248,
+                "n_short": 2249,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": -0.004169410563369655,
+            "is_t": -1.5847343342937088,
+            "oos_mean_ic": -0.003986152771268299,
+            "oos_t": -0.4746244293713354,
+            "retention": 0.9560470744446788,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -1.9123414634146332,
+                "long_net_bps": -7.912341463414633,
+                "short_gross_bps": -2.8881463414634143,
+                "short_net_bps": -8.888146341463415,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 3.6847024390243885,
+                "long_net_bps": -2.3152975609756115,
+                "short_gross_bps": -8.04697265625,
+                "short_net_bps": -14.04697265625,
+                "n_long": 1025,
+                "n_short": 1024,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 4.4154833984375,
+                "long_net_bps": -1.5845166015625,
+                "short_gross_bps": -8.7340869140625,
+                "short_net_bps": -14.7340869140625,
+                "n_long": 2048,
+                "n_short": 2048,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "oir_zcross_x_ti_sign",
+        "family": "R5C",
+        "mechanism": "Trade-confirmed touch-queue flips: oir_z_cross_vel_15s scores the moment control of the best-quote queue changes hands, but a touch flip can be passive -- one market maker pulls quotes and another fills the gap with no directional conviction. trade_imbalance_60s is the executed aggressive-volume balance: positive when buyers are lifting the ask, negative when sellers hit the bid. Hypothesis: a touch-queue hand-off whose NEW direction is corroborated by aggressive trade flow (the crossing velocity and ti_60s agree in sign) is a genuine informed queue takeover where both passive and aggressive channels of the same meta-order are aligned -- and it continues at 300-900s. Unconfirmed flips are scored exactly 0 (the factor is silent, never contrarian). This is the GATE form: it asks 'is aggressive-flow confirmation the necessary condition for touch-flip signal', complementing wdi_zvel_x_ofi_sign (PRODUCT form, book-flow channel) -- here the channel is EXECUTED trade flow, not book-delta flow.",
+        "max_abs_corr_vs_panel": 0.324,
+        "panel_corr_factor": "oir",
+        "best_horizon_s": "15",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.14961457532292075,
+            "is_t": 16.07277178736019,
+            "oos_mean_ic": 0.11527976953741918,
+            "oos_t": 12.294090850229274,
+            "retention": 0.7705116248774894,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.989106382978723,
+                "long_net_bps": -3.010893617021277,
+                "short_gross_bps": 2.8414042553191488,
+                "short_net_bps": -3.1585957446808512,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.6717972742759795,
+                "long_net_bps": -4.3282027257240205,
+                "short_gross_bps": 1.8284241908006815,
+                "short_net_bps": -4.171575809199318,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.5096847224551401,
+                "long_net_bps": -5.49031527754486,
+                "short_gross_bps": 0.5023968042609853,
+                "short_net_bps": -5.497603195739015,
+                "n_long": 5963,
+                "n_short": 6008,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.13142612461531997,
+            "is_t": 17.173988796634514,
+            "oos_mean_ic": 0.07436986165990696,
+            "oos_t": 11.011928108852722,
+            "retention": 0.5658681778648282,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.202,
+                "long_net_bps": -3.798,
+                "short_gross_bps": 3.25736170212766,
+                "short_net_bps": -2.74263829787234,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.1482720273738238,
+                "long_net_bps": -4.851727972626176,
+                "short_gross_bps": 1.5652694610778444,
+                "short_net_bps": -4.434730538922156,
+                "n_long": 1169,
+                "n_short": 1169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.33874600773239194,
+                "long_net_bps": -5.661253992267608,
+                "short_gross_bps": 0.3370075062552126,
+                "short_net_bps": -5.662992493744787,
+                "n_long": 5949,
+                "n_short": 5995,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.1088339398844608,
+            "is_t": 10.507560905128383,
+            "oos_mean_ic": 0.0417910750135607,
+            "oos_t": 5.938274064073913,
+            "retention": 0.38398936083657836,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.3432340425531906,
+                "long_net_bps": -3.6567659574468094,
+                "short_gross_bps": 3.008425531914894,
+                "short_net_bps": -2.991574468085106,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.7999398625429553,
+                "long_net_bps": -5.2000601374570445,
+                "short_gross_bps": 1.1783676975945019,
+                "short_net_bps": -4.821632302405498,
+                "n_long": 1164,
+                "n_short": 1164,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.22997798049701165,
+                "long_net_bps": -5.7700220195029885,
+                "short_gross_bps": 0.7278307560137457,
+                "short_net_bps": -5.272169243986254,
+                "n_long": 9537,
+                "n_short": 2328,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.054606631060286306,
+            "is_t": 6.937121913521337,
+            "oos_mean_ic": 0.011127211944813687,
+            "oos_t": 1.658071517868288,
+            "retention": 0.20377034306564573,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.2619555555555566,
+                "long_net_bps": -3.7380444444444434,
+                "short_gross_bps": 2.097288888888888,
+                "short_net_bps": -3.902711111111112,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.144919928825623,
+                "long_net_bps": -3.855080071174377,
+                "short_gross_bps": -0.32983985765124535,
+                "short_net_bps": -6.329839857651246,
+                "n_long": 1124,
+                "n_short": 1124,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.15214083587287708,
+                "long_net_bps": -6.152140835872877,
+                "short_gross_bps": -0.9326112099644127,
+                "short_net_bps": -6.932611209964413,
+                "n_long": 9188,
+                "n_short": 2248,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.02543895818238435,
+            "is_t": 4.281476561110291,
+            "oos_mean_ic": -0.0074381467523342735,
+            "oos_t": -0.3689485548380598,
+            "retention": 0.2923919564239446,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 9.39131707317073,
+                "long_net_bps": 3.3913170731707307,
+                "short_gross_bps": -0.11073170731707387,
+                "short_net_bps": -6.110731707317074,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 4.554716796875,
+                "long_net_bps": -1.4452832031250002,
+                "short_gross_bps": -3.5431347656250005,
+                "short_net_bps": -9.543134765625,
+                "n_long": 1024,
+                "n_short": 1024,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.022527183653961107,
+                "long_net_bps": -5.977472816346039,
+                "short_gross_bps": -4.847333984374999,
+                "short_net_bps": -10.847333984374998,
+                "n_long": 8369,
+                "n_short": 2048,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "oir_zcross_x_rvhi",
+        "family": "R5C",
+        "mechanism": "Turbulence-isolated touch-queue flips: oir_z_cross_vel_15s scores the cheapest-quotes regime hand-off -- the fastest, cheapest place to signal urgency, which informed traders touch first. But a touch flip in a CALM market is often routine touch rotation between competing market makers with no directional content. Hypothesis: the SAME touch hand-off during TURBULENCE (rv above its trailing mean) marks an abrupt informed queue takeover -- price is already moving, and seizing the touch queue is aggressive priority competition that continues in the new direction at 300-900s. The binary 0/1 gate zeroes all calm-regime flips (where the signal is noise) and retains only turbulent-regime flips, isolating the high-signal regime. Distinct from wdi_zvel_x_rv_regime (signed dual-regime on the CONTINUOUS velocity): this is a one-sided ISOLATION gate on a CROSSING EVENT -- it does not test the calm regime at all, only asks whether turbulence is the necessary condition for touch-flip signal.",
+        "max_abs_corr_vs_panel": 0.425,
+        "panel_corr_factor": "oir",
+        "best_horizon_s": "30",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.1465355075962682,
+            "is_t": 18.73762554237229,
+            "oos_mean_ic": 0.11142793444861691,
+            "oos_t": 11.197317522561184,
+            "retention": 0.760415931104023,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.295086956521738,
+                "long_net_bps": -3.704913043478262,
+                "short_gross_bps": 2.391,
+                "short_net_bps": -3.609,
+                "n_long": 230,
+                "n_short": 230,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.4122914837576823,
+                "long_net_bps": -4.5877085162423175,
+                "short_gross_bps": 1.997655838454785,
+                "short_net_bps": -4.002344161545215,
+                "n_long": 1139,
+                "n_short": 1139,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.3938498683055311,
+                "long_net_bps": -4.606150131694469,
+                "short_gross_bps": 1.6926382791922738,
+                "short_net_bps": -4.307361720807727,
+                "n_long": 2278,
+                "n_short": 2278,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.13371422584997056,
+            "is_t": 8.884639513321755,
+            "oos_mean_ic": 0.0744571195577898,
+            "oos_t": 12.05529102995045,
+            "retention": 0.5568376818883269,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.1557391304347826,
+                "long_net_bps": -3.8442608695652174,
+                "short_gross_bps": 2.6344782608695647,
+                "short_net_bps": -3.3655217391304353,
+                "n_long": 230,
+                "n_short": 230,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.4112028094820017,
+                "long_net_bps": -4.588797190517998,
+                "short_gross_bps": 1.8418700614574188,
+                "short_net_bps": -4.158129938542581,
+                "n_long": 1139,
+                "n_short": 1139,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.4095820501539815,
+                "long_net_bps": -4.590417949846018,
+                "short_gross_bps": 1.5869115706115267,
+                "short_net_bps": -4.413088429388473,
+                "n_long": 2273,
+                "n_short": 2273,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.10952005721184291,
+            "is_t": 5.781031861135339,
+            "oos_mean_ic": 0.0537216954436359,
+            "oos_t": 13.662606232128066,
+            "retention": 0.49051924196608915,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.9039130434782603,
+                "long_net_bps": -4.09608695652174,
+                "short_gross_bps": 2.6537391304347824,
+                "short_net_bps": -3.3462608695652176,
+                "n_long": 230,
+                "n_short": 230,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.5527336860670196,
+                "long_net_bps": -4.44726631393298,
+                "short_gross_bps": 1.8534479717813053,
+                "short_net_bps": -4.146552028218695,
+                "n_long": 1134,
+                "n_short": 1134,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.5751215201060536,
+                "long_net_bps": -4.4248784798939464,
+                "short_gross_bps": 1.4824480777728681,
+                "short_net_bps": -4.517551922227132,
+                "n_long": 2263,
+                "n_short": 2263,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.05940818705065807,
+            "is_t": 5.01920310985917,
+            "oos_mean_ic": 0.021063661292286057,
+            "oos_t": 6.025049050092873,
+            "retention": 0.3545582240091727,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.9410454545454545,
+                "long_net_bps": -2.0589545454545455,
+                "short_gross_bps": 2.5839090909090903,
+                "short_net_bps": -3.4160909090909097,
+                "n_long": 220,
+                "n_short": 220,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 4.6486288848263255,
+                "long_net_bps": -1.3513711151736745,
+                "short_gross_bps": -1.2104021937842777,
+                "short_net_bps": -7.210402193784278,
+                "n_long": 1094,
+                "n_short": 1094,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 4.097993586807147,
+                "long_net_bps": -1.9020064131928534,
+                "short_gross_bps": -1.947549244159414,
+                "short_net_bps": -7.947549244159414,
+                "n_long": 2183,
+                "n_short": 2183,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.04399520327958164,
+            "is_t": 5.224462772786696,
+            "oos_mean_ic": 0.01255302466987763,
+            "oos_t": 3.5095203438825915,
+            "retention": 0.285327120552334,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 12.900099999999998,
+                "long_net_bps": 6.900099999999998,
+                "short_gross_bps": -1.5220999999999993,
+                "short_net_bps": -7.522099999999999,
+                "n_long": 200,
+                "n_short": 200,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 9.477625754527164,
+                "long_net_bps": 3.477625754527164,
+                "short_gross_bps": -5.827414486921529,
+                "short_net_bps": -11.82741448692153,
+                "n_long": 994,
+                "n_short": 994,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 7.605360564800807,
+                "long_net_bps": 1.6053605648008071,
+                "short_gross_bps": -5.514881492687847,
+                "short_net_bps": -11.514881492687847,
+                "n_long": 1983,
+                "n_short": 1983,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "wdi_zcross_x_spread_z",
+        "family": "R5C",
+        "mechanism": "Spread-stress-gated depth-imbalance regime flips: wdi_z_cross_vel_15s (the admitted crossing template on the exp-decay weighted 5-level depth imbalance) scores sign-reversal events where the whole visible bid/ask stack rebuilds against a tilt that persisted for minutes. Such a rebuild is costly -- pulling and refilling across five price levels -- and hypothesis: it is only worth that cost when it is informed. But under TIGHT spreads the rebuild can be cheap routine repositioning; under WIDE spreads the cost is real and the flip is credible as informed repositioning. Multiplying the crossing velocity by z(spread, 300s) re-weights each stack-rebuild event by the spread-stress regime, isolating the costly informed flips that continue at 300-900s while suppressing the cheap routine ones. This is a different economic question from wdi_zvel_x_spread_z (same family): that gates the CONTINUOUS extremity-weighted velocity; this gates the EVENT of a regime sign-reversal -- a stack rebuild, not ongoing momentum.",
+        "max_abs_corr_vs_panel": 0.278,
+        "panel_corr_factor": "oir",
+        "best_horizon_s": "15",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": -0.0888702387562894,
+            "is_t": -9.105259333889506,
+            "oos_mean_ic": -0.1211003945059473,
+            "oos_t": -10.517235970283412,
+            "retention": 1.3626653444472372,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.7177021276595744,
+                "long_net_bps": -6.7177021276595745,
+                "short_gross_bps": -0.670340425531915,
+                "short_net_bps": -6.670340425531915,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.6990289608177174,
+                "long_net_bps": -7.699028960817717,
+                "short_gross_bps": -1.8518654173764904,
+                "short_net_bps": -7.851865417376491,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.5741784037558686,
+                "long_net_bps": -7.574178403755869,
+                "short_gross_bps": -1.71127187366624,
+                "short_net_bps": -7.71127187366624,
+                "n_long": 2343,
+                "n_short": 2343,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": -0.07201145580509163,
+            "is_t": -12.261011443792269,
+            "oos_mean_ic": -0.08280943152718452,
+            "oos_t": -8.576720802631208,
+            "retention": 1.1499480270377953,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.46548936170212735,
+                "long_net_bps": -6.465489361702128,
+                "short_gross_bps": -0.46727659574468083,
+                "short_net_bps": -6.467276595744681,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -1.518203592814371,
+                "long_net_bps": -7.518203592814371,
+                "short_gross_bps": -1.4792814371257486,
+                "short_net_bps": -7.479281437125748,
+                "n_long": 1169,
+                "n_short": 1169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.3328314798973482,
+                "long_net_bps": -7.332831479897348,
+                "short_gross_bps": -1.741988879384089,
+                "short_net_bps": -7.741988879384089,
+                "n_long": 2338,
+                "n_short": 2338,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": -0.05484660573662187,
+            "is_t": -14.089161243764826,
+            "oos_mean_ic": -0.06082108435444239,
+            "oos_t": -7.74525358484835,
+            "retention": 1.1089306901964087,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.5925106382978723,
+                "long_net_bps": -6.592510638297872,
+                "short_gross_bps": -1.7331489361702124,
+                "short_net_bps": -7.733148936170212,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.9151202749140894,
+                "long_net_bps": -6.91512027491409,
+                "short_gross_bps": -2.2099656357388318,
+                "short_net_bps": -8.209965635738833,
+                "n_long": 1164,
+                "n_short": 1164,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -1.0237800687285223,
+                "long_net_bps": -7.023780068728522,
+                "short_gross_bps": -2.2260438144329897,
+                "short_net_bps": -8.22604381443299,
+                "n_long": 2328,
+                "n_short": 2328,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": -0.02645095634540092,
+            "is_t": -12.389279169596344,
+            "oos_mean_ic": -0.029355356282450784,
+            "oos_t": -4.11154863768258,
+            "retention": 1.1098032108602705,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 6.2584,
+                "long_net_bps": 0.25839999999999996,
+                "short_gross_bps": -7.514177777777777,
+                "short_net_bps": -13.514177777777778,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 3.163994661921708,
+                "long_net_bps": -2.836005338078292,
+                "short_gross_bps": -5.753451957295374,
+                "short_net_bps": -11.753451957295374,
+                "n_long": 1124,
+                "n_short": 1124,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.3367348754448396,
+                "long_net_bps": -4.66326512455516,
+                "short_gross_bps": -4.53056049822064,
+                "short_net_bps": -10.530560498220641,
+                "n_long": 2248,
+                "n_short": 2248,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": -0.017011667139171394,
+            "is_t": -10.565367483047856,
+            "oos_mean_ic": -0.020956250728847124,
+            "oos_t": -3.0056402512270455,
+            "retention": 1.2318751923256748,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.6984390243902445,
+                "long_net_bps": -2.3015609756097555,
+                "short_gross_bps": -3.0681951219512187,
+                "short_net_bps": -9.068195121951218,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.3726074218749993,
+                "long_net_bps": -4.627392578125001,
+                "short_gross_bps": -4.675185546875001,
+                "short_net_bps": -10.675185546875001,
+                "n_long": 1024,
+                "n_short": 1024,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.6469921874999998,
+                "long_net_bps": -4.3530078125000005,
+                "short_gross_bps": -5.7042431640624995,
+                "short_net_bps": -11.7042431640625,
+                "n_long": 2048,
+                "n_short": 2048,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "wdi_zvel_2sig_extreme_15s",
+        "family": "R5B",
+        "mechanism": "Tail-isolated depth-imbalance velocity: the 15s z-velocity weighted by extremity (dz * |z|), but scored ONLY when the regime stretch exceeds 2 sigma (|z| > 2.0, top ~5% of the z distribution), zeroed otherwise. The hypothesis is that the round-4 admitted wdi_zvel_extreme_15s signal (dz * |z|, fires every row) is driven by its extreme tail: when the depth-imbalance regime is beyond 2 sigma, the queue state is genuinely crowded and ANY velocity is likely informed repositioning (institutional rebuild or abandonment of a deep multi-level position), while bulk-regime velocity (|z| < 2) is dominated by routine quote maintenance noise. The strict gate produces an event-sparse series (exact zero on ~95% of rows) whose nonzero support is the highest-conviction subset of the product form. Distinct from wdi_zvel_extreme_15s (always active): the threshold gate changes the economic question from 'velocity weighted by stretch' to 'velocity ONLY in the stretched tail'.",
+        "max_abs_corr_vs_panel": 0.205,
+        "panel_corr_factor": "oir",
+        "best_horizon_s": "15",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.11637703150672393,
+            "is_t": 19.651722649070493,
+            "oos_mean_ic": 0.09343015446744217,
+            "oos_t": 7.853707350752672,
+            "retention": 0.8028229733806541,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.656425531914894,
+                "long_net_bps": -3.343574468085106,
+                "short_gross_bps": 3.6668936170212767,
+                "short_net_bps": -2.3331063829787233,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.16543173529024036,
+                "long_net_bps": -5.83456826470976,
+                "short_gross_bps": -0.012708945084805193,
+                "short_net_bps": -6.012708945084805,
+                "n_long": 22757,
+                "n_short": 22817,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.16543173529024036,
+                "long_net_bps": -5.83456826470976,
+                "short_gross_bps": -0.012708945084805193,
+                "short_net_bps": -6.012708945084805,
+                "n_long": 22757,
+                "n_short": 22817,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.09635575418425746,
+            "is_t": 25.1396619909843,
+            "oos_mean_ic": 0.06888422637447535,
+            "oos_t": 5.349239315060402,
+            "retention": 0.714894787111008,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 4.087659574468085,
+                "long_net_bps": -1.912340425531915,
+                "short_gross_bps": 2.8145531914893613,
+                "short_net_bps": -3.1854468085106387,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.2175536178271018,
+                "long_net_bps": -5.782446382172898,
+                "short_gross_bps": -0.05786385595081249,
+                "short_net_bps": -6.057863855950813,
+                "n_long": 22707,
+                "n_short": 22770,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.2175536178271018,
+                "long_net_bps": -5.782446382172898,
+                "short_gross_bps": -0.05786385595081249,
+                "short_net_bps": -6.057863855950813,
+                "n_long": 22707,
+                "n_short": 22770,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": 0.08114036177637203,
+            "is_t": 16.81763637236231,
+            "oos_mean_ic": 0.06185611541878151,
+            "oos_t": 5.8311719407816565,
+            "retention": 0.7623347254632766,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 5.372553191489362,
+                "long_net_bps": -0.6274468085106379,
+                "short_gross_bps": 3.4327234042553187,
+                "short_net_bps": -2.5672765957446813,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.41239186200796113,
+                "long_net_bps": -5.587608137992039,
+                "short_gross_bps": -0.211778973363909,
+                "short_net_bps": -6.211778973363909,
+                "n_long": 22610,
+                "n_short": 22676,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.41239186200796113,
+                "long_net_bps": -5.587608137992039,
+                "short_gross_bps": -0.211778973363909,
+                "short_net_bps": -6.211778973363909,
+                "n_long": 22610,
+                "n_short": 22676,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": 0.04173030719127206,
+            "is_t": 8.510422418157516,
+            "oos_mean_ic": 0.03220618849040842,
+            "oos_t": 2.33930299634473,
+            "retention": 0.7717697438168961,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 9.012,
+                "long_net_bps": 3.0120000000000005,
+                "short_gross_bps": -2.422177777777778,
+                "short_net_bps": -8.422177777777778,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.5148083878943273,
+                "long_net_bps": -4.485191612105673,
+                "short_gross_bps": -1.2725788776768185,
+                "short_net_bps": -7.2725788776768185,
+                "n_long": 21841,
+                "n_short": 21901,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.5148083878943273,
+                "long_net_bps": -4.485191612105673,
+                "short_gross_bps": -1.2725788776768185,
+                "short_net_bps": -7.2725788776768185,
+                "n_long": 21841,
+                "n_short": 21901,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.02961619952684077,
+            "is_t": 8.283529075017519,
+            "oos_mean_ic": 0.027374714573020965,
+            "oos_t": 1.9483311502610168,
+            "retention": 0.924315577635531,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 6.947414634146343,
+                "long_net_bps": 0.9474146341463427,
+                "short_gross_bps": -4.953024390243904,
+                "short_net_bps": -10.953024390243904,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 4.548413904119926,
+                "long_net_bps": -1.4515860958800744,
+                "short_gross_bps": -4.24021291518461,
+                "short_net_bps": -10.24021291518461,
+                "n_long": 19879,
+                "n_short": 19961,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 4.548413904119926,
+                "long_net_bps": -1.4515860958800744,
+                "short_gross_bps": -4.24021291518461,
+                "short_net_bps": -10.24021291518461,
+                "n_long": 19879,
+                "n_short": 19961,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "wdi_zcross_x_rvlo",
+        "family": "R5C",
+        "mechanism": "Calm-isolated depth-stack rebuilds: wdi_z_cross_vel_15s scores sign-reversal events where the entire visible 5-level bid/ask stack rebuilds against a minutes-old tilt. Hypothesis: in CALM regimes (rv at or below its trailing mean) the book trades off queue structure and patient orders get filled in order, so a deliberate full-stack rebuild is credible as informed repositioning whose direction continues at 300-900s. In TURBULENCE, exogenous shocks run over queue positioning and the same rebuild is reactive panic, not information -- the signal decays. The binary 0/1 gate zeroes all turbulent-regime rebuilds and retains only calm-regime ones. This is the OPPOSING falsifiable hypothesis to oir_zcross_x_rvhi: that one says turbulence is the necessary condition (urgency); this one says calm is (deliberate informed positioning). On a different base (wdi 5-level crossing vs oir touch crossing) and different regime polarity, so the pair cleanly spans the two economic answers to 'when does book-structure regime change carry signal'.",
+        "max_abs_corr_vs_panel": 0.24,
+        "panel_corr_factor": "oir",
+        "best_horizon_s": "15",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.11839204918684793,
+            "is_t": 13.141107176629944,
+            "oos_mean_ic": 0.09456345721091879,
+            "oos_t": 7.406361764866806,
+            "retention": 0.7987314845921576,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.320869565217391,
+                "long_net_bps": -2.679130434782609,
+                "short_gross_bps": 1.9891739130434782,
+                "short_net_bps": -4.010826086956522,
+                "n_long": 230,
+                "n_short": 230,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.257243195785777,
+                "long_net_bps": -3.742756804214223,
+                "short_gross_bps": 1.419209833187006,
+                "short_net_bps": -4.580790166812994,
+                "n_long": 1139,
+                "n_short": 1139,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.31340021039975957,
+                "long_net_bps": -5.6865997896002405,
+                "short_gross_bps": 0.05749526290857416,
+                "short_net_bps": -5.942504737091426,
+                "n_long": 13308,
+                "n_short": 16888,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.09983332791248284,
+            "is_t": 21.650048439997665,
+            "oos_mean_ic": 0.06990369418681565,
+            "oos_t": 7.002330867098151,
+            "retention": 0.7002039864692832,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.6065652173913043,
+                "long_net_bps": -2.3934347826086957,
+                "short_gross_bps": 1.6869130434782609,
+                "short_net_bps": -4.313086956521739,
+                "n_long": 230,
+                "n_short": 230,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 2.5410711150131697,
+                "long_net_bps": -3.4589288849868303,
+                "short_gross_bps": 1.2327304653204563,
+                "short_net_bps": -4.767269534679544,
+                "n_long": 1139,
+                "n_short": 1139,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.44769659536004813,
+                "long_net_bps": -5.552303404639952,
+                "short_gross_bps": -0.06862204023500094,
+                "short_net_bps": -6.068622040235001,
+                "n_long": 13276,
+                "n_short": 16851,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": 0.08630280763175383,
+            "is_t": 16.79503967677719,
+            "oos_mean_ic": 0.05589932057744784,
+            "oos_t": 5.680479538481193,
+            "retention": 0.647711495273307,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 4.223391304347826,
+                "long_net_bps": -1.7766086956521736,
+                "short_gross_bps": 1.9875652173913043,
+                "short_net_bps": -4.012434782608696,
+                "n_long": 230,
+                "n_short": 230,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 3.1133774250440918,
+                "long_net_bps": -2.8866225749559082,
+                "short_gross_bps": 1.0371075837742503,
+                "short_net_bps": -4.96289241622575,
+                "n_long": 1134,
+                "n_short": 1134,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.699987890713691,
+                "long_net_bps": -5.300012109286309,
+                "short_gross_bps": -0.30550435197329184,
+                "short_net_bps": -6.305504351973292,
+                "n_long": 13213,
+                "n_short": 16774,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": 0.044569781567753944,
+            "is_t": 12.608765428752063,
+            "oos_mean_ic": 0.023819009416253516,
+            "oos_t": 5.201533441047932,
+            "retention": 0.534420600200708,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 6.481909090909092,
+                "long_net_bps": 0.48190909090909173,
+                "short_gross_bps": -1.0250454545454533,
+                "short_net_bps": -7.025045454545453,
+                "n_long": 220,
+                "n_short": 220,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 4.400895795246801,
+                "long_net_bps": -1.599104204753199,
+                "short_gross_bps": -0.20060329067641677,
+                "short_net_bps": -6.200603290676416,
+                "n_long": 1094,
+                "n_short": 1094,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.821149136577708,
+                "long_net_bps": -3.178850863422292,
+                "short_gross_bps": -2.5742640973380273,
+                "short_net_bps": -8.574264097338027,
+                "n_long": 12740,
+                "n_short": 16191,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": 0.023283482759926553,
+            "is_t": 10.831300757532542,
+            "oos_mean_ic": 0.022650777342508192,
+            "oos_t": 2.9748514590892157,
+            "retention": 0.9728259975562025,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 12.671,
+                "long_net_bps": 6.670999999999999,
+                "short_gross_bps": -3.379649999999998,
+                "short_net_bps": -9.379649999999998,
+                "n_long": 200,
+                "n_short": 200,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 9.17916498993964,
+                "long_net_bps": 3.1791649899396397,
+                "short_gross_bps": -2.7595975855130788,
+                "short_net_bps": -8.75959758551308,
+                "n_long": 994,
+                "n_short": 994,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 8.867705414288187,
+                "long_net_bps": 2.867705414288187,
+                "short_gross_bps": -8.180491803278688,
+                "short_net_bps": -14.180491803278688,
+                "n_long": 11562,
+                "n_short": 11590,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "iopv_prem_z_cross_vel_15s",
+        "family": "R5A",
+        "mechanism": "Premium-arbitrage regime reversal events: the trailing-300s z of iopv_premium (ETF price vs IOPV, ratio) crosses zero within 15s. The premium has a structural component (fund-flow regimes persisting hours) and a transient component (flow bursts, stale IOPV after fast basket moves). A zero-crossing of the 300s z means the transient component just flipped from above-norm (overpriced vs fair value) to below-norm (underpriced) or vice versa -- the direction of AP (authorized participant) creation/redemption pressure has reversed. The crossing VELOCITY measures how fast the reversal is engaging: a decisive fast crossing marks an AP program committing capital to the new direction, whose impact continues at 15-60s while the arb executes; a slow drift across zero scores weak. Event-sparse (0 off crossings). DEDUP: library iopv_premium_z_120s (and z_600s) are pure LEVEL z active every row (regime STATE); here only the transition EVENT is scored. Library iopv_vel_z_300s and iopv_vel_drift_300s z the IOPV VELOCITY column (a different input); here the premium LEVEL itself is z-scored and crossed with its own velocity. Round-1 lesson: unconditional premium levels dead (0/8); DYNAMICS are the live form -- the crossing template extends that finding from velocity-levels to level-reversal events.",
+        "max_abs_corr_vs_panel": 0.316,
+        "panel_corr_factor": "iopv_premium",
+        "best_horizon_s": "15",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": -0.02791146869065905,
+            "is_t": -6.7200267103157465,
+            "oos_mean_ic": -0.02335811116513421,
+            "oos_t": -4.414378220139002,
+            "retention": 0.8368642805583111,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.19327659574468084,
+                "long_net_bps": -6.193276595744681,
+                "short_gross_bps": -0.8279148936170213,
+                "short_net_bps": -6.827914893617021,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": -0.31974446337308343,
+                "long_net_bps": -6.319744463373083,
+                "short_gross_bps": -0.6405621805792164,
+                "short_net_bps": -6.6405621805792165,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.12985061886470334,
+                "long_net_bps": -6.129850618864704,
+                "short_gross_bps": -0.4775501493811353,
+                "short_net_bps": -6.477550149381135,
+                "n_long": 2343,
+                "n_short": 2343,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": -0.024863318471226786,
+            "is_t": -6.590464752995322,
+            "oos_mean_ic": -0.0010827286934424253,
+            "oos_t": -0.1613035154988317,
+            "retention": 0.04354723182649247,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.011914893617021383,
+                "long_net_bps": -6.011914893617021,
+                "short_gross_bps": -0.6509361702127657,
+                "short_net_bps": -6.650936170212765,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.1887168520102652,
+                "long_net_bps": -5.811283147989735,
+                "short_gross_bps": -0.4805560307955518,
+                "short_net_bps": -6.480556030795552,
+                "n_long": 1169,
+                "n_short": 1169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.31862703165098366,
+                "long_net_bps": -5.681372968349017,
+                "short_gross_bps": -0.46005560307955523,
+                "short_net_bps": -6.460055603079555,
+                "n_long": 2338,
+                "n_short": 2338,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": -0.02040858113940575,
+            "is_t": -5.34371626069095,
+            "oos_mean_ic": -0.008120158110788417,
+            "oos_t": -1.1064945130360737,
+            "retention": 0.397879600513221,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.8459999999999999,
+                "long_net_bps": -5.154,
+                "short_gross_bps": -1.597957446808511,
+                "short_net_bps": -7.597957446808511,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.38734536082474214,
+                "long_net_bps": -5.612654639175258,
+                "short_gross_bps": -0.5805927835051544,
+                "short_net_bps": -6.580592783505154,
+                "n_long": 1164,
+                "n_short": 1164,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.4269243986254295,
+                "long_net_bps": -5.573075601374571,
+                "short_gross_bps": -1.106529209621993,
+                "short_net_bps": -7.106529209621993,
+                "n_long": 2328,
+                "n_short": 2328,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": -0.011485005894665027,
+            "is_t": -5.381142843481145,
+            "oos_mean_ic": -0.0026811434876964804,
+            "oos_t": -0.9216386039122814,
+            "retention": 0.23344728877691873,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.21777777777777746,
+                "long_net_bps": -6.217777777777777,
+                "short_gross_bps": -1.2531555555555556,
+                "short_net_bps": -7.253155555555556,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.9558044444444446,
+                "long_net_bps": -5.0441955555555555,
+                "short_gross_bps": -1.1137989323843416,
+                "short_net_bps": -7.113798932384341,
+                "n_long": 1125,
+                "n_short": 1124,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.9709341637010673,
+                "long_net_bps": -4.0290658362989324,
+                "short_gross_bps": -2.3092526690391453,
+                "short_net_bps": -8.309252669039145,
+                "n_long": 2248,
+                "n_short": 2248,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": -0.008708885398500562,
+            "is_t": -6.247347290974919,
+            "oos_mean_ic": -0.004081235163173417,
+            "oos_t": -1.7644650375420066,
+            "retention": 0.4686288745832041,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.4006829268292679,
+                "long_net_bps": -5.599317073170732,
+                "short_gross_bps": -4.7876097560975595,
+                "short_net_bps": -10.78760975609756,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 3.2768749999999995,
+                "long_net_bps": -2.7231250000000005,
+                "short_gross_bps": -3.3958593749999997,
+                "short_net_bps": -9.395859375,
+                "n_long": 1024,
+                "n_short": 1024,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 4.5757861328125005,
+                "long_net_bps": -1.4242138671874995,
+                "short_gross_bps": -6.499414062499999,
+                "short_net_bps": -12.499414062499998,
+                "n_long": 2048,
+                "n_short": 2048,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "microprice_dev_zvel_2sig_extreme_15s",
+        "family": "R5B",
+        "mechanism": "Tail-isolated microprice-deviation velocity: the 15s z-velocity of z_300(microprice_dev) weighted by extremity (dz * |z|), but scored ONLY when |z| > 2.0, zeroed otherwise. microprice_dev (micro minus mid) is the queue-weighted fair-value lead; beyond 2 sigma the lead is genuinely stretched -- the heavy side of the queue is pulling the microprice hard away from mid, an extreme positioning edge. Velocity of that extreme (large institutional repositioning at the touch) continues at 15-60s; velocity near a neutral micro-deviation is quote noise. The strict gate isolates the ~5% highest-conviction rows, producing an event-sparse series distinct from the always-active round-4 microprice_dev_zvel_extreme_15s. The economic question is signal CONCENTRATION: does the micro-deviation velocity product live entirely in the tail?",
+        "max_abs_corr_vs_panel": 0.151,
+        "panel_corr_factor": "microprice_dev",
+        "best_horizon_s": "30",
+        "horizons": {
+          "15": {
+            "passed": false,
+            "is_mean_ic": 0.08500177794988224,
+            "is_t": 11.40672411218522,
+            "oos_mean_ic": 0.04191646207923031,
+            "oos_t": 2.4294795781545315,
+            "retention": 0.49312453327675815,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.10494868822190731,
+                "long_net_bps": -5.895051311778093,
+                "short_gross_bps": -0.07835384945314176,
+                "short_net_bps": -6.0783538494531415,
+                "n_long": 23289,
+                "n_short": 23315,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.10494868822190731,
+                "long_net_bps": -5.895051311778093,
+                "short_gross_bps": -0.07835384945314176,
+                "short_net_bps": -6.0783538494531415,
+                "n_long": 23289,
+                "n_short": 23315,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.10494868822190731,
+                "long_net_bps": -5.895051311778093,
+                "short_gross_bps": -0.07835384945314176,
+                "short_net_bps": -6.0783538494531415,
+                "n_long": 23289,
+                "n_short": 23315,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.07426950692207132,
+            "is_t": 7.418157894754998,
+            "oos_mean_ic": 0.0440643619442224,
+            "oos_t": 2.9825657792768427,
+            "retention": 0.5933035477192242,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.1742883572842269,
+                "long_net_bps": -5.825711642715773,
+                "short_gross_bps": -0.13623468729851712,
+                "short_net_bps": -6.136234687298517,
+                "n_long": 23242,
+                "n_short": 23265,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.1742883572842269,
+                "long_net_bps": -5.825711642715773,
+                "short_gross_bps": -0.13623468729851712,
+                "short_net_bps": -6.136234687298517,
+                "n_long": 23242,
+                "n_short": 23265,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.1742883572842269,
+                "long_net_bps": -5.825711642715773,
+                "short_gross_bps": -0.13623468729851712,
+                "short_net_bps": -6.136234687298517,
+                "n_long": 23242,
+                "n_short": 23265,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": true,
+            "is_mean_ic": 0.05908785139206281,
+            "is_t": 5.060521907569351,
+            "oos_mean_ic": 0.03737973424392452,
+            "oos_t": 2.760262286056181,
+            "retention": 0.6326128529517945,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.3503266646502182,
+                "long_net_bps": -5.649673335349782,
+                "short_gross_bps": -0.30718891622426525,
+                "short_net_bps": -6.307188916224265,
+                "n_long": 23143,
+                "n_short": 23169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.3503266646502182,
+                "long_net_bps": -5.649673335349782,
+                "short_gross_bps": -0.30718891622426525,
+                "short_net_bps": -6.307188916224265,
+                "n_long": 23143,
+                "n_short": 23169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.3503266646502182,
+                "long_net_bps": -5.649673335349782,
+                "short_gross_bps": -0.30718891622426525,
+                "short_net_bps": -6.307188916224265,
+                "n_long": 23143,
+                "n_short": 23169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.03291616803269658,
+            "is_t": 5.582134463482518,
+            "oos_mean_ic": 0.01591175233605694,
+            "oos_t": 2.4413360408142193,
+            "retention": 0.4834023304368643,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.4723450436339223,
+                "long_net_bps": -4.527654956366078,
+                "short_gross_bps": -1.4431985704712982,
+                "short_net_bps": -7.443198570471298,
+                "n_long": 22345,
+                "n_short": 22385,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.4723450436339223,
+                "long_net_bps": -4.527654956366078,
+                "short_gross_bps": -1.4431985704712982,
+                "short_net_bps": -7.443198570471298,
+                "n_long": 22345,
+                "n_short": 22385,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.4723450436339223,
+                "long_net_bps": -4.527654956366078,
+                "short_gross_bps": -1.4431985704712982,
+                "short_net_bps": -7.443198570471298,
+                "n_long": 22345,
+                "n_short": 22385,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.019525370476653616,
+            "is_t": 5.1376040595082415,
+            "oos_mean_ic": 0.01875897938559875,
+            "oos_t": 1.173197968057961,
+            "retention": 0.9607489603349019,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 4.485891830819866,
+                "long_net_bps": -1.5141081691801341,
+                "short_gross_bps": -4.403949715742013,
+                "short_net_bps": -10.403949715742012,
+                "n_long": 20357,
+                "n_short": 20404,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 4.485891830819866,
+                "long_net_bps": -1.5141081691801341,
+                "short_gross_bps": -4.403949715742013,
+                "short_net_bps": -10.403949715742012,
+                "n_long": 20357,
+                "n_short": 20404,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 4.485891830819866,
+                "long_net_bps": -1.5141081691801341,
+                "short_gross_bps": -4.403949715742013,
+                "short_net_bps": -10.403949715742012,
+                "n_long": 20357,
+                "n_short": 20404,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "ofi_zvel_thin_gate",
+        "family": "R5D",
+        "mechanism": "Regime-crossing events active ONLY under THIN quoting: the ofi_z_cross_vel_15s base (velocity of the moment the 300s z of ofi_60s crosses zero within 15s) is zeroed UNLESS the raw quoted spread is below its trailing mean -- the comfortable, cheap-to-trade subset. The economic claim is the OPPOSITE of the wide-gate family: a book-flow regime switch is MORE informative when the spread is thin, because the arbitrage that closes the gap is cheapest to execute there -- informed participants can act on the crossing at minimum cost, so the new direction asserts itself fastest in the tight regime. Under wide spreads the same crossing faces an expensive toll and is slower to resolve; this spec is switched off there with no continuation claim. This is the first thin-gate spec in the library (all prior spread interactions gate the wide subset); the binary on/off in the cheap regime is a genuinely different economic question from any wide-gate sibling. Dedup note: the nonzero support is a strict subset of ofi_z_cross_vel_15s (round-3 admitted), so panel corr may be moderate, but the regime selection (thin half only) is the distinct input.",
+        "max_abs_corr_vs_panel": 0.214,
+        "panel_corr_factor": "ofi_15s",
+        "best_horizon_s": "15",
+        "horizons": {
+          "15": {
+            "passed": true,
+            "is_mean_ic": 0.02736234192960458,
+            "is_t": 5.373034179814715,
+            "oos_mean_ic": 0.03502225953812408,
+            "oos_t": 2.8200308184704275,
+            "retention": 1.2799437865452548,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 0.9383404255319149,
+                "long_net_bps": -5.061659574468085,
+                "short_gross_bps": 1.7238723404255318,
+                "short_net_bps": -4.276127659574469,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.8716424294268605,
+                "long_net_bps": -5.128357570573139,
+                "short_gross_bps": 0.8674679213002566,
+                "short_net_bps": -5.132532078699743,
+                "n_long": 1169,
+                "n_short": 1169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.15042188376004484,
+                "long_net_bps": -5.849578116239956,
+                "short_gross_bps": -0.011139039431881905,
+                "short_net_bps": -6.011139039431882,
+                "n_long": 21404,
+                "n_short": 21404,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.01983670033116054,
+            "is_t": 3.0840718711498445,
+            "oos_mean_ic": 0.03464762929971253,
+            "oos_t": 2.1878043191110033,
+            "retention": 1.7466427743169666,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.1706382978723406,
+                "long_net_bps": -4.82936170212766,
+                "short_gross_bps": 2.795191489361702,
+                "short_net_bps": -3.204808510638298,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.3848969072164947,
+                "long_net_bps": -4.615103092783505,
+                "short_gross_bps": 1.3732302405498282,
+                "short_net_bps": -4.6267697594501715,
+                "n_long": 1164,
+                "n_short": 1164,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.22259025143980896,
+                "long_net_bps": -5.777409748560191,
+                "short_gross_bps": -0.04062183929574828,
+                "short_net_bps": -6.040621839295748,
+                "n_long": 21357,
+                "n_short": 21356,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.011978216971323822,
+            "is_t": 2.2001873636918163,
+            "oos_mean_ic": 0.013474352959493036,
+            "oos_t": 0.9464831854824479,
+            "retention": 1.1249047326284876,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.489446808510638,
+                "long_net_bps": -3.510553191489362,
+                "short_gross_bps": 2.7690638297872345,
+                "short_net_bps": -3.2309361702127655,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.5459706643658326,
+                "long_net_bps": -4.454029335634168,
+                "short_gross_bps": 0.6102070750647108,
+                "short_net_bps": -5.389792924935289,
+                "n_long": 1159,
+                "n_short": 1159,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.34409991062608764,
+                "long_net_bps": -5.655900089373913,
+                "short_gross_bps": -0.20565863756115926,
+                "short_net_bps": -6.205658637561159,
+                "n_long": 21259,
+                "n_short": 21256,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.002416278367522505,
+            "is_t": 0.9581736879170092,
+            "oos_mean_ic": 0.009992723390089765,
+            "oos_t": 1.9063954607971134,
+            "retention": 4.135584510627248,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.21537777777777792,
+                "long_net_bps": -6.215377777777778,
+                "short_gross_bps": -0.8866666666666653,
+                "short_net_bps": -6.886666666666665,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 3.1471403038427166,
+                "long_net_bps": -2.8528596961572834,
+                "short_gross_bps": -0.6195084897229669,
+                "short_net_bps": -6.619508489722967,
+                "n_long": 1119,
+                "n_short": 1119,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.3409550753621766,
+                "long_net_bps": -4.659044924637824,
+                "short_gross_bps": -1.258270394223263,
+                "short_net_bps": -7.258270394223263,
+                "n_long": 20501,
+                "n_short": 20496,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.0014056300147445755,
+            "is_t": 0.685556267886791,
+            "oos_mean_ic": 0.00900380605487477,
+            "oos_t": 1.2979088138233992,
+            "retention": 6.40553058801245,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -5.604097560975611,
+                "long_net_bps": -11.60409756097561,
+                "short_gross_bps": 1.5420975609756093,
+                "short_net_bps": -4.457902439024391,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 3.9834641805691855,
+                "long_net_bps": -2.0165358194308145,
+                "short_gross_bps": -0.7897841020608444,
+                "short_net_bps": -6.789784102060844,
+                "n_long": 1019,
+                "n_short": 1019,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 4.636883326171035,
+                "long_net_bps": -1.3631166738289648,
+                "short_gross_bps": -4.450610313491423,
+                "short_net_bps": -10.450610313491424,
+                "n_long": 18616,
+                "n_short": 18597,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "depth5_imb_z_velneg_gate_15s",
+        "family": "R5B",
+        "mechanism": "Decay-isolated visible-depth level: z_300(depth5_imb) scored only when its own 15s z-velocity is negative (regime actively fading), zeroed otherwise. The depth5_imb base is the flat-weighted (non-exp-decayed) top-5 imbalance, proportionally more sensitive to level 3-5 queue fills than the engine wdi. When this visible-stack regime is stretched (high |z|) and its velocity turns negative, the crowded queue is being ABANDONED -- resting orders pulled across multiple levels -- and the stretched level reverts at 15-60s as the phantom depth disappears. The one-sided gate (dz < 0 only) makes NO claim during build-up, where the level may continue. This is the mirror image of oir_z_velpos_gate_15s: decay-side rather than build-up-side, and on the broader visible depth base. Distinct from library depth5_imb_zvel_extreme_15s (round-4 product form): the gate is a binary velocity-sign filter, not a magnitude-weighted product.",
+        "max_abs_corr_vs_panel": 0.361,
+        "panel_corr_factor": "wdi",
+        "best_horizon_s": "900",
+        "horizons": {
+          "15": {
+            "passed": false,
+            "is_mean_ic": 0.15101969243276528,
+            "is_t": 14.545702448111633,
+            "oos_mean_ic": 0.056198364405119425,
+            "oos_t": 7.915201045989923,
+            "retention": 0.3721260684605037,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.246,
+                "long_net_bps": -3.754,
+                "short_gross_bps": 1.560468085106383,
+                "short_net_bps": -4.439531914893617,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.8313117546848382,
+                "long_net_bps": -5.1686882453151615,
+                "short_gross_bps": 1.5743611584327089,
+                "short_net_bps": -4.425638841567292,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.3216645326504482,
+                "long_net_bps": -5.678335467349552,
+                "short_gross_bps": 1.2534314980793855,
+                "short_net_bps": -4.746568501920614,
+                "n_long": 2343,
+                "n_short": 2343,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": 0.1479641051909977,
+            "is_t": 7.666785938439245,
+            "oos_mean_ic": 0.04946885827262794,
+            "oos_t": 4.917820447618443,
+            "retention": 0.3343301283022099,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.9715744680851055,
+                "long_net_bps": -4.028425531914895,
+                "short_gross_bps": 1.2085531914893617,
+                "short_net_bps": -4.7914468085106385,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.9341659538066724,
+                "long_net_bps": -5.065834046193327,
+                "short_gross_bps": 1.6281608212147134,
+                "short_net_bps": -4.371839178785287,
+                "n_long": 1169,
+                "n_short": 1169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.4833319076133447,
+                "long_net_bps": -5.516668092386655,
+                "short_gross_bps": 1.341441402908469,
+                "short_net_bps": -4.658558597091531,
+                "n_long": 2338,
+                "n_short": 2338,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.13941471242984615,
+            "is_t": 4.94961856216426,
+            "oos_mean_ic": 0.040861065686625564,
+            "oos_t": 4.480094344632342,
+            "retention": 0.293090054661103,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.316595744680851,
+                "long_net_bps": -4.683404255319149,
+                "short_gross_bps": 1.1467234042553192,
+                "short_net_bps": -4.853276595744681,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.7057989690721649,
+                "long_net_bps": -4.294201030927836,
+                "short_gross_bps": 1.4064604810996564,
+                "short_net_bps": -4.593539518900344,
+                "n_long": 1164,
+                "n_short": 1164,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.034965635738832,
+                "long_net_bps": -4.965034364261168,
+                "short_gross_bps": 1.3546864261168385,
+                "short_net_bps": -4.645313573883161,
+                "n_long": 2328,
+                "n_short": 2328,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": 0.08669577034878603,
+            "is_t": 3.883867977872429,
+            "oos_mean_ic": 0.016814330025235167,
+            "oos_t": 0.9385198456090974,
+            "retention": 0.1939463708274277,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.030622222222221,
+                "long_net_bps": -2.969377777777779,
+                "short_gross_bps": -0.36382222222222155,
+                "short_net_bps": -6.363822222222222,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.11075622775800725,
+                "long_net_bps": -5.889243772241993,
+                "short_gross_bps": -0.24212633451957238,
+                "short_net_bps": -6.242126334519573,
+                "n_long": 1124,
+                "n_short": 1124,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.034105871886120936,
+                "long_net_bps": -5.965894128113879,
+                "short_gross_bps": -0.30018683274021324,
+                "short_net_bps": -6.300186832740213,
+                "n_long": 2248,
+                "n_short": 2248,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": 0.06238262466138357,
+            "is_t": 4.606772588344316,
+            "oos_mean_ic": 0.0413334875209492,
+            "oos_t": 2.3984048309588126,
+            "retention": 0.6625801294079837,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -1.7114634146341425,
+                "long_net_bps": -7.711463414634142,
+                "short_gross_bps": 5.094146341463415,
+                "short_net_bps": -0.9058536585365848,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 4.0912500000000005,
+                "long_net_bps": -1.9087499999999995,
+                "short_gross_bps": -1.9962109374999994,
+                "short_net_bps": -7.996210937499999,
+                "n_long": 1024,
+                "n_short": 1024,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 5.4739208984375,
+                "long_net_bps": -0.5260791015624999,
+                "short_gross_bps": -1.7707763671874992,
+                "short_net_bps": -7.7707763671875,
+                "n_long": 2048,
+                "n_short": 2048,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "ltns_z_cross_vel_15s",
+        "family": "R5A",
+        "mechanism": "Large-trade direction regime reversal events: the trailing-300s z of large_trade_net_share_60s crosses zero within 15s. ltns attributes a SIGNED net direction to the largest ~10% of prints (+ when biggest tickets are buyer-initiated, - when seller-initiated). Unlike the direction-free large_trade_share_60s whose LEVEL died in iter-002 (no sign = no directional information), ltns carries the direction of whale flow. A zero-crossing of its 300s z means the institutional big-ticket flow has just switched from net-buying-above-norm to net-selling-above-norm (or vice versa) -- the whales have changed direction. The crossing VELOCITY scores how decisive the hand-off is: a fast cross marks a program switching sides (information-driven re-direction), whose new direction continues at 15-60s while the program executes. Event-sparse (0 off crossings). DEDUP: library ltns_z_180s is the pure LEVEL z (180s window, state only, no velocity); library ltns_delta_60s is a raw unnormalized 60s delta; library ltns_confirms_ofi_z and ltns_confirms_ti15_z cross ltns with OTHER flow signals. Here the ltns z is crossed with ITS OWN velocity, and only the regime-reversal EVENT is scored -- a different economic question from all four library factors.",
+        "max_abs_corr_vs_panel": 0.274,
+        "panel_corr_factor": "trade_imbalance_15s",
+        "best_horizon_s": "300",
+        "horizons": {
+          "15": {
+            "passed": false,
+            "is_mean_ic": 0.030654427864268696,
+            "is_t": 8.05521961416339,
+            "oos_mean_ic": 0.008164926227751725,
+            "oos_t": 1.30792483732456,
+            "retention": 0.26635389392698133,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -0.22804255319148872,
+                "long_net_bps": -6.2280425531914885,
+                "short_gross_bps": 0.9907234042553192,
+                "short_net_bps": -5.009276595744681,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.4811291702309667,
+                "long_net_bps": -5.518870829769034,
+                "short_gross_bps": 0.40169375534644997,
+                "short_net_bps": -5.59830624465355,
+                "n_long": 1169,
+                "n_short": 1169,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.03774539219888559,
+                "long_net_bps": -5.962254607801114,
+                "short_gross_bps": 0.3644749249892842,
+                "short_net_bps": -5.635525075010716,
+                "n_long": 2333,
+                "n_short": 2333,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": true,
+            "is_mean_ic": 0.02601389620133256,
+            "is_t": 6.066125517133628,
+            "oos_mean_ic": 0.018255281234181072,
+            "oos_t": 2.108208730912463,
+            "retention": 0.7017511368883661,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -1.4433617021276592,
+                "long_net_bps": -7.4433617021276595,
+                "short_gross_bps": 1.796255319148936,
+                "short_net_bps": -4.203744680851064,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.2022336769759452,
+                "long_net_bps": -5.797766323024055,
+                "short_gross_bps": 0.8898883161512027,
+                "short_net_bps": -5.110111683848797,
+                "n_long": 1164,
+                "n_short": 1164,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": -0.01953178694158083,
+                "long_net_bps": -6.019531786941581,
+                "short_gross_bps": 0.6726932989690722,
+                "short_net_bps": -5.327306701030928,
+                "n_long": 2328,
+                "n_short": 2328,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": 0.02394196886560001,
+            "is_t": 6.742011627666984,
+            "oos_mean_ic": 0.000767408869748029,
+            "oos_t": 0.06476206723437186,
+            "retention": 0.032052872261923604,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -2.897021276595744,
+                "long_net_bps": -8.897021276595744,
+                "short_gross_bps": 0.7968510638297868,
+                "short_net_bps": -5.203148936170213,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.8176100086281276,
+                "long_net_bps": -5.182389991371872,
+                "short_gross_bps": -0.15894736842105261,
+                "short_net_bps": -6.158947368421052,
+                "n_long": 1159,
+                "n_short": 1159,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.5432743744607422,
+                "long_net_bps": -5.456725625539258,
+                "short_gross_bps": -0.32284296807592755,
+                "short_net_bps": -6.3228429680759275,
+                "n_long": 2318,
+                "n_short": 2318,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": true,
+            "is_mean_ic": 0.011816572650071135,
+            "is_t": 5.827090722604243,
+            "oos_mean_ic": 0.008952258072536034,
+            "oos_t": 2.196132307377366,
+            "retention": 0.7576019153474373,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 4.043688888888889,
+                "long_net_bps": -1.956311111111111,
+                "short_gross_bps": -0.5410222222222212,
+                "short_net_bps": -6.541022222222221,
+                "n_long": 225,
+                "n_short": 225,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 3.9811974977658626,
+                "long_net_bps": -2.0188025022341374,
+                "short_gross_bps": -2.6145397676496875,
+                "short_net_bps": -8.614539767649688,
+                "n_long": 1119,
+                "n_short": 1119,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 2.9468275245755144,
+                "long_net_bps": -3.0531724754244856,
+                "short_gross_bps": -2.174106344950849,
+                "short_net_bps": -8.174106344950848,
+                "n_long": 2238,
+                "n_short": 2238,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": false,
+            "is_mean_ic": 0.008340810902922883,
+            "is_t": 3.1153747363734667,
+            "oos_mean_ic": -0.0017091331146504743,
+            "oos_t": -0.45148554984894324,
+            "retention": 0.20491210441559587,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 3.3183414634146335,
+                "long_net_bps": -2.6816585365853665,
+                "short_gross_bps": -3.9167804878048753,
+                "short_net_bps": -9.916780487804875,
+                "n_long": 205,
+                "n_short": 205,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 7.714573110893031,
+                "long_net_bps": 1.7145731108930313,
+                "short_gross_bps": -6.606614327772328,
+                "short_net_bps": -12.606614327772327,
+                "n_long": 1019,
+                "n_short": 1019,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 5.747914622178608,
+                "long_net_bps": -0.25208537782139206,
+                "short_gross_bps": -6.573228655544653,
+                "short_net_bps": -12.573228655544654,
+                "n_long": 2038,
+                "n_short": 2038,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "vis_hid_share_x_ofi_60s",
+        "family": "R5D",
+        "mechanism": "Passive flow on a concentrated touch: the 300s z of the visible (top-5) share of total depth multiplied by the raw ofi_60s. When depth concentrates at the touch (visible share unusually HIGH) the hidden buffer behind the executable tip is thin, so passive book-building flow (OFI: limit placements and cancels at the touch) carries through more forcefully -- the visible layer is the only thing absorbing the flow with no deep reserve to dampen it. Positive OFI (bid-side building) under high visible share predicts up-moves at 15-60s; negative predicts down. Conversely, the same OFI with LOW visible share (depth parked deep, hidden-heavy book) is buffered by the hidden reservoir and carries less information. Distinct from the dead vis_share_x_ti (round-3 rejected, which used the ACTIVE trade channel trade_imbalance instead of the PASSIVE limit channel): OFI is the leading microstructure flow variable (Cont-Kukanov-Stoikov 2014: OFI dominates signed volume for short-horizon prediction), and the passive-channel interaction with book structure tests whether LIMIT-ORDER flow is what the concentrated touch amplifies. Product of a sign-blind shape z and a signed flow, structurally different from both parents.",
+        "max_abs_corr_vs_panel": 0.053,
+        "panel_corr_factor": "wdi",
+        "best_horizon_s": "900",
+        "horizons": {
+          "15": {
+            "passed": false,
+            "is_mean_ic": -0.01175400348431242,
+            "is_t": -3.0173556275923126,
+            "oos_mean_ic": 0.0002500139307520501,
+            "oos_t": 0.017952532720401378,
+            "retention": 0.021270534000243684,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 1.0353191489361704,
+                "long_net_bps": -4.96468085106383,
+                "short_gross_bps": -0.48119148936170164,
+                "short_net_bps": -6.481191489361701,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.37528109028960815,
+                "long_net_bps": -5.624718909710392,
+                "short_gross_bps": -0.29668654173764897,
+                "short_net_bps": -6.296686541737649,
+                "n_long": 1174,
+                "n_short": 1174,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.0651278772378517,
+                "long_net_bps": -5.934872122762148,
+                "short_gross_bps": -0.34884484228473994,
+                "short_net_bps": -6.34884484228474,
+                "n_long": 2346,
+                "n_short": 2346,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "30": {
+            "passed": false,
+            "is_mean_ic": -0.007653644629119182,
+            "is_t": -1.4696223507668151,
+            "oos_mean_ic": 0.001139328740392142,
+            "oos_t": 0.05882432948167928,
+            "retention": 0.14886094084606868,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 2.831191489361702,
+                "long_net_bps": -3.168808510638298,
+                "short_gross_bps": -2.0535319148936173,
+                "short_net_bps": -8.053531914893618,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.9024914675767918,
+                "long_net_bps": -5.097508532423208,
+                "short_gross_bps": -0.9851877133105801,
+                "short_net_bps": -6.98518771331058,
+                "n_long": 1172,
+                "n_short": 1172,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.2963135412217001,
+                "long_net_bps": -5.7036864587783,
+                "short_gross_bps": -0.6461170439982914,
+                "short_net_bps": -6.6461170439982915,
+                "n_long": 2341,
+                "n_short": 2341,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "60": {
+            "passed": false,
+            "is_mean_ic": -0.004444038661896507,
+            "is_t": -0.8400553302161415,
+            "oos_mean_ic": -0.012149459923794086,
+            "oos_t": -0.8879527915530784,
+            "retention": 2.7338780888574146,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": 5.014510638297871,
+                "long_net_bps": -0.985489361702129,
+                "short_gross_bps": -2.411106382978721,
+                "short_net_bps": -8.411106382978721,
+                "n_long": 235,
+                "n_short": 235,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.5728020565552698,
+                "long_net_bps": -4.42719794344473,
+                "short_gross_bps": -1.5476092544987146,
+                "short_net_bps": -7.547609254498715,
+                "n_long": 1167,
+                "n_short": 1167,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.8626383526383526,
+                "long_net_bps": -5.137361647361647,
+                "short_gross_bps": -0.9752852852852851,
+                "short_net_bps": -6.975285285285285,
+                "n_long": 2331,
+                "n_short": 2331,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "300": {
+            "passed": false,
+            "is_mean_ic": -0.016968758719672253,
+            "is_t": -1.7357446704794441,
+            "oos_mean_ic": -0.029449843477442367,
+            "oos_t": -0.888178154986322,
+            "retention": 1.7355331620868957,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -2.5933039647577076,
+                "long_net_bps": -8.593303964757707,
+                "short_gross_bps": -3.1402643171806184,
+                "short_net_bps": -9.140264317180618,
+                "n_long": 227,
+                "n_short": 227,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 1.3358385093167702,
+                "long_net_bps": -4.66416149068323,
+                "short_gross_bps": -2.9605767524401063,
+                "short_net_bps": -8.960576752440106,
+                "n_long": 1127,
+                "n_short": 1127,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 0.7572501110617504,
+                "long_net_bps": -5.242749888938249,
+                "short_gross_bps": -2.368533984895602,
+                "short_net_bps": -8.368533984895603,
+                "n_long": 2251,
+                "n_short": 2251,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          },
+          "900": {
+            "passed": true,
+            "is_mean_ic": -0.03517441422339829,
+            "is_t": -2.8723761314502334,
+            "oos_mean_ic": -0.08559299103153842,
+            "oos_t": -2.098441007874415,
+            "retention": 2.433387816721659,
+            "head_stats": [
+              {
+                "tau": 0.01,
+                "long_gross_bps": -4.765942028985505,
+                "long_net_bps": -10.765942028985505,
+                "short_gross_bps": -9.573091787439614,
+                "short_net_bps": -15.573091787439614,
+                "n_long": 207,
+                "n_short": 207,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.05,
+                "long_gross_bps": 0.41717624148003835,
+                "long_net_bps": -5.582823758519962,
+                "short_gross_bps": -7.591421616358325,
+                "short_net_bps": -13.591421616358325,
+                "n_long": 1027,
+                "n_short": 1027,
+                "n_days_long": 5,
+                "n_days_short": 5
+              },
+              {
+                "tau": 0.1,
+                "long_gross_bps": 1.2636031204290583,
+                "long_net_bps": -4.7363968795709415,
+                "short_gross_bps": -9.275631399317406,
+                "short_net_bps": -15.275631399317406,
+                "n_long": 2051,
+                "n_short": 2051,
+                "n_days_long": 5,
+                "n_days_short": 5
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "death_map": {
+      "by_family_dominant_mode": {
+        "R5A/is_dead": [
+          "rv60_logz_cross_vel_15s",
+          "rv300_logz_cross_vel_60s",
+          "rv300_logzvel_div_15s"
+        ],
+        "R5A/oos_collapse": [
+          "iopv_prem_zvel_extreme_60s",
+          "iopv_prem_zvel_div_60s",
+          "rv60_logzvel_extreme_15s",
+          "rv60_logzvel_div_60s",
+          "ltns_zvel_div_60s",
+          "event_int_z_cross_vel_15s",
+          "event_int_zvel_extreme_60s"
+        ],
+        "R5B/is_dead": [
+          "microprice_dev_z_accel_sign_15s",
+          "ofi_z_accel_sign_15s",
+          "wdi_vel15_x_vel60",
+          "fullbook_imb_vel15_x_vel60",
+          "ti60_vel15_x_vel60",
+          "oir_z_x_velfrac_15s",
+          "ofi_z_x_vel_15s"
+        ],
+        "R5B/oos_collapse": [
+          "fullbook_imb_z_x_vel_15s"
+        ],
+        "R5C/is_dead": [
+          "wdi_zvel_x_rv_regime",
+          "wdi_zvel_x_ofi_sign",
+          "wdi_zvel_x_oir_zvel",
+          "oir_zcross_x_fullbook_imb_zvel"
+        ],
+        "R5C/oos_collapse": [
+          "fullbook_imb_zcross_x_rv_regime",
+          "fullbook_imb_zcross_x_ti_sign",
+          "fullbook_imb_zcross_x_wdi_zvel"
+        ],
+        "R5D/is_dead": [
+          "ofi_pdepth_wide_walk",
+          "div_vis_wide_walk",
+          "hidden_ask_x_ltns_15s"
+        ],
+        "R5D/oos_collapse": [
+          "hidden_bid_x_buyvel_15s",
+          "hidden_ask_x_sellvel_15s",
+          "hidden_imb_x_ti_agree_60s",
+          "hidden_imb_x_ti_disagree_60s",
+          "hidden_bid_x_ltns_15s"
+        ]
+      },
+      "notes": [
+        "R5A: z-velocity template does NOT generalize to volatility/premium/intensity state -- rv60/rv300/iopv_premium/event_int z-vel all IS-dead or OOS-collapse; only lastgap & ltns (gap/large-trade state) survive. Template is book/trade-imbalance + gap specific.",
+        "R5B: raw velocity products (vel15_x_vel60), z_x_vel (non-extreme), and sign-gated accel are IS-dead -- extremeness weighting is essential; bare acceleration dies.",
+        "R5C: stacking two book-imbalance signals (fullbook_x_wdi_zvel, wdi_x_oir_zvel, fullbook_x_oir_zvel) collapses -- one economic dimension, cross-multiply adds nothing. spread_z remains the ONLY live conditioning gate (rv_regime/ti_sign/ofi_sign die).",
+        "R5D: _spread_wide_gate degenerates to rho>=0.999 CLONES of its base on 588000 (spread too tight/constant for the multiplier to add info) -- 4/4 killed as clones. hidden-depth x trade-velocity all OOS-collapse."
+      ]
+    },
+    "lessons": [
+      "BREAKTHROUGH: z-ACCELERATION (2nd derivative) extremeness beats z-velocity. oir_zaccel_extreme_15s OOS t=27.74 across all 5 horizons (30s) -- strongest signal in the project. The acceleration (change-of-velocity) of a stretched book regime, extremeness-weighted, is the new primary direction: extend to fullbook_imb, depth5_imb, microprice_dev, ti60.",
+      "z-velocity template is book/trade-imbalance + gap SPECIFIC: it dies on rv, iopv_premium, event_int state (R5A 10/14 fail). Volatility and premium levels do not carry the z-vs-velocity mismatch signal. Stop applying it to vol/premium.",
+      "Extremeness weighting is mandatory: bare z_x_vel, vel15_x_vel60, z_accel_sign all IS-dead; only the extreme/2sigma-weighted variants live (2sig_extreme passed on wdi & microprice).",
+      "spread_z is the ONLY live conditioning gate (3/3 zcross_x_spread_z pass); rv_regime / ti_sign / ofi_sign gates on zcross all die. spread-z gating now near saturated across the library.",
+      "wide_gate (x spread LEVEL) is a DEAD END on 588000: 4/4 are rho>=0.999 clones of their base (spread too tight/constant). Stop multiplying by spread level.",
+      "Cross-multiplying two book-imbalance signals collapses (rho-high, OOS-collapse): the book-imbalance family is one economic dimension.",
+      "NEW dedup rule worked: killed the weaker twin in 2 batch pairs (lastgap z_cross_vel < zvel_extreme; wdi_zaccel < oir_zaccel t 13 vs 28) instead of first-in, and kept library on 4 rho~1.0 clones where t was identical."
+    ],
+    "artifacts": {
+      "candidates_key": "iter003_round5",
+      "reports": "scratch-iter003/reports_round5/ (23 PASS JSON), round5_all.json (56)",
+      "detail": "round5_admitted_detail.json, round5_deathmap.json",
+      "corr": "iter003_round5_corr.json/.txt (pooled Spearman 92 factors x ~307k rows)",
+      "server_log": "/data/factor_lzt/logs/iter003_round5.log"
+    }
   }
 }

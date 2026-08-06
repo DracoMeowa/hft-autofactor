@@ -149,7 +149,7 @@ def run_prototype(
     dates: Sequence[str],
     *,
     chunk_days: int = 5,
-    k: int = 4,
+    k: int = 8,
     overwrite: bool = False,
 ) -> RunResult:
     """Compute one prototype over ``dates`` with the causality gate armed.

@@ -1,0 +1,59 @@
+{
+ "by_family_dominant_mode": {
+  "R5A/is_dead": [
+   "rv60_logz_cross_vel_15s",
+   "rv300_logz_cross_vel_60s",
+   "rv300_logzvel_div_15s"
+  ],
+  "R5A/oos_collapse": [
+   "iopv_prem_zvel_extreme_60s",
+   "iopv_prem_zvel_div_60s",
+   "rv60_logzvel_extreme_15s",
+   "rv60_logzvel_div_60s",
+   "ltns_zvel_div_60s",
+   "event_int_z_cross_vel_15s",
+   "event_int_zvel_extreme_60s"
+  ],
+  "R5B/is_dead": [
+   "microprice_dev_z_accel_sign_15s",
+   "ofi_z_accel_sign_15s",
+   "wdi_vel15_x_vel60",
+   "fullbook_imb_vel15_x_vel60",
+   "ti60_vel15_x_vel60",
+   "oir_z_x_velfrac_15s",
+   "ofi_z_x_vel_15s"
+  ],
+  "R5B/oos_collapse": [
+   "fullbook_imb_z_x_vel_15s"
+  ],
+  "R5C/is_dead": [
+   "wdi_zvel_x_rv_regime",
+   "wdi_zvel_x_ofi_sign",
+   "wdi_zvel_x_oir_zvel",
+   "oir_zcross_x_fullbook_imb_zvel"
+  ],
+  "R5C/oos_collapse": [
+   "fullbook_imb_zcross_x_rv_regime",
+   "fullbook_imb_zcross_x_ti_sign",
+   "fullbook_imb_zcross_x_wdi_zvel"
+  ],
+  "R5D/is_dead": [
+   "ofi_pdepth_wide_walk",
+   "div_vis_wide_walk",
+   "hidden_ask_x_ltns_15s"
+  ],
+  "R5D/oos_collapse": [
+   "hidden_bid_x_buyvel_15s",
+   "hidden_ask_x_sellvel_15s",
+   "hidden_imb_x_ti_agree_60s",
+   "hidden_imb_x_ti_disagree_60s",
+   "hidden_bid_x_ltns_15s"
+  ]
+ },
+ "notes": [
+  "R5A: z-velocity template does NOT generalize to volatility/premium/intensity state -- rv60/rv300/iopv_premium/event_int z-vel all IS-dead or OOS-collapse; only lastgap & ltns (gap/large-trade state) survive. Template is book/trade-imbalance + gap specific.",
+  "R5B: raw velocity products (vel15_x_vel60), z_x_vel (non-extreme), and sign-gated accel are IS-dead -- extremeness weighting is essential; bare acceleration dies.",
+  "R5C: stacking two book-imbalance signals (fullbook_x_wdi_zvel, wdi_x_oir_zvel, fullbook_x_oir_zvel) collapses -- one economic dimension, cross-multiply adds nothing. spread_z remains the ONLY live conditioning gate (rv_regime/ti_sign/ofi_sign die).",
+  "R5D: _spread_wide_gate degenerates to rho>=0.999 CLONES of its base on 588000 (spread too tight/constant for the multiplier to add info) -- 4/4 killed as clones. hidden-depth x trade-velocity all OOS-collapse."
+ ]
+}
